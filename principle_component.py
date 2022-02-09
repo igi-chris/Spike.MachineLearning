@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, List, Dict
+from typing import Iterable, List, Dict, Optional
 import json
 import uuid
 
@@ -38,16 +38,23 @@ def build_components(trained_model: PCA) -> Iterable[Component]:
             eigenvector=trained_model.components_[i].tolist())
 
 
-def to_json(components: Iterable[Component], model: PCA) -> str:
+def build_interpretation_response(components: Iterable[Component], 
+                                  model: PCA,
+                                  ref: Optional[str] = None) -> str:
     com = [ob.__dict__ for ob in components]
-    ref = str(uuid.uuid4())
-    ref_to_model[ref] = model
+    if ref is None:
+        ref = str(uuid.uuid4())
+        ref_to_model[ref] = model
 
     resp = {
-        "components": com,
+        "ref": ref,
         "means": model.mean_.tolist(),
-        "ref": ref
+        "components": com,
     }
     return json.dumps(resp, indent=4)
 
 
+def build_transformed_data_response(ref: str, data: List[List[float]]) -> str:
+    model = ref_to_model[ref]
+    transformed_data = model.transform(data).tolist()
+    return json.dumps(transformed_data, indent=4)
