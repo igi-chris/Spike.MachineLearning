@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from typing import Iterable, List
+from typing import Iterable, List, Any
 import json
 
 from sklearn.decomposition import PCA
+from skl2onnx import to_onnx
+import numpy as np
 
 
 @dataclass()
@@ -13,6 +15,12 @@ class Component:
     singular_value: float
     eigenvalue: float
     eigenvector: List[float]
+
+
+@dataclass
+class PcaResponse:
+    data: Iterable[Component]
+    onnx_model: bytes
 
 
 def build_components(trained_model: PCA) -> Iterable[Component]:
@@ -32,5 +40,12 @@ def build_components(trained_model: PCA) -> Iterable[Component]:
             eigenvector=trained_model.components_[i].tolist())
 
 
-def to_json(components: Iterable[Component]) -> str:
-    return json.dumps([ob.__dict__ for ob in components], indent=4)
+def to_json(components: Iterable[Component], model: PCA, data_for_types: Any) -> str:
+    onx = to_onnx(model, np.array(data_for_types))
+    serialised_onx = onx.SerializeToString()
+    #resp_obj = PcaResponse(data=components, onnx_model=serialised_onx)
+
+    json_dict = {"data": serialised_onx}
+    json_dict["onnx_model"] = [ob.__dict__ for ob in components]
+
+    return json.dumps(json_dict, indent=4)
