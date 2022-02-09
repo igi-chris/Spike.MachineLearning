@@ -19,7 +19,7 @@ def pca() -> Response:
     model.fit(data)
 
     pcs = build_components(model)
-    resp_json = to_json(pcs)
+    resp_json = to_json(pcs, model)
     return make_response(resp_json, HTTPStatus.ACCEPTED)
 
 if __name__ =='__main__':
