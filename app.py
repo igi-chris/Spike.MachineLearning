@@ -6,13 +6,13 @@ import joblib
 from sklearn.decomposition import PCA
 from flask import Flask, Response, make_response, request, send_file
 
-from principle_component import (
-    build_components, ref_to_model, 
-    build_interpretation_response,
-    build_transformed_data_response
-) 
+from pca.principle_component import build_interpretation_json, build_transformed_data_json
+from pca.model_register import get_model, register_model
+
 
 app = Flask("ml_service")
+models_dir = "./models"
+os.makedirs(models_dir, exist_ok=True)
 
 
 @app.route("/")
@@ -24,10 +24,7 @@ def train_pca() -> Response:
     data = request.json
     model = PCA()
     model.fit(data)
-
-    pcs = build_components(model)
-    resp_json = build_interpretation_response(pcs, model)
-    return make_response(resp_json, HTTPStatus.ACCEPTED)
+    return make_response(build_interpretation_json(model), HTTPStatus.ACCEPTED)
 
 
 @app.route("/pca/apply", methods=['POST'])
@@ -39,7 +36,7 @@ def apply_pca() -> Response:
         return make_response("ref and data keys expected", HTTPStatus.BAD_REQUEST)
 
     try: 
-        resp_json = build_transformed_data_response(ref, data)
+        resp_json = build_transformed_data_json(ref, data)
     except KeyError:
         return make_response(f"ref {ref} not found", HTTPStatus.INTERNAL_SERVER_ERROR)
 
@@ -47,19 +44,38 @@ def apply_pca() -> Response:
 
 
 @app.route("/pca/get-model", methods=['GET'])
-def get_model() -> Response:
+def get_serialised_model() -> Response:
     ref = request.args["ref"]   # TODO : handle err resp
-    model = ref_to_model[ref]
-    
-    models_dir = "./models"
-    os.makedirs(models_dir, exist_ok=True)
+    model = get_model(ref)    
 
     fpath = joblib.dump(model, os.path.join(models_dir, f"pca_{ref}.joblib"), 
                         compress=True)[0]
     return make_response(send_file(fpath, as_attachment=True), HTTPStatus.OK)
 
+
+@app.route("/pca/rebuild", methods=['Post'])
+def rebuild_model_from_file() -> Response:
+    uploaded_file = request.files['file']
+    if not uploaded_file.filename:
+        return make_response("Compressed model must be provided as a .joblib file", 
+                             HTTPStatus.BAD_REQUEST)
+    
+    tmp_path = os.path.join(models_dir, 'temp.joblib')    
+    uploaded_file.save(tmp_path)
+    model = joblib.load(tmp_path)
+    return make_response(build_interpretation_json(model), HTTPStatus.ACCEPTED)
+
+
 if __name__ =='__main__':
     import sys
     # to allow debugging, deployed version will start service using WSGI server
     if sys.argv[-1].startswith('local'):  
+        # load test case into memory
+        test_ref = 'keep_test_case'
+        test_model_path = os.path.join(models_dir, f'pca_{test_ref}.joblib')
+        if os.path.exists(test_model_path):
+            model = joblib.load(test_model_path)
+            register_model(model, as_ref=test_ref)
+
+        # start web server
         app.run(port=5000)
