@@ -64,6 +64,8 @@ def rebuild_model_from_file() -> Response:
     uploaded_file.save(tmp_path)
     model = joblib.load(tmp_path)
     return make_response(build_interpretation_json(model), HTTPStatus.ACCEPTED)
+    # TODO: parse ref from filename to rebuild as the same ref?
+    #       or build ref from md5 hash so that the same file will automatically get the same ref?
 
 
 if __name__ =='__main__':

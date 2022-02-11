@@ -12,8 +12,8 @@ from pca.model_register import register_model, has_model, get_model
 class Component:
     name: str
     proportion: float
-    cumulative_proportion: float
-    singular_value: float
+    cumulativeproportion: float
+    singularvalue: float
     eigenvalue: float
     eigenvector: List[float]
 
@@ -28,9 +28,9 @@ def build_components(trained_model: PCA) -> Iterable[Component]:
         prop = trained_model.explained_variance_ratio_[i]
         cumulative_prop += prop
         yield Component(name=f"PC{i+1}",
-            proportion=prop,
-            cumulative_proportion=cumulative_prop,
-            singular_value=sv,
+            proportion=prop * 100,
+            cumulativeproportion=cumulative_prop * 100,
+            singularvalue=sv,
             eigenvalue=sv**2,
             eigenvector=trained_model.components_[i].tolist())
 
