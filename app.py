@@ -10,6 +10,11 @@ from pca.principle_component import build_interpretation_json, build_transformed
 from pca.model_register import get_model, register_model
 
 
+# TODO: Consider error handling (see https://flask.palletsprojects.com/en/2.0.x/errorhandling/)
+#       Would be preferable to pass error details back to pigi, not just 500
+#       * Catch warnings (https://stackoverflow.com/a/5645133/2012446)
+#         e.g. sklearn warning (https://github.com/Prosserc/python_notebooks/blob/master/learning/sklearn/ICA.ipynb)
+
 app = Flask("ml_service")
 models_dir = "./models"
 os.makedirs(models_dir, exist_ok=True)
