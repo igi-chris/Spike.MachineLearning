@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import Iterable, List, Dict, Optional
+from typing import Iterable, List, Optional
 import json
-import uuid
 
 from sklearn.decomposition import PCA
 
-from pca.model_register import register_model, has_model, get_model
+from common.model_register import register_model, has_model, get_model
 
 
 @dataclass()

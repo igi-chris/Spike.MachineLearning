@@ -1,14 +1,12 @@
 from http import HTTPStatus
-from http.client import OK
 import os
 import joblib
 
-from sklearn.decomposition import PCA
-from flask import Flask, Response, make_response, request, send_file
+from flask import Flask, Response, make_response, render_template
 
-from pca.principle_component import build_interpretation_json, build_transformed_data_json
-from pca.model_register import get_model, register_model
-
+from literals import models_dir
+from app_pca import pca_blueprint
+from common.model_register import register_model
 
 # TODO: Consider error handling (see https://flask.palletsprojects.com/en/2.0.x/errorhandling/)
 #       Would be preferable to pass error details back to pigi, not just 500
@@ -16,68 +14,21 @@ from pca.model_register import get_model, register_model
 #         e.g. sklearn warning (https://github.com/Prosserc/python_notebooks/blob/master/learning/sklearn/ICA.ipynb)
 
 app = Flask("ml_service")
-models_dir = "./models"
-os.makedirs(models_dir, exist_ok=True)
+app.register_blueprint(pca_blueprint)
 
 
 @app.route("/")
 def connection_test() -> Response:
     return make_response("Request Successful", HTTPStatus.ACCEPTED)
 
-@app.route("/pca/train", methods=['POST'])
-def train_pca() -> Response:
-    data = request.json
-    model = PCA()
-    model.fit(data)
-    return make_response(build_interpretation_json(model), HTTPStatus.ACCEPTED)
 
-
-@app.route("/pca/apply", methods=['POST'])
-def apply_pca() -> Response:
-    try:
-        ref = request.json["ref"]  # type: ignore
-        data = request.json["data"]  # type: ignore
-    except KeyError:
-        return make_response("ref and data keys expected", HTTPStatus.BAD_REQUEST)
-
-    try: 
-        resp_json = build_transformed_data_json(ref, data)
-    except KeyError:
-        return make_response(f"ref {ref} not found", HTTPStatus.INTERNAL_SERVER_ERROR)
-
-    return make_response(resp_json, HTTPStatus.ACCEPTED)
-
-
-@app.route("/pca/get-model", methods=['GET'])
-def get_serialised_model() -> Response:
-    ref = request.args["ref"]   # TODO : handle err resp
-    model = get_model(ref)    
-
-    fpath = joblib.dump(model, os.path.join(models_dir, f"pca_{ref}.joblib"), 
-                        compress=True)[0]
-    return make_response(send_file(fpath, as_attachment=True), HTTPStatus.OK)
-
-
-@app.route("/pca/rebuild", methods=['Post'])
-def rebuild_model_from_file() -> Response:
-    uploaded_file = request.files['file']
-    if not uploaded_file.filename:
-        return make_response("Compressed model must be provided as a .joblib file", 
-                             HTTPStatus.BAD_REQUEST)
-    
-    tmp_path = os.path.join(models_dir, 'temp.joblib')    
-    uploaded_file.save(tmp_path)
-    model = joblib.load(tmp_path)
-    return make_response(build_interpretation_json(model), HTTPStatus.ACCEPTED)
-    # TODO: parse ref from filename to rebuild as the same ref?
-    #       or build ref from md5 hash so that the same file will automatically get the same ref?
 
 
 if __name__ =='__main__':
     import sys
     # to allow debugging, deployed version will start service using WSGI server
     if sys.argv[-1].startswith('local'):  
-        # load test case into memory
+        # load test case into memory (tmp)
         test_ref = 'keep_test_case'
         test_model_path = os.path.join(models_dir, f'pca_{test_ref}.joblib')
         if os.path.exists(test_model_path):
