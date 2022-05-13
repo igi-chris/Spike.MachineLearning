@@ -1,0 +1,67 @@
+:root {
+  /* color variables from here: 
+  https://github.com/thomaspark/bootswatch/blob/v5/dist/flatly/bootstrap.css#L38 */
+  --bs-primary: #2c3e50;
+  --bs-secondary: #95a5a6;
+  --bs-success: #18bc9c;
+  --bs-info: #3498db;
+  --bs-warning: #f39c12;
+  --bs-danger: #e74c3c;
+  --bs-light: #ecf0f1;
+  --bs-dark: #7b8a8b;
+
+  /* other variables */
+  --info-dark-blue: #085394;
+  --info-light-blue: #e7f7fd;
+}
+
+.card:hover {
+  border-color: #66afe9;
+  box-shadow: 0 0 8px rgba(255,0,0, 0.6);
+  /* box-shadow: 0 0 8px rgba(111, 188, 233, 0.842); */ /* alt shadow colour */
+  /* opacity: 0.6; */
+}
+
+/* body {background-color: #2C3E50;} */ /* dark bakground */
+#dropZone {
+  border: 2px dashed var(--bs-primary);
+  background-color: var(--bs-light);
+  border-radius: 5px;
+  padding: 10px;
+  width:  100%;
+  min-height: 175px;
+}
+
+#dropZone.dragging {
+  border: 2px solid;
+  border-color: #66afe9;
+  box-shadow: 0 0 8px rgba(255,0,0, 0.6);
+}
+
+#browseFile {
+  display:none
+}
+
+#homeIcon {
+  height: 24px;
+  vertical-align: top;
+  float: right;
+}
+
+.info-icon {
+  height: 16px;
+  fill: var(--info-dark-blue);
+}
+
+#homeIcon:hover {
+  fill: var(--bs-success);
+}
+
+.info-card {
+  border-radius: 4px;
+  border-width: 1;
+  border: solid var(--info-dark-blue);
+  color: var(--info-dark-blue);
+  background-color: var(--info-light-blue);
+  font-size: 13px;
+}

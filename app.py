@@ -13,15 +13,36 @@ from common.model_register import register_model
 #       * Catch warnings (https://stackoverflow.com/a/5645133/2012446)
 #         e.g. sklearn warning (https://github.com/Prosserc/python_notebooks/blob/master/learning/sklearn/ICA.ipynb)
 
+_version = 'v0.0.1 - in prog...'
 app = Flask("ml_service")
 app.register_blueprint(pca_blueprint)
 
 
-@app.route("/")
+@app.route("/test")
 def connection_test() -> Response:
     return make_response("Request Successful", HTTPStatus.ACCEPTED)
 
 
+@app.route("/")
+@app.route("/index", methods=['GET'])
+def index() -> str:
+    title_link_pairs = [('Regression', '/regression'), 
+                        ('Classification', '/classification'), 
+                        ('Clustering', '/clustering'), 
+                        ('Dimension Reduction', '/dimensions')]
+    #print(title_link_pairs)
+    return render_template('index.html', 
+                           title_link_pairs=title_link_pairs, 
+                           version=_version)
+
+
+#TODO: move to blueprint
+@app.route("/regression", methods=['GET'])
+def resgression() -> str:
+    return render_template('regression.html',
+                           accepts_file_types='.csv', 
+                           route='regression', 
+                           version=_version) 
 
 
 if __name__ =='__main__':
