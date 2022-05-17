@@ -40,6 +40,7 @@
         <!--Basic Training options (supervised)-->
         <fieldset>
             <div class="form-group">
+
                 <!--Result col option-->
                 <label for="resultColumn" class="form-label mt-4">Result column (just do index tmp)</label>
                 <select class="form-select" id="resultColumn">
@@ -47,19 +48,42 @@
                     <option>{{ idx }}</option>
                     {% endfor %}
                 </select>
+                
+                <!--Model selection-->
+                <div>
+                    <label for="regression-model">Regression model:</label>
+                    <select id="regression-model">
+                        <option value="LinearRegression">
+                            Linear Regression
+                             <!-- (Ordinary least squares Linear Regression) -->
+                        </option>
+                        <option value="GradientBoostingRegression">
+                            Gradient Boosting Regression
+                             <!-- (Ensemble decision tree model) -->
+                        </option>
+                    </select>
+                </div>
+
                 <!--Test train split-->
                 <div>
-                    <label for="trainingSplit" class="form-label">Training split</label>
+                    <label for="trn-split" class="form-label">Training split</label>
                     <input type="range" class="form-range" min="0" max="1" step="0.01" 
-                           list="tickmarks" value=0.8 id="trainingSplit" style="width: 40%">
+                           list="tickmarks" value=0.8 id="trn-split" style="width: 30%; padding-left: 5px;">
                     <datalist id="tickmarks">
                         {% for pct in range(0, 110, 10) %}
                         <option value="{{ pct/100 }}" label="{{ pct }}"></option>
                         {% endfor %}
                     </datalist>
 
-                    <input type="text" disabled="" value="80%" id="trainingPctDisplay" style="width: 50px"/>
-                           
+                    <input type="text" disabled="" value="80%" id="trn-pct-display" 
+                           style="width: 50px; margin-left: 10px"/>
+                    
+                    <!--TODO: tooltip explaining why to use-->
+                    <label for="trn-split-random-seed" class="form-label" style="padding-left: 10px">
+                        Random Seed <small>(optional)</small>
+                    </label>
+                    <input type="number" id="trn-split-random-seed" style="width: 75px">      
+                    
                     <br/>
                     <small style="margin-left: 20px">
                         The proportion of the data to be used for training the model (the rest 

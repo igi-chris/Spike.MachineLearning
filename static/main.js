@@ -25,14 +25,14 @@ function setupBrowseListener() {
 }
 
 function setupTrainingOptionsListerners() {
-    var trainingSplitSlider = document.getElementById("trainingSplit");
+    var trainingSplitSlider = document.getElementById("trn-split");
     if (trainingSplitSlider) {
-        trainingSplitSlider.addEventListener('change', handleTrainingSplitInputChange, false);
+        trainingSplitSlider.addEventListener('input', handleTrainingSplitInputChange, false);
     }
 
     function handleTrainingSplitInputChange(e) {
         var pct = trainingSplitSlider.value * 100;
-        var displayTrainingSplit = document.getElementById("trainingPctDisplay");
+        var displayTrainingSplit = document.getElementById("trn-pct-display");
         displayTrainingSplit.value = `${pct}%`
     }
 }
