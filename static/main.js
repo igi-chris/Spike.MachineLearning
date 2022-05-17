@@ -64,9 +64,23 @@ function dropHandler(ev) {
 }
 
 function saveTrainingFile(file) {
+
     console.log(file.name);
     document.getElementById('file-display').innerHTML = `File: ${file.name}`;
-    
+      
+    var formData = new FormData();
+    formData.append("file", file);
+    var oReq = new XMLHttpRequest();
+    oReq.responseType = 'json';
+    oReq.open("POST", "/api/savefile", true);
+
+    oReq.onload = function(e) {
+        // handle failure, progress etc later
+        // TODO: get path and heads from data
+        console.log(this.responseText);
+    }
+
+    oReq.send();
 }
 
 function dragOverHandler(ev) {

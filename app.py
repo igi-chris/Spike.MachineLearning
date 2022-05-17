@@ -36,13 +36,12 @@ def index() -> str:
                         # ('Clustering', '/clustering'), 
                         # ('Dimension Reduction', '/dimensions')
                        ]
-    #print(title_link_pairs)
     return render_template('index.html', 
                            title_link_pairs=title_link_pairs, 
                            version=_version)
 
 
-@app.route("/api/savefile")
+@app.route("/api/savefile", methods=['POST'])
 def save_file() -> Response:
     uploaded_file = request.files['file']
     if uploaded_file.filename:        
