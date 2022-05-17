@@ -34,7 +34,7 @@
         </p>
         <input type="hidden" id="route" value={{route}}>
     </div>
-    <p id="fileDisplay" class="text-secondary"></p>
+    <p id="file-display" class="text-secondary"></p>
 
     <form>
         <!--Basic Training options (supervised)-->
@@ -43,16 +43,16 @@
 
                 <!--Result col option-->
                 <label for="resultColumn" class="form-label mt-4">Result column (just do index tmp)</label>
-                <select class="form-select" id="resultColumn">
+                <select class="form-select" id="resultColumn" required>
                     {% for idx in range(255) %}
                     <option>{{ idx }}</option>
                     {% endfor %}
                 </select>
-                
+
                 <!--Model selection-->
                 <div>
                     <label for="regression-model">Regression model:</label>
-                    <select id="regression-model">
+                    <select id="regression-model" required>
                         <option value="LinearRegression">
                             Linear Regression
                              <!-- (Ordinary least squares Linear Regression) -->
@@ -68,7 +68,8 @@
                 <div>
                     <label for="trn-split" class="form-label">Training split</label>
                     <input type="range" class="form-range" min="0" max="1" step="0.01" 
-                           list="tickmarks" value=0.8 id="trn-split" style="width: 30%; padding-left: 5px;">
+                           list="tickmarks" value=0.8 id="trn-split" required 
+                           style="width: 30%; padding-left: 5px;">
                     <datalist id="tickmarks">
                         {% for pct in range(0, 110, 10) %}
                         <option value="{{ pct/100 }}" label="{{ pct }}"></option>
@@ -78,11 +79,14 @@
                     <input type="text" disabled="" value="80%" id="trn-pct-display" 
                            style="width: 50px; margin-left: 10px"/>
                     
-                    <!--TODO: tooltip explaining why to use-->
+                    <!--TODO: tooltip explaining why to use i.e.
+                              If you use the same file, split % and random seed, the same rows will
+                              be allocated to each set, allowing for reproducible results.-->
                     <label for="trn-split-random-seed" class="form-label" style="padding-left: 10px">
                         Random Seed <small>(optional)</small>
                     </label>
-                    <input type="number" id="trn-split-random-seed" style="width: 75px">      
+                    <input type="number" id="trn-split-random-seed" 
+                           placeholder="For a reproducible split">      
                     
                     <br/>
                     <small style="margin-left: 20px">
@@ -123,8 +127,8 @@
 
     <div class="progress" id="progress" style="visibility: hidden;">
         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar"
-            id="progressBar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Training
-            Model...</div>
+            id="progressBar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+        </div>
     </div>
 
     <!--Hidden until error-->

@@ -3,19 +3,32 @@ from typing import Optional
 from http import HTTPStatus
 
 from sklearn.linear_model import LinearRegression
-from flask import Response, Blueprint, make_response, request, send_file, jsonify
-from sklearn.pipeline import Pipeline
+from flask import Response, Blueprint, render_template, request, jsonify
 import pandas as pd
 
-from literals import models_dir
+from literals import models_dir, _version
 from common.model_register import get_model, register_model
-from common.preprocessing import build_column_transformer
 from models.regression import train
 
 
 regression_blueprint = Blueprint('regression', __name__)
 
-@regression_blueprint.route("/regression/linear/train", methods=['POST'])
+
+###############################################################################
+#                              U I   R o u t e s                              #
+###############################################################################
+@regression_blueprint.route("/regression", methods=['GET'])
+def resgression() -> str:
+    return render_template('regression.html',
+                           accepts_file_types='.csv', 
+                           route='regression', 
+                           version=_version) 
+
+
+###############################################################################
+#                             A P I   R o u t e s                             #
+###############################################################################
+@regression_blueprint.route("/api/regression/linear/train", methods=['POST'])
 def train_linear_regression(csv_path, # TODO: get file from request instead
                             result_column: str, 
                             standardise: bool = False, 
@@ -33,3 +46,4 @@ def train_linear_regression(csv_path, # TODO: get file from request instead
                   validation_split_random_seed=validation_split_random_seed)
     ref = register_model(model)
     return jsonify(model_ref=ref)
+

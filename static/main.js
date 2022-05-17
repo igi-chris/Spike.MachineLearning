@@ -18,7 +18,7 @@ function setupBrowseListener() {
     function handleBrowseFileChange(e) {
         var fileList = browseFile.files;
         for (var i = 0; i < fileList.length; i++) {
-            callProcessFile(fileList[i]);
+            saveTrainingFile(fileList[i]);
             e.preventDefault();
         }       
      }
@@ -34,6 +34,7 @@ function setupTrainingOptionsListerners() {
         var pct = trainingSplitSlider.value * 100;
         var displayTrainingSplit = document.getElementById("trn-pct-display");
         displayTrainingSplit.value = `${pct}%`
+        e.preventDefault();
     }
 }
 
@@ -50,33 +51,22 @@ function dropHandler(ev) {
             // If dropped items aren't files, reject them
             if (ev.dataTransfer.items[i].kind === 'file') {
                 var file = ev.dataTransfer.items[i].getAsFile();
-                callProcessFile(file);                
+                saveTrainingFile(file);                
             } 
         }
     } else {
         // Use DataTransfer interface to access the file(s)
         for (var i = 0; i < ev.dataTransfer.files.length; i++) {
             var file = ev.dataTransfer.files[i];
-            callProcessFile(file);  
+            saveTrainingFile(file);  
         }
     }
 }
 
-function callProcessFile(file) {
-    var fileDisplay = document.getElementById('fileDisplay');
-    fileDisplay.innerHTML = `File: ${file.name}`
-    var formData = new FormData();
-    //formData.append("file", file);
-
-    // options = document.getElementsByClassName("transformer-option")
-    // Array.prototype.forEach.call(options, function(el) {
-    //     if (!el.disabled) {
-    //         console.log(`Found element - ${el.id}: ${el.value}`)
-    //         formData.append(el.id, el.value);
-    //     }
-    // });
-    console.log(`route: ${route}`);
-    processFile(formData);
+function saveTrainingFile(file) {
+    console.log(file.name);
+    document.getElementById('file-display').innerHTML = `File: ${file.name}`;
+    
 }
 
 function dragOverHandler(ev) {
@@ -84,79 +74,9 @@ function dragOverHandler(ev) {
     dropZone.classList.add('dragging');
     // Prevent default behavior (Prevent file from being opened in browser)
     ev.preventDefault();
-  }
+}
 
 function endDragOver() {
     dropZone = document.getElementById('dropZone');
     dropZone.classList.remove('dragging');
-}
-
-function resetResults(progressBar) {
-    progressBar.classList.remove('bg-danger')
-    progressBar.classList.add('bg-success', 'progress-bar-animated')
-    progressBar.innerHTML = 'File Transformation in progress...';
-
-    errDetails = document.getElementById('errorDetails');
-    errDetails.innerHTML = '';
-    errInfo = document.getElementById('errorInfo');
-    errInfo.style.display = 'none';
-}
-
-function processFile(formData) {
-    document.getElementById('progress').style.visibility = 'visible';
-    progressBar = document.getElementById('progressBar');
-    resetResults(progressBar)  // in case of reusing without refreshing page first
-
-    var oReq = new XMLHttpRequest();
-    route = document.getElementById("route").value;
-    oReq.open("POST", route, true);
-    oReq.responseType = 'json';
-
-    oReq.onload = function(e) {
-        if (oReq.status == 200) {
-            handleFileTransSuccess(this.response);
-        } else {
-            handleFileTransFailure(this.response);
-        }
-
-        function handleFileTransSuccess(response) {
-            console.log('Handling success response...');
-            progressBar.classList.remove('progress-bar-animated');
-            progressBar.innerHTML = 'Finished';
-
-            var blob = response;
-            var contentDispo = e.currentTarget.getResponseHeader('Content-Disposition');
-            var filename = contentDispo.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
-            console.log(`calling saveBlob for ${filename}`)
-            saveBlob(blob, filename);
-        }
-
-        function handleFileTransFailure(response) {
-            console.log('Handling failure response...');
-            progressBar.innerHTML = 'Error';
-            progressBar.classList.remove('progress-bar-animated', 'bg-success');
-            progressBar.classList.add('bg-danger');
-
-            response.text().then(data => {
-                errDetails = document.getElementById('errorDetails');
-                console.log(data);
-                respJson = JSON.parse(data);
-                errText = respJson["user_error_details"];
-                console.log(errText);
-                if (errText) {
-                    errDetails.innerHTML = errText;
-                }
-                errInfo = document.getElementById('errorInfo');
-                errInfo.style.display = 'block';
-            });
-        }
-    }
-    oReq.send(formData);  
-}
-
-function saveBlob(blob, filename) {
-    var a = document.createElement('a');
-    a.href = window.URL.createObjectURL(blob);
-    a.download = filename;
-    a.dispatchEvent(new MouseEvent('click'));
 }
