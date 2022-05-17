@@ -41,7 +41,7 @@
         <fieldset>
             <div class="form-group">
                 <!--Result col option-->
-                <label for="resultColumn" class="form-label mt-4">Result Column (just do index tmp)</label>
+                <label for="resultColumn" class="form-label mt-4">Result column (just do index tmp)</label>
                 <select class="form-select" id="resultColumn">
                     {% for idx in range(255) %}
                     <option>{{ idx }}</option>
@@ -51,29 +51,12 @@
                 <div>
                     <label for="trainingSplit" class="form-label">Training split</label>
                     <input type="range" class="form-range" min="0" max="1" step="0.01" 
-                           list="tickmarks" value=0.8 id="trainingSplit">
-                    <!-- <datalist id="tickmarks">
-                        {% for pct in range(0, 110, 10) %}
-                        <option value="{{ pct/100 }}" 
-                                {% if pct in [0, 50, 100] %}
-                                    label="{{ pct|string }}%"
-                                {% endif %}>
-                        </option>
-                        {% endfor %}
-                    </datalist> -->
+                           list="tickmarks" value=0.8 id="trainingSplit" style="width: 40%">
                     <datalist id="tickmarks">
-                        <option value="0" label="0%"></option>
-                        <option value="10"></option>
-                        <option value="20"></option>
-                        <option value="30"></option>
-                        <option value="40"></option>
-                        <option value="50" label="50%"></option>
-                        <option value="60"></option>
-                        <option value="70"></option>
-                        <option value="80"></option>
-                        <option value="90"></option>
-                        <option value="100" label="100%"></option>
-                        </datalist>
+                        {% for pct in range(0, 110, 10) %}
+                        <option value="{{ pct/100 }}" label="{{ pct }}"></option>
+                        {% endfor %}
+                    </datalist>
                     <br/>
                     <small style="margin-left: 20px">
                         The proportion of the data to be used for training the model (the rest 
@@ -101,10 +84,9 @@
                     Normalise data per sample (sum to one, accounting for missing values)
                 </label>
                 <div class="text-warning">
-                    <small>Use with care. This option should only be used
+                    <small>This should only be used
                         if it makes sense for the columns in each row to sum to one 
                         (i.e. they can be seen as proportions of a whole).
-                        Otherwise you will lose signal in the data.
                     </small>
                 </div>
             </div>
