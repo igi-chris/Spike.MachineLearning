@@ -6,6 +6,7 @@ from flask import Flask, Response, make_response, render_template
 
 from literals import models_dir
 from app_pca import pca_blueprint
+from app_regression import regression_blueprint
 from common.model_register import register_model
 
 # TODO: Consider error handling (see https://flask.palletsprojects.com/en/2.0.x/errorhandling/)
@@ -16,6 +17,7 @@ from common.model_register import register_model
 _version = 'v0.0.1 - in prog...'
 app = Flask("ml_service")
 app.register_blueprint(pca_blueprint)
+app.register_blueprint(regression_blueprint)
 
 
 @app.route("/test")
@@ -27,9 +29,10 @@ def connection_test() -> Response:
 @app.route("/index", methods=['GET'])
 def index() -> str:
     title_link_pairs = [('Regression', '/regression'), 
-                        ('Classification', '/classification'), 
-                        ('Clustering', '/clustering'), 
-                        ('Dimension Reduction', '/dimensions')]
+                        # ('Classification', '/classification'), 
+                        # ('Clustering', '/clustering'), 
+                        # ('Dimension Reduction', '/dimensions')
+                       ]
     #print(title_link_pairs)
     return render_template('index.html', 
                            title_link_pairs=title_link_pairs, 

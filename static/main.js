@@ -49,9 +49,10 @@ function dropHandler(ev) {
 }
 
 function callProcessFile(file) {
-    console.log('... input file name = ' + file.name);
+    var fileDisplay = document.getElementById('fileDisplay');
+    fileDisplay.innerHTML = `File: ${file.name}`
     var formData = new FormData();
-    formData.append("file", file);
+    //formData.append("file", file);
 
     // options = document.getElementsByClassName("transformer-option")
     // Array.prototype.forEach.call(options, function(el) {

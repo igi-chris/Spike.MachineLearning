@@ -34,33 +34,79 @@
         </p>
         <input type="hidden" id="route" value={{route}}>
     </div>
-    <br />
+    <p id="fileDisplay" class="text-secondary"></p>
 
     <form>
+        <!--Basic Training options (supervised)-->
         <fieldset>
             <div class="form-group">
+                <!--Result col option-->
                 <label for="resultColumn" class="form-label mt-4">Result Column (just do index tmp)</label>
                 <select class="form-select" id="resultColumn">
                     {% for idx in range(255) %}
                     <option>{{ idx }}</option>
                     {% endfor %}
                 </select>
+                <!--Test train split-->
+                <div>
+                    <label for="trainingSplit" class="form-label">Training split</label>
+                    <input type="range" class="form-range" min="0" max="1" step="0.01" 
+                           list="tickmarks" value=0.8 id="trainingSplit">
+                    <!-- <datalist id="tickmarks">
+                        {% for pct in range(0, 110, 10) %}
+                        <option value="{{ pct/100 }}" 
+                                {% if pct in [0, 50, 100] %}
+                                    label="{{ pct|string }}%"
+                                {% endif %}>
+                        </option>
+                        {% endfor %}
+                    </datalist> -->
+                    <datalist id="tickmarks">
+                        <option value="0" label="0%"></option>
+                        <option value="10"></option>
+                        <option value="20"></option>
+                        <option value="30"></option>
+                        <option value="40"></option>
+                        <option value="50" label="50%"></option>
+                        <option value="60"></option>
+                        <option value="70"></option>
+                        <option value="80"></option>
+                        <option value="90"></option>
+                        <option value="100" label="100%"></option>
+                        </datalist>
+                    <br/>
+                    <small style="margin-left: 20px">
+                        The proportion of the data to be used for training the model (the rest 
+                        will be held back to evaluate the trained model against).
+                    </small>
+                </div>
             </div>
         </fieldset>
+        <fieldset>
 
+        <!--Preprocessing-->
         <fieldset class="form-group">
             <legend class="mt-4">Preprocessing Options</legend>
             <div class="form-check">
+                <!--standardise option-->
                 <input class="form-check-input" type="checkbox" value="" id="checkStandardise" checked="">
                 <label class="form-check-label" for="checkStandardise">
                     Standardise (centre and scale data across properties to zero mean, unit variance)
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="checkNormalise" >
+                <!--normalise option-->
+                <input class="form-check-input" type="checkbox" value="" id="checkNormalise">
                 <label class="form-check-label" for="checkNormalise">
                     Normalise data per sample (sum to one, accounting for missing values)
                 </label>
+                <div class="text-warning">
+                    <small>Use with care. This option should only be used
+                        if it makes sense for the columns in each row to sum to one 
+                        (i.e. they can be seen as proportions of a whole).
+                        Otherwise you will lose signal in the data.
+                    </small>
+                </div>
             </div>
             <p>Option for missing values comming soon...</p>
         </fieldset>
