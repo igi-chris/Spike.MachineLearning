@@ -54,8 +54,8 @@ def save_file() -> Response:
         
         input_file_path = os.path.join(target_dir, upl_filename)
         uploaded_file.save(input_file_path)
-        register_data(input_file_path)  # allows up to look up dataframe from path
-        return jsonify(filepath=input_file_path)
+        df = register_data(input_file_path)  # allows up to look up dataframe from path
+        return jsonify(filepath=input_file_path, headers=df.columns.tolist())
     raise FileNotFoundError("No file given in request")
 
 

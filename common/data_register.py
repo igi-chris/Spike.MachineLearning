@@ -6,12 +6,14 @@ import pandas as pd
 _path_to_data: Dict[str, pd.DataFrame] = {}
 
 
-def register_data(path: str) -> None:
+def register_data(path: str) -> pd.DataFrame:
     """
     Add data to register and get back a reference key.
     """
     print(f"Storing data under ref: {path}")
-    _path_to_data[path] = pd.read_csv(path, encoding='utf-8')
+    df = pd.read_csv(path, encoding='utf-8')
+    _path_to_data[path] = df
+    return df
 
 def lookup_dataframe(path: str) -> pd.DataFrame:
     """

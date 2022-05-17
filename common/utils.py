@@ -1,5 +1,8 @@
 import csv
+import os
+import re
 from typing import Sequence
+import unicodedata
 
 
 def get_csv_headers(file_path: str) -> Sequence[str]:
@@ -31,7 +34,8 @@ def secure_filename(filename: str) -> str:
     .. versionadded:: 0.5
 
     :param filename: the filename to secure
-    """
+    """    
+    _filename_ascii_strip_re = re.compile(r"[^A-Za-z0-9_.-]")
     filename = unicodedata.normalize("NFKD", filename)
     filename = filename.encode("ascii", "ignore").decode("ascii")
 
@@ -41,15 +45,5 @@ def secure_filename(filename: str) -> str:
     filename = str(_filename_ascii_strip_re.sub("", "_".join(filename.split()))).strip(
         "._"
     )
-
-    # on nt a couple of special files are present in each folder.  We
-    # have to ensure that the target file is not such a filename.  In
-    # this case we prepend an underline
-    if (
-        os.name == "nt"
-        and filename
-        and filename.split(".")[0].upper() in _windows_device_files
-    ):
-        filename = f"_{filename}"
 
     return filename
