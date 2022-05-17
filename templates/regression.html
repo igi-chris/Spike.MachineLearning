@@ -3,7 +3,7 @@
 {% block content %}
 <div>
     <h4>
-        <span>Regression</span>
+        <span>Train a Regression Model</span>
         <a href="{{url_for('index')}}">
             <svg id="homeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
                 <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
@@ -17,7 +17,7 @@
     <div id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" ondragleave="endDragOver();"
         ondragend="endDragOver();">
         <p class="text-center">
-            Drag file(s) here or
+            Drag file here or
             <label>
                 <input id="browseFile" type="file" accept="{{accepts_file_types}}" />
                 <a href="" id="browseLink">browse</a>
@@ -57,6 +57,9 @@
                         <option value="{{ pct/100 }}" label="{{ pct }}"></option>
                         {% endfor %}
                     </datalist>
+
+                    <input type="text" disabled="" value="80%" id="trainingPctDisplay" style="width: 50px"/>
+                           
                     <br/>
                     <small style="margin-left: 20px">
                         The proportion of the data to be used for training the model (the rest 

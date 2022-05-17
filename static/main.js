@@ -1,5 +1,6 @@
 window.onload = function() {
     setupBrowseListener();
+    setupTrainingOptionsListerners();
 }
 
 
@@ -21,6 +22,19 @@ function setupBrowseListener() {
             e.preventDefault();
         }       
      }
+}
+
+function setupTrainingOptionsListerners() {
+    var trainingSplitSlider = document.getElementById("trainingSplit");
+    if (trainingSplitSlider) {
+        trainingSplitSlider.addEventListener('change', handleTrainingSplitInputChange, false);
+    }
+
+    function handleTrainingSplitInputChange(e) {
+        var pct = trainingSplitSlider.value * 100;
+        var displayTrainingSplit = document.getElementById("trainingPctDisplay");
+        displayTrainingSplit.value = `${pct}%`
+    }
 }
 
 function dropHandler(ev) {
