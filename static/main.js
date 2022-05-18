@@ -7,7 +7,6 @@ window.onload = function() {
     setupTrainingOptionsListerners();
 }
 
-
 function setupBrowseListener() {
     var browseFile = document.getElementById("browse-file");
     var browseLink = document.getElementById("browse-link");

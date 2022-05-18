@@ -31,14 +31,16 @@ def resgression() -> str:
 ###############################################################################
 #                             A P I   R o u t e s                             #
 ###############################################################################
-@regression_blueprint.route("/api/regression/linear/train", methods=['POST'])
-def train_linear_regression(csv_path, # TODO: get file from request instead
-                            result_column: str, 
-                            standardise: bool = False, 
-                            normalise: bool = False,
-                            validation_split: float = 0.2,
-                            validation_split_random_seed: Optional[int] = None
-                            ) -> Response:
+@regression_blueprint.route("/api/regression/linear/train", methods=['GET'])
+def train_linear_regression() -> Response:
+    # get query params
+    csv_path: str = request.args.get('csv_path', default='')
+    result_column: str = request.args.get('result_column', default='')
+    standardise: bool = request.args.get('standardise', default=True, type=lambda v: v.lower() == 'true')
+    normalise: bool = request.args.get('normalise', default=False, type=lambda v: v.lower() == 'true')
+    validation_split: float = request.args.get('validation_split', 0.2, type=lambda v: float(v))
+    validation_split_random_seed: Optional[int] = request.args.get('random_seed', type=lambda v: int(v))
+
     data = pd.read_csv(csv_path)
     model = train(data=data, 
                   result_column=result_column, 
@@ -48,5 +50,7 @@ def train_linear_regression(csv_path, # TODO: get file from request instead
                   validation_split=validation_split, 
                   validation_split_random_seed=validation_split_random_seed)
     ref = register_model(model)
+
+    # eval against test data here???
     return jsonify(model_ref=ref)
 

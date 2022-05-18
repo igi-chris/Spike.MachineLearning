@@ -28,7 +28,7 @@ def train(data: DataFrame,
 
     preprocessor = build_column_transformer(standardise=standardise, normalise=normalise)
     model = Pipeline(steps=[('preprocessor', preprocessor),
-                             'regressor', LinearRegression()])
+                             'regressor', regressor])
     trained_model = model.fit(X_train, (y_train))
     return trained_model
 
