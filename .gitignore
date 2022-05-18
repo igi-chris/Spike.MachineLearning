@@ -131,4 +131,5 @@ dmypy.json
 
 .vscode
 serialised_models
+input_files
 local_runner/

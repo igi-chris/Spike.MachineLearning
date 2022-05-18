@@ -1,4 +1,6 @@
 from http import HTTPStatus
+from http.client import HTTPException
+import json
 import os
 import uuid
 import joblib
@@ -12,8 +14,7 @@ from app_regression import regression_blueprint
 from common.model_register import register_model
 from common.utils import secure_filename
 
-# TODO: Consider error handling (see https://flask.palletsprojects.com/en/2.0.x/errorhandling/)
-#       Would be preferable to pass error details back to pigi, not just 500
+# TODO: 
 #       * Catch warnings (https://stackoverflow.com/a/5645133/2012446)
 #         e.g. sklearn warning (https://github.com/Prosserc/python_notebooks/blob/master/learning/sklearn/ICA.ipynb)
 
@@ -56,6 +57,20 @@ def save_file() -> Response:
         df = register_data(input_file_path)  # allows up to look up dataframe from path
         return jsonify(filepath=input_file_path, headers=df.columns.tolist())
     raise FileNotFoundError("No file given in request")
+    
+    
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # pass through HTTP errors
+    if isinstance(e, HTTPException):
+        return e
+    resp = {
+        "code": e.code,
+        "name": e.name,
+        "description": e.description,
+    }
+    # TODO: decide how we can separate 400 / 500 status responses - just ex type may not be enough
+    return jsonify(**resp), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 if __name__ =='__main__':

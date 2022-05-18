@@ -77,10 +77,12 @@ function saveTrainingFile(file) {
     oReq.onload = function(e) {
         // handle failure, progress etc later
         // TODO: get path and heads from data
-        console.log(this.responseText);
+        console.log(this.response);
+        filepath = this.response['filepath']
+        heads = this.response['headers']
     }
 
-    oReq.send();
+    oReq.send(formData);
 }
 
 function dragOverHandler(ev) {
