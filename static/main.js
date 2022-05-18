@@ -1,4 +1,8 @@
+// TODO: do this another way without globals! (used for spike) 
+var training_filepath;
+
 window.onload = function() {
+    training_filepath = "";
     setupBrowseListener();
     setupTrainingOptionsListerners();
 }
@@ -76,10 +80,15 @@ function saveTrainingFile(file) {
 
     oReq.onload = function(e) {
         // handle failure, progress etc later
-        // TODO: get path and heads from data
         console.log(this.response);
-        filepath = this.response['filepath']
+        training_filepath = this.response['filepath']
         heads = this.response['headers']
+
+        var resultColSelect = document.getElementById("resultColumn");
+        //resultColSelect.options = heads;
+        for(i in heads) {
+            resultColSelect.options[resultColSelect.options.length] = new Option(heads[i], i);
+        }
     }
 
     oReq.send(formData);

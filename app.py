@@ -58,7 +58,7 @@ def save_file() -> Response:
         return jsonify(filepath=input_file_path, headers=df.columns.tolist())
     raise FileNotFoundError("No file given in request")
     
-    
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     # pass through HTTP errors

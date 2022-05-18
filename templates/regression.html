@@ -42,11 +42,9 @@
             <div class="form-group">
 
                 <!--Result col option-->
-                <label for="resultColumn" class="form-label mt-4">Result column (just do index tmp)</label>
-                <select class="form-select" id="resultColumn" required>
-                    {% for idx in range(255) %}
-                    <option>{{ idx }}</option>
-                    {% endfor %}
+                <label for="resultColumn" class="form-label mt-4">Result column</label>
+                <select class="form-select" id="resultColumn" required 
+                        placeholder="Add file to see options...">
                 </select>
 
                 <!--Model selection-->
