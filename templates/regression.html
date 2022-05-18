@@ -5,7 +5,7 @@
     <h4>
         <span>Train a Regression Model</span>
         <a href="{{url_for('index')}}">
-            <svg id="homeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+            <svg id="home-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
                 <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
                 <path fill-opacity="80%"
                     d="M575.8 255.5C575.8 273.5 560.8 287.6 543.8 287.6H511.8L512.5 447.7C512.5 450.5 512.3 453.1 512 455.8V472C512 494.1 494.1 512 472 512H456C454.9 512 453.8 511.1 452.7 511.9C451.3 511.1 449.9 512 448.5 512H392C369.9 512 352 494.1 352 472V384C352 366.3 337.7 352 320 352H256C238.3 352 224 366.3 224 384V472C224 494.1 206.1 512 184 512H128.1C126.6 512 125.1 511.9 123.6 511.8C122.4 511.9 121.2 512 120 512H104C81.91 512 64 494.1 64 472V360C64 359.1 64.03 358.1 64.09 357.2V287.6H32.05C14.02 287.6 0 273.5 0 255.5C0 246.5 3.004 238.5 10.01 231.5L266.4 8.016C273.4 1.002 281.4 0 288.4 0C295.4 0 303.4 2.004 309.5 7.014L564.8 231.5C572.8 238.5 576.9 246.5 575.8 255.5L575.8 255.5z" />
@@ -14,13 +14,13 @@
     </h4>
 
     <p>Select a file to be used for training data...</p>
-    <div id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" ondragleave="endDragOver();"
+    <div id="drop-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" ondragleave="endDragOver();"
         ondragend="endDragOver();">
         <p class="text-center">
             Drag file here or
             <label>
-                <input id="browseFile" type="file" accept="{{accepts_file_types}}" />
-                <a href="" id="browseLink">browse</a>
+                <input id="browse-file" type="file" accept="{{accepts_file_types}}" />
+                <a href="" id="browse-link">browse</a>
             </label>
             <label class="text-dark text-sm font-italic text-center text-sm">
                 ({{accepts_file_types}})
@@ -43,7 +43,7 @@
 
                 <!--Result col option-->
                 <label for="resultColumn" class="form-label mt-4">Result column</label>
-                <select class="form-select" id="resultColumn" required 
+                <select class="form-select" id="result-column" required 
                         placeholder="Add file to see options...">
                 </select>
 
@@ -101,15 +101,15 @@
             <legend class="mt-4">Preprocessing Options</legend>
             <div class="form-check">
                 <!--standardise option-->
-                <input class="form-check-input" type="checkbox" value="" id="checkStandardise" checked="">
-                <label class="form-check-label" for="checkStandardise">
+                <input class="form-check-input" type="checkbox" value="" id="check-standardise" checked="">
+                <label class="form-check-label" for="check-standardise">
                     Standardise (centre and scale data across properties to zero mean, unit variance)
                 </label>
             </div>
             <div class="form-check">
                 <!--normalise option-->
-                <input class="form-check-input" type="checkbox" value="" id="checkNormalise">
-                <label class="form-check-label" for="checkNormalise">
+                <input class="form-check-input" type="checkbox" value="" id="check-normalise">
+                <label class="form-check-label" for="check-normalise">
                     Normalise data per sample (sum to one, accounting for missing values)
                 </label>
                 <div class="text-warning">
@@ -125,15 +125,15 @@
 
     <div class="progress" id="progress" style="visibility: hidden;">
         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar"
-            id="progressBar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            id="progress-bar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
         </div>
     </div>
 
     <!--Hidden until error-->
-    <div id="errorInfo" style="display: none">
+    <div id="error-info" style="display: none">
         <p style="color:#FF0000" ;>
             <!--Erorr details below overwritten in js if we get more details in json resp-->
-            <span id="errorDetails">An Error Occurred. Please consider sending the file to us for investigation.</span>
+            <span id="error-details">An Error Occurred. Please consider sending the file to us for investigation.</span>
             <a href="mailto:{{support_email}}?subject=Error - {{route.upper()}}">
                 <i class="fa fa-lg fa-solid fa-envelope"></i>
             </a>

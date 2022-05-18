@@ -19,6 +19,9 @@ regression_blueprint = Blueprint('regression', __name__)
 ###############################################################################
 @regression_blueprint.route("/regression", methods=['GET'])
 def resgression() -> str:
+    # TODO (for pigi integration)
+    #      could check for attached file (add POST option) & save / register
+    #      would need to pass through filepath and heads (for result-column )
     return render_template('regression.html',
                            accepts_file_types='.csv', 
                            route='regression', 

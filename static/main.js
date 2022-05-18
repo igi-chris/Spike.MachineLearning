@@ -9,8 +9,8 @@ window.onload = function() {
 
 
 function setupBrowseListener() {
-    var browseFile = document.getElementById("browseFile");
-    var browseLink = document.getElementById("browseLink");
+    var browseFile = document.getElementById("browse-file");
+    var browseLink = document.getElementById("browse-link");
     if (browseLink) {browseLink.addEventListener('click', handleBrowseLinkClick, false);}
     if (browseFile) {browseFile.addEventListener('change', handleBrowseFileChange, false);}
 
@@ -84,7 +84,7 @@ function saveTrainingFile(file) {
         training_filepath = this.response['filepath']
         heads = this.response['headers']
 
-        var resultColSelect = document.getElementById("resultColumn");
+        var resultColSelect = document.getElementById("result-column");
         //resultColSelect.options = heads;
         for(i in heads) {
             resultColSelect.options[resultColSelect.options.length] = new Option(heads[i], i);
@@ -95,13 +95,13 @@ function saveTrainingFile(file) {
 }
 
 function dragOverHandler(ev) {
-    dropZone = document.getElementById('dropZone');
+    dropZone = document.getElementById('drop-zone');
     dropZone.classList.add('dragging');
     // Prevent default behavior (Prevent file from being opened in browser)
     ev.preventDefault();
 }
 
 function endDragOver() {
-    dropZone = document.getElementById('dropZone');
+    dropZone = document.getElementById('drop-zone');
     dropZone.classList.remove('dragging');
 }
