@@ -1,6 +1,3 @@
-// TODO: do this another way without globals! (used for spike) 
-var training_filepath;
-
 window.onload = function() {
     training_filepath = "";
     setupBrowseListener();
@@ -80,13 +77,15 @@ function saveTrainingFile(file) {
     oReq.onload = function(e) {
         // handle failure, progress etc later
         console.log(this.response);
-        training_filepath = this.response['filepath']
-        heads = this.response['headers']
+        var training_filepath = this.response['filepath']
+        trnCsvPath = document.getElementById("csv-path")
+        trnCsvPath.value = this.response['filepath']
 
+        heads = this.response['headers']
         var resultColSelect = document.getElementById("result-column");
         //resultColSelect.options = heads;
         for(i in heads) {
-            resultColSelect.options[resultColSelect.options.length] = new Option(heads[i], i);
+            resultColSelect.options[resultColSelect.options.length] = new Option(heads[i], heads[i]);
         }
     }
 

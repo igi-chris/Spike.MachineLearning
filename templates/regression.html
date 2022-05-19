@@ -36,26 +36,27 @@
     </div>
     <p id="file-display" class="text-secondary"></p>
 
-    <form>
+    <form action="/api/regression/linear/train" method="GET">
+        <input type="hidden" id="csv-path", name="csv_path">
         <!--Basic Training options (supervised)-->
         <fieldset>
             <div class="form-group">
 
                 <!--Result col option-->
                 <label for="resultColumn" class="form-label mt-4">Result column</label>
-                <select class="form-select" id="result-column" required 
+                <select class="form-select" id="result-column" name="result_column" required 
                         placeholder="Add file to see options...">
                 </select>
 
                 <!--Model selection-->
                 <div>
                     <label for="regression-model">Regression model:</label>
-                    <select id="regression-model" required>
+                    <select id="regression-model" name="regression_model" required>
                         <option value="LinearRegression">
                             Linear Regression
                              <!-- (Ordinary least squares Linear Regression) -->
                         </option>
-                        <option value="GradientBoostingRegression">
+                        <option value="GradientBoostingRegressor">
                             Gradient Boosting Regression
                              <!-- (Ensemble decision tree model) -->
                         </option>
@@ -66,7 +67,7 @@
                 <div>
                     <label for="trn-split" class="form-label">Training split</label>
                     <input type="range" class="form-range" min="0" max="1" step="0.01" 
-                           list="tickmarks" value=0.8 id="trn-split" required 
+                           list="tickmarks" value=0.8 id="trn-split" name="trn_split" required 
                            style="width: 30%; padding-left: 5px;">
                     <datalist id="tickmarks">
                         {% for pct in range(0, 110, 10) %}
@@ -83,7 +84,7 @@
                     <label for="trn-split-random-seed" class="form-label" style="padding-left: 10px">
                         Random Seed <small>(optional)</small>
                     </label>
-                    <input type="number" id="trn-split-random-seed" 
+                    <input type="number" id="trn-split-random-seed" name="trn_split_random_seed"
                            placeholder="For a reproducible split">      
                     
                     <br/>
@@ -101,14 +102,16 @@
             <legend class="mt-4">Preprocessing Options</legend>
             <div class="form-check">
                 <!--standardise option-->
-                <input class="form-check-input" type="checkbox" value="" id="check-standardise" checked="">
+                <input class="form-check-input" type="checkbox" id="check-standardise" 
+                       name="check_standardise" checked="">
                 <label class="form-check-label" for="check-standardise">
                     Standardise (centre and scale data across properties to zero mean, unit variance)
                 </label>
             </div>
             <div class="form-check">
                 <!--normalise option-->
-                <input class="form-check-input" type="checkbox" value="" id="check-normalise">
+                <input class="form-check-input" type="checkbox" id="check-normalise"
+                       name="check_normalise">
                 <label class="form-check-label" for="check-normalise">
                     Normalise data per sample (sum to one, accounting for missing values)
                 </label>
@@ -121,6 +124,8 @@
             </div>
             <p>Option for missing values comming soon...</p>
         </fieldset>
+        
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
     <div class="progress" id="progress" style="visibility: hidden;">

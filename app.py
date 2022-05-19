@@ -2,6 +2,7 @@ from http import HTTPStatus
 from http.client import HTTPException
 import json
 import os
+import traceback
 import uuid
 import joblib
 
@@ -59,15 +60,16 @@ def save_file() -> Response:
     raise FileNotFoundError("No file given in request")
     
 
+# TODO - Replace with a json resp or page that is suuitable for users.
+#        Returning exc & stack trace for now for ease of debugging.
 @app.errorhandler(Exception)
 def handle_exception(e):
     # pass through HTTP errors
     if isinstance(e, HTTPException):
         return e
     resp = {
-        "code": e.code,
-        "name": e.name,
-        "description": e.description,
+        "error": str(e),
+        "traceback": traceback.format_exception(e)
     }
     # TODO: decide how we can separate 400 / 500 status responses - just ex type may not be enough
     return jsonify(**resp), HTTPStatus.INTERNAL_SERVER_ERROR

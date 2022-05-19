@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 from http import HTTPStatus
+from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
 
 from sklearn.linear_model import LinearRegression
 from flask import Response, Blueprint, render_template, request, jsonify
@@ -36,19 +37,28 @@ def train_linear_regression() -> Response:
     # get query params
     csv_path: str = request.args.get('csv_path', default='')
     result_column: str = request.args.get('result_column', default='')
-    standardise: bool = request.args.get('standardise', default=True, type=lambda v: v.lower() == 'true')
-    normalise: bool = request.args.get('normalise', default=False, type=lambda v: v.lower() == 'true')
-    validation_split: float = request.args.get('validation_split', 0.2, type=lambda v: float(v))
-    validation_split_random_seed: Optional[int] = request.args.get('random_seed', type=lambda v: int(v))
+    model_str: str = request.args.get('regression_model', default='')
+    validation_split: float = 1.0 - request.args.get('trn_split', default=0.8, 
+                                                     type=lambda v: float(v))
+    random_seed_str: Optional[str] = request.args.get('trn_split_random_seed')
+    standardise: bool = request.args.get('check_standardise', default=True, 
+                                         type=lambda v: v.lower() == 'on')
+    normalise: bool = request.args.get('check_normalise', default=False, 
+                                       type=lambda v: v.lower() == 'on')
+
+    # TODO define a mapping somewhere or expect exact str and initialise class from it
+    regressor = GradientBoostingRegressor() if model_str == 'GradientBoostingRegressor' else LinearRegression()
+    random_seed: Optional[int] = None
+    random_seed = int(random_seed_str) if random_seed_str else None
 
     data = pd.read_csv(csv_path)
     model = train(data=data, 
                   result_column=result_column, 
-                  regressor=LinearRegression(),
+                  regressor=regressor,
                   standardise=standardise, 
                   normalise=normalise, 
                   validation_split=validation_split, 
-                  validation_split_random_seed=validation_split_random_seed)
+                  validation_split_random_seed=random_seed)
     ref = register_model(model)
 
     # eval against test data here???
