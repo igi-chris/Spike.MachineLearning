@@ -2,10 +2,11 @@ from dataclasses import dataclass, field
 import os
 from typing import Optional, List, Tuple
 
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.base import BaseEstimator
 from pandas import DataFrame
 from pandas.api.types import is_numeric_dtype
 import numpy as np
@@ -37,35 +38,28 @@ class RegressionEvaluation():
 
 
 def train(data: DataFrame,
-          result_column: str,
-          regressor: BaseEstimator,
-          standardise: bool = False, 
-          normalise: bool = False,
-          validation_split: float = 0.2,
-          random_seed: Optional[int] = None
-          ) -> Pipeline:
-    X_train, _, y_train, _ = split_data(data, result_column, validation_split, random_seed)
+          args: RegressionArgs) -> Pipeline:
+    X_train, _, y_train, _ = split_data(data, args)
 
-    if standardise or normalise:
-        preprocessor = build_column_transformer(standardise=standardise, normalise=normalise)
+    # TODO define a mapping somewhere or expect exact str and initialise class from it
+    regressor = GradientBoostingRegressor() if args.model_name == 'GradientBoostingRegressor' else LinearRegression()
+
+    if args.standardise or args.normalise:
+        preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)
         model = Pipeline(steps=[('preprocessor', preprocessor),
                                 ('regressor', regressor)])
     else:
         model = Pipeline(steps=[('regressor', regressor)])
+
     trained_model = model.fit(X_train, (y_train))
     return trained_model
 
 
 def evaluate(data: DataFrame,
              trained_model_pipeline: Pipeline,
-             result_column: str,
-             standardise: bool = False, 
-             normalise: bool = False,
-             validation_split: float = 0.2,
-             random_seed: Optional[int] = None
-             ) -> RegressionEvaluation:
+             args: RegressionArgs) -> RegressionEvaluation:
     # may eval training and test later and return evaluation for both...
-    _, X_test, _, y_test = split_data(data, result_column, validation_split, random_seed)
+    _, X_test, _, y_test = split_data(data, args)
     y_predictions = trained_model_pipeline.predict(X_test)
 
     # metrics
@@ -82,13 +76,13 @@ def predict(X_test: np.ndarray, model: Pipeline):
     return model.predict(X_test)
 
 
-def split_data(data, result_column, validation_split, random_seed) -> Tuple:
-    if result_column not in data.columns:
-        raise ValueError(f"Result col {result_column} not in data frame cols: {data.columns}")
-    numeric_features = extract_numeric_columns(data, result_column)
-    X, y = data[numeric_features].values, data[result_column].values
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=validation_split, 
-        random_state=random_seed)
+def split_data(data, args: RegressionArgs) -> Tuple:
+    if args.result_column not in data.columns:
+        raise ValueError(f"Result col {args.result_column} not in data frame cols: {data.columns}")
+    numeric_features = extract_numeric_columns(data, args.result_column)
+    X, y = data[numeric_features].values, data[args.result_column].values
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1-args.training_split, 
+                                                        random_state=args.random_seed)
         
     return X_train, X_test, y_train, y_test
 

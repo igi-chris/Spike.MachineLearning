@@ -83,7 +83,7 @@ function saveTrainingFile(file) {
         console.log(`trnCsvPath.value set to ${trnCsvPath.value}`)
 
         // tmp
-        document.getElementById("csv-path-display").value = training_filepath
+        //document.getElementById("csv-path-display").value = training_filepath
 
         heads = this.response['headers']
         var resultColSelect = document.getElementById("result-column");
@@ -98,13 +98,11 @@ function saveTrainingFile(file) {
 }
 
 function dragOverHandler(ev) {
-    dropZone = document.getElementById('drop-zone');
-    dropZone.classList.add('dragging');
+    document.getElementById('drop-zone').classList.add('dragging');
     // Prevent default behavior (Prevent file from being opened in browser)
     ev.preventDefault();
 }
 
 function endDragOver() {
-    dropZone = document.getElementById('drop-zone');
-    dropZone.classList.remove('dragging');
+    document.getElementById('drop-zone').classList.remove('dragging');
 }

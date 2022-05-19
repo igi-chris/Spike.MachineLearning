@@ -45,25 +45,16 @@ def train_linear_regression() -> str:
         normalise = request.args.get('check_normalise', default=False, 
                                      type=lambda v: v.lower() == 'on')
     )
-
-    # TODO define a mapping somewhere or expect exact str and initialise class from it
-    regressor = GradientBoostingRegressor() if args.model_name == 'GradientBoostingRegressor' else LinearRegression()
-
     data = pd.read_csv(args.csv_path)
     # TODO: consider whether train should take RegressionArgs as param??? (consider empties)
-    model = train(data=data, 
-                  result_column=args.result_column, 
-                  regressor=regressor,
-                  standardise=args.standardise, 
-                  normalise=args.normalise, 
-                  validation_split=1 - args.training_split, 
-                  random_seed=args.random_seed)
+    model = train(data=data, args=args)
     model_ref = register_model(model)
 
-    #evaluation = evaluate()
+    evaluation = evaluate(data, model, args)
     return render_template('regression.html',
                            args=args,
                            model_ref=model_ref,
+                           evaluation=evaluation,
                            version=_version) 
 
 
