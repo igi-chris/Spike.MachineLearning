@@ -68,7 +68,7 @@
 
                 <!--Model selection-->
                 <div>
-                    <label for="regression-model">Regression model:</label>
+                    <label for="regression-model">Model:</label>
                     <select id="regression-model" name="regression_model" required>
                         <option value="LinearRegression"
                                 {% if args.model_name == 'LinearRegression' %} 
@@ -130,7 +130,7 @@
                 <input class="form-check-input" type="checkbox" id="check-standardise" 
                        name="check_standardise" {{ 'checked=""' if args.standardise else '' }}>
                 <label class="form-check-label" for="check-standardise">
-                    Standardise (centre and scale data across properties to zero mean, unit variance)
+                    Standardise (centre and scale data across columns to zero mean, unit variance)
                 </label>
             </div>
             <div class="form-check">
