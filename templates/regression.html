@@ -19,11 +19,11 @@
         <p class="text-center">
             Drag file here or
             <label>
-                <input id="browse-file" type="file" accept="{{accepts_file_types}}" />
+                <input id="browse-file" type="file" accept=".csv" />
                 <a href="" id="browse-link">browse</a>
             </label>
             <label class="text-dark text-sm font-italic text-center text-sm">
-                ({{accepts_file_types}})
+                (.csv)
             </label>
             <br /><br />
             <svg height="50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -32,33 +32,49 @@
                     d="M105.4 182.6c12.5 12.49 32.76 12.5 45.25 .001L224 109.3V352c0 17.67 14.33 32 32 32c17.67 0 32-14.33 32-32V109.3l73.38 73.38c12.49 12.49 32.75 12.49 45.25-.001c12.49-12.49 12.49-32.75 0-45.25l-128-128C272.4 3.125 264.2 0 256 0S239.6 3.125 233.4 9.375L105.4 137.4C92.88 149.9 92.88 170.1 105.4 182.6zM480 352h-160c0 35.35-28.65 64-64 64s-64-28.65-64-64H32c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h448c17.67 0 32-14.33 32-32v-96C512 366.3 497.7 352 480 352zM432 456c-13.2 0-24-10.8-24-24c0-13.2 10.8-24 24-24s24 10.8 24 24C456 445.2 445.2 456 432 456z" />
             </svg>
         </p>
-        <input type="hidden" id="route" value={{route}}>
     </div>
-    <p id="file-display" class="text-secondary"></p>
 
-    <form action="/api/regression/linear/train" method="GET">
-        <input type="hidden" id="csv-path", name="csv_path">
+    <p id="file-display" class="text-secondary">{{ args.csv_filename }}</p> 
+
+    <form action="/regression/linear/train" method="GET">
+
+        <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden"/>
+
+        <!--tmp for debugging-->
+        <label for="csv-path-display" class="form-label mt-4">csv
+            <small>(tmp for debugging)</small>
+        </label>
+        <input id="csv-path-display" name="csv_path_display" value="{{ args.csv_path }}" 
+               disabled style="width: 100%"/>
+        <!--tmp end-->
         <!--Basic Training options (supervised)-->
         <fieldset>
             <div class="form-group">
 
                 <!--Result col option-->
-                <label for="resultColumn" class="form-label mt-4">Result column</label>
+                <label for="result-column" class="form-label mt-4">Result column</label>
                 <select class="form-select" id="result-column" name="result_column" required 
                         placeholder="Add file to see options...">
+                    {% if args.result_column %}
+                        <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
+                    {% endif %}
                 </select>
 
                 <!--Model selection-->
                 <div>
                     <label for="regression-model">Regression model:</label>
                     <select id="regression-model" name="regression_model" required>
-                        <option value="LinearRegression">
+                        <option value="LinearRegression"
+                                {% if args.model_name == 'LinearRegression' %} 
+                                    selected 
+                                {% endif %}>
                             Linear Regression
-                             <!-- (Ordinary least squares Linear Regression) -->
                         </option>
-                        <option value="GradientBoostingRegressor">
+                        <option value="GradientBoostingRegressor"
+                        {% if args.model_name == 'GradientBoostingRegressor' %} 
+                            selected 
+                        {% endif %}>
                             Gradient Boosting Regression
-                             <!-- (Ensemble decision tree model) -->
                         </option>
                     </select>
                 </div>
@@ -67,25 +83,28 @@
                 <div>
                     <label for="trn-split" class="form-label">Training split</label>
                     <input type="range" class="form-range" min="0" max="1" step="0.01" 
-                           list="tickmarks" value=0.8 id="trn-split" name="trn_split" required 
-                           style="width: 30%; padding-left: 5px;">
+                           list="tickmarks" value={{ args.training_split }} id="trn-split" 
+                           name="trn_split" required style="width: 30%; padding-left: 5px;">
                     <datalist id="tickmarks">
                         {% for pct in range(0, 110, 10) %}
                         <option value="{{ pct/100 }}" label="{{ pct }}"></option>
                         {% endfor %}
                     </datalist>
 
-                    <input type="text" disabled="" value="80%" id="trn-pct-display" 
-                           style="width: 50px; margin-left: 10px"/>
+                    <input type="text" disabled="" id="trn-pct-display" 
+                           style="width: 50px; margin-left: 10px"
+                           value="{{ '%0.0f'|format(args.training_split*100) ~ '%' }}" />
                     
                     <!--TODO: tooltip explaining why to use i.e.
                               If you use the same file, split % and random seed, the same rows will
                               be allocated to each set, allowing for reproducible results.-->
-                    <label for="trn-split-random-seed" class="form-label" style="padding-left: 10px">
+                    <label for="trn-split-random-seed" class="form-label" 
+                           style="padding-left: 10px">
                         Random Seed <small>(optional)</small>
                     </label>
-                    <input type="number" id="trn-split-random-seed" name="trn_split_random_seed"
-                           placeholder="For a reproducible split">      
+                    <input type="number" id="trn-split-random-seed" 
+                           name="trn_split_random_seed" value="{{ args.random_seed }}"
+                           placeholder="For a reproducible split">
                     
                     <br/>
                     <small style="margin-left: 20px">
@@ -103,7 +122,7 @@
             <div class="form-check">
                 <!--standardise option-->
                 <input class="form-check-input" type="checkbox" id="check-standardise" 
-                       name="check_standardise" checked="">
+                       name="check_standardise" {{ 'checked=""' if args.standardise else '' }}>
                 <label class="form-check-label" for="check-standardise">
                     Standardise (centre and scale data across properties to zero mean, unit variance)
                 </label>
@@ -111,7 +130,7 @@
             <div class="form-check">
                 <!--normalise option-->
                 <input class="form-check-input" type="checkbox" id="check-normalise"
-                       name="check_normalise">
+                       name="check_normalise" {{ 'checked=""' if args.normalise else '' }}>
                 <label class="form-check-label" for="check-normalise">
                     Normalise data per sample (sum to one, accounting for missing values)
                 </label>
@@ -139,10 +158,17 @@
         <p style="color:#FF0000" ;>
             <!--Erorr details below overwritten in js if we get more details in json resp-->
             <span id="error-details">An Error Occurred. Please consider sending the file to us for investigation.</span>
-            <a href="mailto:{{support_email}}?subject=Error - {{route.upper()}}">
+            <a href="mailto:{{support_email}}?subject=Error">
                 <i class="fa fa-lg fa-solid fa-envelope"></i>
             </a>
         </p>
+    </div>
+
+    <!--tmp for debugging - model ref-->
+    <div>
+        <label for="model-ref" class="form-label">Trained model ref</label>
+        <input type="text" id="model-ref" name="model_ref" value="{{ model_ref }}" 
+               disabled="" style="width: 42%"/>
     </div>
 </div>
 {% endblock %}

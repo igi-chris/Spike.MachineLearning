@@ -79,7 +79,11 @@ function saveTrainingFile(file) {
         console.log(this.response);
         var training_filepath = this.response['filepath']
         trnCsvPath = document.getElementById("csv-path")
-        trnCsvPath.value = this.response['filepath']
+        trnCsvPath.value = training_filepath
+        console.log(`trnCsvPath.value set to ${trnCsvPath.value}`)
+
+        // tmp
+        document.getElementById("csv-path-display").value = training_filepath
 
         heads = this.response['headers']
         var resultColSelect = document.getElementById("result-column");
@@ -87,6 +91,7 @@ function saveTrainingFile(file) {
         for(i in heads) {
             resultColSelect.options[resultColSelect.options.length] = new Option(heads[i], heads[i]);
         }
+        resultColSelect.value = heads[i]  // default to last col for now
     }
 
     oReq.send(formData);
