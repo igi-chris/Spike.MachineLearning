@@ -13,7 +13,7 @@
         </a>
     </h4>
 
-    {% if not evaluation %}
+    {% if not args.csv_path %}
     <p>Select a file to be used for training data...</p>
     <div id="drop-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" ondragleave="endDragOver();"
         ondragend="endDragOver();">
@@ -54,10 +54,13 @@
             <div class="form-group">
 
                 <!--Result col option-->
-                <label for="result-column" class="form-label mt-4">Result column</label>
-                <select class="form-select" id="result-column" name="result_column" required 
-                        placeholder="Add file to see options..."
-                        {{ 'style.display="none"' if evaluation else '' }}>
+                <label for="result-column" 
+                       class="form-label mt-4 {{ 'hide-and-collapse' if args.csv_path else '' }}">
+                    Result column
+                </label>
+                <select class="form-select {{ 'hide-and-collapse' if args.csv_path else '' }}"
+                        id="result-column" name="result_column" required 
+                        placeholder="Add file to see options...">
                     {% if args.result_column %}
                         <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
                     {% endif %}
@@ -169,22 +172,25 @@
 
     {% if evaluation %}
     <div>
-        <h4>Metrics</h4>
+        <h4>    
+            Metrics
+            <small><small>(using test data held back from training)</small></small>
+        </h4>
 
         <div>
-            <input type="number" value="{{ '%0.3f'|format(evaluation.mse) }}" 
+            <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.mse) }}" 
                    id="mse" disabled="">
             <label for="mse" class="form-label">Mean Squared Error</label>
         </div>
         
         <div>
-            <input type="number" value="{{ '%0.3f'|format(evaluation.rmse) }}" 
+            <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.rmse) }}" 
                    id="rmse" disabled="">
             <label for="rmse" class="form-label">Root Mean Squared Error</label>
         </div>
         
         <div>
-            <input type="number" value="{{ '%0.3f'|format(evaluation.r2) }}" 
+            <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.r2) }}" 
                    id="r2" disabled="">
             <label for="r2" class="form-label">r² (Coefficient of determination)</label>
         </div>

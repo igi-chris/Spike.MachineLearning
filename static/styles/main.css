@@ -65,3 +65,12 @@
   background-color: var(--info-light-blue);
   font-size: 13px;
 }
+
+.metric {
+  width: 80px;
+  text-align: right;
+}
+
+.hide-and-collapse {
+  display: none;
+}
