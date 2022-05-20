@@ -67,10 +67,14 @@
 }
 
 .metric {
-  width: 120px;
+  width: 100px;
   text-align: right;
 }
 
 .hide-and-collapse {
   display: none;
+}
+
+.plot {
+  width: 500px;
 }

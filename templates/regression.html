@@ -171,31 +171,39 @@
     </div>
 
     {% if evaluation %}
-    <div>
-        <h4>    
-            Metrics
-            <small><small>(using test data held back from training)</small></small>
-        </h4>
+    <!-- <h4>    
+        Metrics
+        <small><small>(using test data held back from training)</small></small>
+    </h4> -->
 
-        <div>
-            <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.mse) }}" 
-                   id="mse" disabled="">
-            <label for="mse" class="form-label">Mean Squared Error</label>
-        </div>
-        
-        <div>
-            <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.rmse) }}" 
-                   id="rmse" disabled="">
-            <label for="rmse" class="form-label">Root Mean Squared Error</label>
-        </div>
-        
-        <div>
-            <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.r2) }}" 
-                   id="r2" disabled="">
-            <label for="r2" class="form-label">r² (Coefficient of determination)</label>
+    <div class="row">
+
+        <div class="col">
+            <img class="plot" src="{{ act_vs_pred_uri }}"
+                 alt="Plot of predicted vs actual values">
         </div>
 
-        <img src="{{ act_vs_pred_uri }}" alt="Plot of predicted vs actual values">
+        <div class="col">
+            <div>
+                <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.mse) }}" 
+                    id="mse" disabled="">
+                <label for="mse" class="form-label">Mean Squared Error</label>
+            </div>
+            
+            <div>
+                <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.rmse) }}" 
+                    id="rmse" disabled="">
+                <label for="rmse" class="form-label">Root Mean Squared Error</label>
+            </div>
+            
+            <div>
+                <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.r2) }}" 
+                    id="r2" disabled="">
+                <label for="r2" class="form-label">r² 
+                    <small>(Coefficient of determination)</small></label>
+            </div>
+        </div>
+        
     </div>
     {% endif %}
 

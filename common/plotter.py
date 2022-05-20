@@ -25,7 +25,7 @@ def build_actual_vs_predicted(actual: np.ndarray, predictions: np.ndarray,
     plt.legend()
 
     fpath = os.path.join(os.path.split(data_path)[0], 'act_vs_pred.png')
-    plt.savefig(fpath)
+    plt.savefig(fpath, bbox_inches='tight')
     plt.close()
 
     relative_path = fpath.split('static')[-1].replace("\\", "/")
