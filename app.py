@@ -78,13 +78,25 @@ def handle_exception(e):
 if __name__ =='__main__':
     import sys
     # to allow debugging, deployed version will start service using WSGI server
-    if sys.argv[-1].startswith('local'):  
+    if sys.argv[-1].startswith('local'):
+
         # load test case into memory (tmp)
         test_ref = 'keep_test_case'
         test_model_path = os.path.join(models_dir, f'pca_{test_ref}.joblib')
         if os.path.exists(test_model_path):
             model = joblib.load(test_model_path)
             register_model(model, as_ref=test_ref)
+
+        # remove old input files to stop them accumulating
+        input_files_dir = os.path.join(_this_dir, 'input_files')
+        for filename in os.listdir(input_files_dir):
+            os.remove(os.path.join(input_files_dir, filename))
+
+        # remove old model files to stop them accumulating
+        for filename in os.listdir(models_dir):
+            filepath = os.path.join(models_dir, filename)
+            if filepath != test_model_path:
+                os.remove(filepath)
 
         # start web server
         app.run(port=5000)
