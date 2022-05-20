@@ -1,14 +1,15 @@
 from dataclasses import dataclass, field
+from lib2to3.pgen2 import literals
 import os
 from typing import Optional
 from http import HTTPStatus
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression
-from flask import Response, Blueprint, render_template, request, jsonify
+from flask import Response, Blueprint, render_template, request, jsonify, url_for
 import pandas as pd
 
-from literals import models_dir, _version
+from literals import models_dir, _version, base_dir, tmp_files_dir_name
 from common.model_register import get_model, register_model
 from models.regression import evaluate, train, RegressionArgs
 
@@ -51,11 +52,18 @@ def train_linear_regression() -> str:
     model_ref = register_model(model)
 
     evaluation = evaluate(data, model, args)
+    act_vs_pred_uri = url_for('static', 
+                              filename=evaluation.act_vs_pred_plot_relative_path)  #get_plot_uri(evaluation.act_vs_pred_plot_path)
     return render_template('regression.html',
                            args=args,
                            model_ref=model_ref,
                            evaluation=evaluation,
-                           version=_version) 
+                           act_vs_pred_uri=act_vs_pred_uri,
+                           version=_version)
+
+
+# def get_plot_uri(path: str) -> str:
+#     return url_for(path)
 
 
 ###############################################################################

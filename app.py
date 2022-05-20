@@ -9,7 +9,7 @@ import joblib
 from flask import Flask, Response, jsonify, make_response, render_template, request
 from common.data_register import register_data
 
-from literals import models_dir, _version
+from literals import models_dir, _version, tmp_files_dir_name
 from app_pca import pca_blueprint
 from app_regression import regression_blueprint
 from common.model_register import register_model
@@ -48,7 +48,7 @@ def save_file() -> Response:
     uploaded_file = request.files['file']
     if uploaded_file.filename:        
         upl_filename = secure_filename(uploaded_file.filename)
-        target_dir = os.path.join(_this_dir, 'input_files')
+        target_dir = os.path.join(_this_dir, tmp_files_dir_name)
         session_id = str(uuid.uuid4())
         target_dir = os.path.join(target_dir, session_id)
         os.makedirs(target_dir)
@@ -87,16 +87,19 @@ if __name__ =='__main__':
             model = joblib.load(test_model_path)
             register_model(model, as_ref=test_ref)
 
-        # remove old input files to stop them accumulating
-        input_files_dir = os.path.join(_this_dir, 'input_files')
-        for filename in os.listdir(input_files_dir):
-            os.remove(os.path.join(input_files_dir, filename))
+        # try:
+        #     # remove old input files to stop them accumulating
+        #     input_files_dir = os.path.join(_this_dir, tmp_files_dir_name)
+        #     for filename in os.listdir(input_files_dir):
+        #         os.remove(os.path.join(input_files_dir, filename))
 
-        # remove old model files to stop them accumulating
-        for filename in os.listdir(models_dir):
-            if 'keep' in filename:
-                continue
-            os.remove(os.path.join(models_dir, filename))
+        #     # remove old model files to stop them accumulating
+        #     for filename in os.listdir(models_dir):
+        #         if 'keep' in filename:
+        #             continue
+        #         os.remove(os.path.join(models_dir, filename))
+        # except PermissionError as e:
+        #     print(f"Unable to remove file: {str(e)}")
 
         # start web server
         app.run(port=5000)

@@ -4,11 +4,15 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
+from literals import tmp_files_dir_name
+
 def build_actual_vs_predicted(actual: np.ndarray, predictions: np.ndarray, 
                               data_path: str, data_label: str="Test data") -> str:
     """
-    Build plot, save file and return path.
+    Build plot, save file and returns the relative path (easier to get the uri for).
     """
+    sns.set()
+
     # Plot predicted vs actual
     plt.scatter(actual, predictions, alpha=0.5, zorder=1, label=data_label)
     plt.xlabel('Actual Labels')
@@ -22,5 +26,9 @@ def build_actual_vs_predicted(actual: np.ndarray, predictions: np.ndarray,
 
     fpath = os.path.join(os.path.split(data_path)[0], 'act_vs_pred.png')
     plt.savefig(fpath)
-    return fpath
-    
+    plt.close()
+
+    relative_path = fpath.split('static')[-1].replace("\\", "/")
+    if relative_path.startswith("/"):
+        relative_path = relative_path[1:]
+    return relative_path

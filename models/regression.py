@@ -11,6 +11,7 @@ from pandas import DataFrame
 from pandas.api.types import is_numeric_dtype
 import numpy as np
 
+from common.plotter import build_actual_vs_predicted
 from common.preprocessing import build_column_transformer
 
 
@@ -24,18 +25,14 @@ class RegressionArgs():
     standardise: bool = field(default=False)
     normalise: bool = field(default=False)
 
-    @property
-    def csv_filename(self) -> str:
-        return os.path.split(self.csv_path)[-1] if self.csv_path else ""
-
 
 @dataclass
 class RegressionEvaluation():
     mse: float
     rmse: float
     r2: float
-    act_vs_pred_plot_path: str = field(default="")
-    # plot path(s) etc to follow
+    act_vs_pred_plot_relative_path: str
+
 
 
 def train(data: DataFrame,
@@ -65,10 +62,14 @@ def evaluate(data: DataFrame,
 
     # metrics
     mse = mean_squared_error(y_test, y_predictions)
+    act_vs_pred_path = build_actual_vs_predicted(actual=y_test, predictions=y_predictions,
+                                                 data_path=args.csv_path, 
+                                                 data_label='Test data')
     eval = RegressionEvaluation(
         mse = mse,
         rmse = np.sqrt(mse),
-        r2 = r2_score(y_test, y_predictions))
+        r2 = r2_score(y_test, y_predictions),
+        act_vs_pred_plot_relative_path=act_vs_pred_path)
 
     return eval
 
