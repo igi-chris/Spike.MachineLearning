@@ -26,7 +26,7 @@
             <label class="text-dark text-sm font-italic text-center text-sm">
                 (.csv)
             </label>
-            <br />
+            <br /><br />
             <svg height="50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                 <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
                 <path fill-opacity="80%"
@@ -35,12 +35,12 @@
         </p>
     </div>
 
-    <p id="file-display" class="text-secondary">{{ args.csv_filename }}</p> 
+    <p id="file-display" class="text-secondary">{{ args.csv_filename }}</p>
     {% endif %}
 
     <form action="/regression/linear/train" method="GET">
 
-        <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden"/>
+        <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
 
         <!--tmp for debugging-->
         <!-- <label for="csv-path-display" class="form-label mt-4">csv
@@ -54,15 +54,13 @@
             <div class="form-group">
 
                 <!--Result col option-->
-                <label for="result-column" 
-                       class="form-label mt-4 {{ 'hide-and-collapse' if args.csv_path else '' }}">
+                <label for="result-column" class="form-label mt-4 {{ 'hide-and-collapse' if args.csv_path else '' }}">
                     Result column
                 </label>
-                <select class="form-select {{ 'hide-and-collapse' if args.csv_path else '' }}"
-                        id="result-column" name="result_column" required 
-                        placeholder="Add file to see options...">
+                <select class="form-select {{ 'hide-and-collapse' if args.csv_path else '' }}" id="result-column"
+                    name="result_column" required placeholder="Add file to see options...">
                     {% if args.result_column %}
-                        <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
+                    <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
                     {% endif %}
                 </select>
 
@@ -70,16 +68,12 @@
                 <div>
                     <label for="regression-model">Model:</label>
                     <select id="regression-model" name="regression_model" required>
-                        <option value="LinearRegression"
-                                {% if args.model_name == 'LinearRegression' %} 
-                                    selected 
-                                {% endif %}>
+                        <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif
+                            %}>
                             Linear Regression
                         </option>
-                        <option value="GradientBoostingRegressor"
-                        {% if args.model_name == 'GradientBoostingRegressor' %} 
-                            selected 
-                        {% endif %}>
+                        <option value="GradientBoostingRegressor" {% if args.model_name=='GradientBoostingRegressor' %}
+                            selected {% endif %}>
                             Gradient Boosting Regression
                         </option>
                     </select>
@@ -88,33 +82,30 @@
                 <!--Test train split-->
                 <div>
                     <label for="trn-split" class="form-label">Training split</label>
-                    <input type="range" class="form-range" min="0" max="1" step="0.01" 
-                           list="tickmarks" value={{ args.training_split }} id="trn-split" 
-                           name="trn_split" required style="width: 30%; padding-left: 5px;">
+                    <input type="range" class="form-range" min="0" max="1" step="0.01" list="tickmarks" value={{
+                        args.training_split }} id="trn-split" name="trn_split" required
+                        style="width: 30%; padding-left: 5px;">
                     <datalist id="tickmarks">
                         {% for pct in range(0, 110, 10) %}
                         <option value="{{ pct/100 }}" label="{{ pct }}"></option>
                         {% endfor %}
                     </datalist>
 
-                    <input type="text" disabled="" id="trn-pct-display" 
-                           style="width: 50px; margin-left: 10px"
-                           value="{{ '%0.0f'|format(args.training_split*100) ~ '%' }}" />
-                    
+                    <input type="text" disabled="" id="trn-pct-display" style="width: 50px; margin-left: 10px"
+                        value="{{ '%0.0f'|format(args.training_split*100) ~ '%' }}" />
+
                     <!--TODO: tooltip explaining why to use i.e.
                               If you use the same file, split % and random seed, the same rows will
                               be allocated to each set, allowing for reproducible results.-->
-                    <label for="trn-split-random-seed" class="form-label" 
-                           style="padding-left: 10px">
+                    <label for="trn-split-random-seed" class="form-label" style="padding-left: 10px">
                         Random Seed <small>(optional)</small>
                     </label>
-                    <input type="number" id="trn-split-random-seed" 
-                           name="trn_split_random_seed" value="{{ args.random_seed }}"
-                           placeholder="For a reproducible split">
-                    
-                    <br/>
+                    <input type="number" id="trn-split-random-seed" name="trn_split_random_seed"
+                        value="{{ args.random_seed }}" placeholder="For a reproducible split">
+
+                    <br />
                     <small style="margin-left: 20px">
-                        The proportion of the data to be used for training the model (the rest 
+                        The proportion of the data to be used for training the model (the rest
                         will be held back to evaluate the trained model against).
                     </small>
                 </div>
@@ -122,35 +113,35 @@
         </fieldset>
         <fieldset>
 
-        <!--Preprocessing-->
-        <fieldset class="form-group">
-            <legend class="mt-4">Preprocessing Options</legend>
-            <div class="form-check">
-                <!--standardise option-->
-                <input class="form-check-input" type="checkbox" id="check-standardise" 
-                       name="check_standardise" {{ 'checked=""' if args.standardise else '' }}>
-                <label class="form-check-label" for="check-standardise">
-                    Standardise (centre and scale data across columns to zero mean, unit variance)
-                </label>
-            </div>
-            <div class="form-check">
-                <!--normalise option-->
-                <input class="form-check-input" type="checkbox" id="check-normalise"
-                       name="check_normalise" {{ 'checked=""' if args.normalise else '' }}>
-                <label class="form-check-label" for="check-normalise">
-                    Normalise data per sample (sum to one, accounting for missing values)
-                </label>
-                <div class="text-warning">
-                    <small>This should only be used
-                        if it makes sense for the columns in each row to sum to one 
-                        (i.e. they can be seen as proportions of a whole).
-                    </small>
+            <!--Preprocessing-->
+            <fieldset class="form-group">
+                <legend class="mt-4">Preprocessing Options</legend>
+                <div class="form-check">
+                    <!--standardise option-->
+                    <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
+                        {{ 'checked=""' if args.standardise else '' }}>
+                    <label class="form-check-label" for="check-standardise">
+                        Standardise (centre and scale data across columns to zero mean, unit variance)
+                    </label>
                 </div>
-            </div>
-            <p>Option for missing values comming soon...</p>
-        </fieldset>
-        
-        <button type="submit" class="btn btn-success">Train Model</button>
+                <div class="form-check">
+                    <!--normalise option-->
+                    <input class="form-check-input" type="checkbox" id="check-normalise" name="check_normalise"
+                        {{ 'checked=""' if args.normalise else '' }}>
+                    <label class="form-check-label" for="check-normalise">
+                        Normalise data per sample (sum to one, accounting for missing values)
+                    </label>
+                    <div class="text-warning">
+                        <small>This should only be used
+                            if it makes sense for the columns in each row to sum to one
+                            (i.e. they can be seen as proportions of a whole).
+                        </small>
+                    </div>
+                </div>
+                <p>Option for missing values comming soon...</p>
+            </fieldset>
+
+            <button type="submit" class="btn btn-success">Train Model</button>
     </form>
 
     <div class="progress" id="progress" style="visibility: hidden;">
@@ -179,31 +170,28 @@
     <div class="row">
 
         <div class="col">
-            <img class="plot" src="{{ act_vs_pred_uri }}"
-                 alt="Plot of predicted vs actual values">
+            <img class="plot" src="{{ act_vs_pred_uri }}" alt="Plot of predicted vs actual values">
         </div>
 
         <div class="col">
-            <div>
-                <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.mse) }}" 
-                    id="mse" disabled="">
-                <label for="mse" class="form-label">Mean Squared Error</label>
-            </div>
-            
-            <div>
-                <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.rmse) }}" 
-                    id="rmse" disabled="">
-                <label for="rmse" class="form-label">Root Mean Squared Error</label>
-            </div>
-            
-            <div>
-                <input class="metric" type="number" value="{{ '%0.3f'|format(evaluation.r2) }}" 
-                    id="r2" disabled="">
-                <label for="r2" class="form-label">r² 
-                    <small>(Coefficient of determination)</small></label>
-            </div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Metrics</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for (desc, val) in evaluation.metrics %}
+                    <tr>
+                        <td>{{ desc }}</th>
+                        <td>{{ '%0.3f'|format(val) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-        
+
     </div>
     {% endif %}
 
