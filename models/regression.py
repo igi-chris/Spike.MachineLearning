@@ -34,6 +34,7 @@ class RegressionEvaluation():
     mse: float
     rmse: float
     r2: float
+    act_vs_pred_plot_path: str = field(default="")
     # plot path(s) etc to follow
 
 
