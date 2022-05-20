@@ -2,9 +2,13 @@ import os
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 
 from literals import tmp_files_dir_name
+
+matplotlib.use('Agg')  # to stop matplot lib using threads for UI (showing plots)
+
 
 def build_actual_vs_predicted(actual: np.ndarray, predictions: np.ndarray, 
                               data_path: str, data_label: str="Test data") -> str:
@@ -19,8 +23,8 @@ def build_actual_vs_predicted(actual: np.ndarray, predictions: np.ndarray,
     plt.ylabel('Predicted Labels')
 
     # add identity line
-    zero_to_max = [0, actual.max()]
-    plt.plot(zero_to_max, zero_to_max, color='indianred', zorder=2, alpha=0.75, 
+    data_range = [min(0,actual.min(), predictions.min()), max(actual.max(), predictions.max())]
+    plt.plot(data_range, data_range, color='indianred', zorder=2, alpha=0.75, 
              label="Identity line")
     plt.legend()
 
