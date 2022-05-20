@@ -94,9 +94,9 @@ if __name__ =='__main__':
 
         # remove old model files to stop them accumulating
         for filename in os.listdir(models_dir):
-            filepath = os.path.join(models_dir, filename)
-            if filepath != test_model_path:
-                os.remove(filepath)
+            if 'keep' in filename:
+                continue
+            os.remove(os.path.join(models_dir, filename))
 
         # start web server
         app.run(port=5000)
