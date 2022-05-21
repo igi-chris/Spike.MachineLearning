@@ -188,16 +188,20 @@
     <h5>Previous Experiments</h5>
     {% endif %}
     {% for exp in prev_experiments|reverse %}
-        <span class="badge bg-light">
+        <span class="badge bg-light mb-3 text-primary">
             <div>
                 <span>Model: {{ exp.model_abbr }}</span>
 
                 {% if exp.args.standardise %}
                     <span class="badge bg-primary text-white">S</span>
+                {% else %}
+                    <span class="badge bg-light text-light">-</span>
                 {% endif %}
 
                 {% if exp.args.normalise %}
                     <span class="badge bg-primary text-white">N</span>
+                    {% else %}
+                        <span class="badge bg-light text-light">-</span>
                 {% endif %}
             </div>
             <div>
