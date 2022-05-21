@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass, field
 import os
 from typing import NamedTuple, Optional, List, Sequence, Tuple
@@ -16,12 +17,6 @@ from common.plotter import build_actual_vs_predicted
 from common.preprocessing import build_column_transformer
 
 
-class Metric(NamedTuple):
-    code: str
-    full_name: str
-    value: float
-
-
 @dataclass
 class RegressionArgs():
     csv_path: str = field(default="")
@@ -32,6 +27,12 @@ class RegressionArgs():
     random_seed: Optional[int] = field(default=None)
     standardise: bool = field(default=False)
     normalise: bool = field(default=False)
+
+
+class Metric(NamedTuple):
+    code: str
+    full_name: str
+    value: float
 
 
 @dataclass
@@ -64,10 +65,15 @@ class RegressionExperiment():
     args: RegressionArgs
     eval: RegressionEvaluation
     model_ref: str
+    num: int
 
     @property
-    def session_ref(self):
-        return self.args.session_ref
+    def model_abbr(self) -> str:
+        return "".join(chr for chr in self.args.model_name if chr.isupper())
+
+    def has_different_args(self, others: List[RegressionExperiment]) -> bool:
+        # should split & random seed count as diffs or just modelling / preproc args?
+        return self.args not in [e.args for e in others]
 
 
 def train(data: DataFrame,
