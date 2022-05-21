@@ -42,9 +42,13 @@
   display:none
 }
 
+.float-right {
+  float: right;
+}
+
 #home-icon {
+  margin: 20px;
   height: 24px;
-  vertical-align: top;
   float: right;
 }
 
