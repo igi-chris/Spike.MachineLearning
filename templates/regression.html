@@ -121,7 +121,10 @@
                     <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
                         {{ 'checked=""' if args.standardise else '' }}>
                     <label class="form-check-label" for="check-standardise">
-                        Standardise (centre and scale data across columns to zero mean, unit variance)
+                        Standardise 
+                        <small>
+                            (centre and scale data across columns to zero mean, unit variance)
+                        </small>
                     </label>
                 </div>
                 <div class="form-check">
@@ -129,7 +132,10 @@
                     <input class="form-check-input" type="checkbox" id="check-normalise" name="check_normalise"
                         {{ 'checked=""' if args.normalise else '' }}>
                     <label class="form-check-label" for="check-normalise">
-                        Normalise data per sample (sum to one, accounting for missing values)
+                        Normalise data per sample 
+                        <small>
+                            (sum to one, accounting for missing values)
+                        </small>
                     </label>
                     <div class="text-warning">
                         <small>This should only be used
@@ -185,7 +191,7 @@
                 {% for (desc, val) in evaluation.metrics %}
                     <tr>
                         <td>{{ desc }}</th>
-                        <td>{{ '%0.3f'|format(val) }}</td>
+                        <td style="text-align: right;">{{ '%0.2f'|format(val) }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

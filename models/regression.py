@@ -52,7 +52,10 @@ def train(data: DataFrame,
     X_train, _, y_train, _ = split_data(data, args)
 
     # TODO define a mapping somewhere or expect exact str and initialise class from it
-    regressor = GradientBoostingRegressor() if args.model_name == 'GradientBoostingRegressor' else LinearRegression()
+    if args.model_name == 'GradientBoostingRegressor':
+        regressor = GradientBoostingRegressor(random_state=args.random_seed)  
+    else: 
+        regressor = LinearRegression()
 
     if args.standardise or args.normalise:
         preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)
