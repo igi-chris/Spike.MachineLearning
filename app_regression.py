@@ -52,13 +52,15 @@ def train_linear_regression() -> str:
     data = lookup_dataframe(args.session_ref)
 
     model = train(data=data, args=args)
-    model_ref = register_model(model)
 
     evaluation = evaluate(data, model, args)
-    prev_experiments = get_experiments(args.session_ref)[:]
-    exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, 
-                               num=len(prev_experiments))
-    if exp.has_different_args(prev_experiments):
+    prev_experiments = get_experiments(args.session_ref)
+
+    matched_experiment = args.find_same_modelling_args(prev_experiments)
+    model_ref = matched_experiment.model_ref if matched_experiment else register_model(model)
+    exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref)
+
+    if not matched_experiment:
         register_experiment(ref=args.session_ref, experiment=exp)
 
     return render_template('regression.html',

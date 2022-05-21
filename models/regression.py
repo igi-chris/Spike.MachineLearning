@@ -28,6 +28,20 @@ class RegressionArgs():
     standardise: bool = field(default=False)
     normalise: bool = field(default=False)
 
+    @property
+    def modelling_args(self) -> Tuple[str, bool, bool]:
+        """
+        Relates to preprocessing & modelling args that will form part of the pipeline.
+        """
+        return (self.model_name, self.standardise, self.normalise)
+        
+    def find_same_modelling_args(self, prev: List[RegressionExperiment]) -> Optional[RegressionExperiment]:
+        """
+        Checks the provided list previous experiments and compares on 
+        modelling args and return a match if found.
+        """
+        return next((e for e in prev if e.args.modelling_args == self.modelling_args), None)
+
 
 class Metric(NamedTuple):
     code: str
@@ -65,15 +79,10 @@ class RegressionExperiment():
     args: RegressionArgs
     eval: RegressionEvaluation
     model_ref: str
-    num: int
 
     @property
     def model_abbr(self) -> str:
         return "".join(chr for chr in self.args.model_name if chr.isupper())
-
-    def has_different_args(self, others: List[RegressionExperiment]) -> bool:
-        # should split & random seed count as diffs or just modelling / preproc args?
-        return self.args not in [e.args for e in others]
 
 
 def train(data: DataFrame,
