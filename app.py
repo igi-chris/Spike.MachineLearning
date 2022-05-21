@@ -7,7 +7,7 @@ import uuid
 import joblib
 
 from flask import Flask, Response, jsonify, make_response, render_template, request
-from common.data_register import register_data
+from common.data_register import register_dataframe
 
 from literals import models_dir, _version, tmp_files_dir_name
 from app_pca import pca_blueprint
@@ -55,8 +55,8 @@ def save_file() -> Response:
         
         input_file_path = os.path.join(target_dir, upl_filename)
         uploaded_file.save(input_file_path)
-        df = register_data(input_file_path)  # allows up to look up dataframe from path
-        return jsonify(filepath=input_file_path, headers=df.columns.tolist())
+        df = register_dataframe(path=input_file_path, ref=session_id)
+        return jsonify(filepath=input_file_path, df_ref=session_id, headers=df.columns.tolist())
     raise FileNotFoundError("No file given in request")
     
 

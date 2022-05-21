@@ -77,10 +77,9 @@ function saveTrainingFile(file) {
     oReq.onload = function(e) {
         // handle failure, progress etc later
         console.log(this.response);
-        var training_filepath = this.response['filepath']
-        trnCsvPath = document.getElementById("csv-path")
-        trnCsvPath.value = training_filepath
-        console.log(`trnCsvPath.value set to ${trnCsvPath.value}`)
+
+        document.getElementById("csv-path").value = this.response['filepath']
+        document.getElementById("df-ref").value = this.response['df_ref']
 
         // tmp
         //document.getElementById("csv-path-display").value = training_filepath

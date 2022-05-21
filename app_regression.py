@@ -8,6 +8,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression
 from flask import Response, Blueprint, render_template, request, jsonify, url_for
 import pandas as pd
+from common.data_register import lookup_dataframe
 
 from literals import models_dir, _version, base_dir, tmp_files_dir_name
 from common.model_register import get_model, register_model
@@ -35,6 +36,7 @@ def train_linear_regression() -> str:
     args = RegressionArgs(
     # get query params
         csv_path = request.args.get('csv_path', default=''),
+        df_ref = request.args.get('df_ref', default=''),
         result_column = request.args.get('result_column', default=''),
         model_name = request.args.get('regression_model', default=''),
         training_split = request.args.get('trn_split', default=0.8, 
@@ -46,7 +48,8 @@ def train_linear_regression() -> str:
         normalise = request.args.get('check_normalise', default=False, 
                                      type=lambda v: v.lower() == 'on')
     )
-    data = pd.read_csv(args.csv_path)
+    #data = pd.read_csv(args.csv_path)
+    data = lookup_dataframe(args.df_ref)
     model = train(data=data, args=args)
     model_ref = register_model(model)
 

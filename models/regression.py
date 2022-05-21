@@ -19,6 +19,7 @@ from common.preprocessing import build_column_transformer
 @dataclass
 class RegressionArgs():
     csv_path: str = field(default="")
+    df_ref: str = field(default="")
     result_column: str = field(default="")
     model_name: str = field(default="")
     training_split: float = field(default=0.7)
@@ -49,6 +50,13 @@ class RegressionEvaluation():
     @property
     def act_vs_pred_uri(self) -> str:
         return url_for('static', filename=self.act_vs_pred_plot_relative_path) 
+
+
+@dataclass
+class RegressionExperiment():
+    args: RegressionArgs
+    eval: RegressionEvaluation
+    model_ref: str
 
 
 def train(data: DataFrame,
