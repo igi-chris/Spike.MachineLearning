@@ -42,7 +42,7 @@
     <form action="/regression/linear/train" method="GET">
 
         <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
-        <input id="df-ref" name="df_ref" value="{{ args.df_ref }}" type="hidden" />
+        <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
 
         <!--tmp for debugging-->
         <!-- <label for="csv-path-display" class="form-label mt-4">csv
@@ -103,7 +103,7 @@
                         Random Seed <small>(optional)</small>
                     </label>
                     <input type="number" id="trn-split-random-seed" name="trn_split_random_seed"
-                        value="{{ args.random_seed }}" placeholder="For a reproducible split">
+                        value="{{ args.random_seed }}" placeholder="For reproducible results">
 
                     <br />
                     <small style="margin-left: 20px">
@@ -187,10 +187,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for (desc, val) in evaluation.metrics %}
+                {% for (code, name, val) in evaluation.metrics %}
                     <tr>
-                        <td>{{ desc }}</th>
-                        <td style="text-align: right;">{{ '%0.2f'|format(val) }}</td>
+                        <td>{{ name }}</th>
+                        <td id="{{ code }}" style="text-align: right;">
+                            {{ '%0.2f'|format(val) }}
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import os
-from typing import Optional, List, Sequence, Tuple
+from typing import NamedTuple, Optional, List, Sequence, Tuple
 from flask import url_for
 
 from sklearn.ensemble import GradientBoostingRegressor
@@ -16,10 +16,16 @@ from common.plotter import build_actual_vs_predicted
 from common.preprocessing import build_column_transformer
 
 
+class Metric(NamedTuple):
+    code: str
+    full_name: str
+    value: float
+
+
 @dataclass
 class RegressionArgs():
     csv_path: str = field(default="")
-    df_ref: str = field(default="")
+    session_ref: str = field(default="")
     result_column: str = field(default="")
     model_name: str = field(default="")
     training_split: float = field(default=0.7)
@@ -38,13 +44,14 @@ class RegressionEvaluation():
     act_vs_pred_plot_relative_path: str
 
     @property
-    def metrics(self) -> Sequence[Tuple[str, float]]:
+    def metrics(self) -> Sequence[Metric]:
+        "Tuples of long name, value, short name"
         return [
-            ("Mean Squared Error", self.mse),
-            ("Root Mean Squared Error", self.rmse),
-            ("Mean Absolute Error", self.mean_abs_err),
-            ("Median Absolute Error", self.median_abs_err),
-            ("R² (Coefficient of determination)", self.r2)
+            Metric("MSE", "Mean Squared Error", self.mse),
+            Metric("RMSE", "Root Mean Squared Error", self.rmse),
+            Metric("MnAE", "Mean Absolute Error", self.mean_abs_err),
+            Metric("MdAE", "Median Absolute Error", self.median_abs_err),
+            Metric("R²", "R² (Coefficient of determination)", self.r2)
         ]
 
     @property
@@ -57,6 +64,10 @@ class RegressionExperiment():
     args: RegressionArgs
     eval: RegressionEvaluation
     model_ref: str
+
+    @property
+    def session_ref(self):
+        return self.args.session_ref
 
 
 def train(data: DataFrame,

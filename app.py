@@ -49,14 +49,14 @@ def save_file() -> Response:
     if uploaded_file.filename:        
         upl_filename = secure_filename(uploaded_file.filename)
         target_dir = os.path.join(_this_dir, tmp_files_dir_name)
-        session_id = str(uuid.uuid4())
-        target_dir = os.path.join(target_dir, session_id)
+        session_ref = str(uuid.uuid4())
+        target_dir = os.path.join(target_dir, session_ref)
         os.makedirs(target_dir)
         
         input_file_path = os.path.join(target_dir, upl_filename)
         uploaded_file.save(input_file_path)
-        df = register_dataframe(path=input_file_path, ref=session_id)
-        return jsonify(filepath=input_file_path, df_ref=session_id, headers=df.columns.tolist())
+        df = register_dataframe(path=input_file_path, ref=session_ref)
+        return jsonify(filepath=input_file_path, session_ref=session_ref, headers=df.columns.tolist())
     raise FileNotFoundError("No file given in request")
     
 

@@ -79,7 +79,7 @@ function saveTrainingFile(file) {
         console.log(this.response);
 
         document.getElementById("csv-path").value = this.response['filepath']
-        document.getElementById("df-ref").value = this.response['df_ref']
+        document.getElementById("session-ref").value = this.response['session_ref']
 
         // tmp
         //document.getElementById("csv-path-display").value = training_filepath
