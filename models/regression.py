@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import os
 from typing import Optional, List, Sequence, Tuple
+from flask import url_for
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression
@@ -45,6 +46,9 @@ class RegressionEvaluation():
             ("R² (Coefficient of determination)", self.r2)
         ]
 
+    @property
+    def act_vs_pred_uri(self) -> str:
+        return url_for('static', filename=self.act_vs_pred_plot_relative_path) 
 
 
 def train(data: DataFrame,

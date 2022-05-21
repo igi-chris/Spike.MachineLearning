@@ -168,15 +168,12 @@
     </div>
 
     {% if evaluation %}
-    <!-- <h4>    
-        Metrics
-        <small><small>(using test data held back from training)</small></small>
-    </h4> -->
 
     <div class="row">
 
         <div class="col">
-            <img class="plot" src="{{ act_vs_pred_uri }}" alt="Plot of predicted vs actual values">
+            <img class="plot" src="{{ evaluation.act_vs_pred_uri }}" 
+                 alt="Plot of predicted vs actual values">
         </div>
 
         <div class="col">
