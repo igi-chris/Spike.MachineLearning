@@ -55,7 +55,7 @@ def train_linear_regression() -> str:
     model_ref = register_model(model)
 
     evaluation = evaluate(data, model, args)
-    prev_experiments = get_experiments(args.session_ref)
+    prev_experiments = get_experiments(args.session_ref)[:]
     exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, 
                                num=len(prev_experiments))
     if exp.has_different_args(prev_experiments):
