@@ -1,28 +1,25 @@
 from http import HTTPStatus
 from http.client import HTTPException
-import json
 import os
 import traceback
-import uuid
 import joblib
 
-from flask import Flask, Response, jsonify, make_response, render_template, request
-from common.data_register import register_dataframe
+from flask import Flask, Response, jsonify, make_response, render_template
 
-from literals import models_dir, _version, tmp_files_dir_name
+from literals import models_dir, _version
 from app_pca import pca_blueprint
 from app_regression import regression_blueprint
+from app_utils import utils_blueprint
 from common.model_register import register_model
-from common.utils import secure_filename
 
 # TODO: 
 #       * Catch warnings (https://stackoverflow.com/a/5645133/2012446)
 #         e.g. sklearn warning (https://github.com/Prosserc/python_notebooks/blob/master/learning/sklearn/ICA.ipynb)
 
 app = Flask("ml_service")
+app.register_blueprint(utils_blueprint)
 app.register_blueprint(regression_blueprint)
 app.register_blueprint(pca_blueprint)
-_this_dir = os.path.dirname(__file__)
 
 
 @app.route("/test")
@@ -33,7 +30,7 @@ def connection_test() -> Response:
 @app.route("/")
 @app.route("/index", methods=['GET'])
 def index() -> str:
-    title_link_pairs = [('Regression', '/regression'), 
+    title_link_pairs = [('Regression', '/regression/train'), 
                         # ('Classification', '/classification'), 
                         # ('Clustering', '/clustering'), 
                         # ('Dimension Reduction', '/dimensions')
@@ -41,23 +38,6 @@ def index() -> str:
     return render_template('index.html', 
                            title_link_pairs=title_link_pairs, 
                            version=_version)
-
-
-@app.route("/api/savefile", methods=['POST'])
-def save_file() -> Response:
-    uploaded_file = request.files['file']
-    if uploaded_file.filename:        
-        upl_filename = secure_filename(uploaded_file.filename)
-        target_dir = os.path.join(_this_dir, tmp_files_dir_name)
-        session_ref = str(uuid.uuid4())
-        target_dir = os.path.join(target_dir, session_ref)
-        os.makedirs(target_dir)
-        
-        input_file_path = os.path.join(target_dir, upl_filename)
-        uploaded_file.save(input_file_path)
-        df = register_dataframe(path=input_file_path, ref=session_ref)
-        return jsonify(filepath=input_file_path, session_ref=session_ref, headers=df.columns.tolist())
-    raise FileNotFoundError("No file given in request")
     
 
 # TODO - Replace with a json resp or page that is suuitable for users.

@@ -5,6 +5,7 @@ from typing import NamedTuple, Optional, List, Sequence, Tuple
 from flask import url_for
 
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -25,8 +26,12 @@ class RegressionArgs():
     model_name: str = field(default="")
     training_split: float = field(default=0.7)
     random_seed: Optional[int] = field(default=None)
-    standardise: bool = field(default=False)
+    standardise: bool = field(default=True)
     normalise: bool = field(default=False)
+
+    @property
+    def csv_filename(self) -> str:
+        return os.path.split(self.csv_path)[-1]
 
     @property
     def modelling_args(self) -> Tuple[str, bool, bool]:
@@ -92,8 +97,12 @@ def train(data: DataFrame,
     # TODO define a mapping somewhere or expect exact str and initialise class from it
     if args.model_name == 'GradientBoostingRegressor':
         regressor = GradientBoostingRegressor(random_state=args.random_seed)  
+    elif args.model_name == 'GaussianProcessRegressor':
+        regressor = GaussianProcessRegressor(random_state=args.random_seed)  
+    elif args.model_name == 'LinearRegression':
+        regressor = LinearRegression()  
     else: 
-        regressor = LinearRegression()
+        raise NotImplementedError(f"{args.model_name} model not currently supported")
 
     if args.standardise or args.normalise:
         preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)

@@ -7,17 +7,17 @@
             <h4>Train a Regression Model</h4>
         </div>
         <div class="col">
-            <a href="/regression">
+            <a href="/regression/train">
                 <span class="badge rounded-pill float-right" id="restart">Restart</span>
             </a>
         </div>
     </div>
     
 
-    {% if not args.csv_path %}
+    {% if not evaluation %}
     <p>Select a file to be used for training data...</p>
-    <div id="drop-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" ondragleave="endDragOver();"
-        ondragend="endDragOver();">
+    <div id="drop-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" 
+         ondragleave="endDragOver();" ondragend="endDragOver();">
         <p class="text-center">
             Drag file here or
             <label>
@@ -36,10 +36,10 @@
         </p>
     </div>
 
-    <p id="file-display" class="text-secondary">{{ args.csv_filename }}</p>
+    <p id="file-display" class="text-dark">{{ args.csv_filename }}</p>
     {% endif %}
 
-    <form action="/regression/linear/train" method="GET">
+    <form action="/regression/evaluate" method="GET">
 
         <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
@@ -56,13 +56,23 @@
             <div class="form-group">
 
                 <!--Result col option-->
-                <label for="result-column" class="form-label mt-4 {{ 'hide-and-collapse' if args.csv_path else '' }}">
+                <label for="result-column" 
+                       class="form-label mt-4 {{ 'hide-and-collapse' if evaluation else '' }}">
                     Result column
                 </label>
-                <select class="form-select {{ 'hide-and-collapse' if args.csv_path else '' }}" id="result-column"
+                <select class="form-select {{ 'hide-and-collapse' if evaluation else '' }}" id="result-column"
                     name="result_column" required placeholder="Add file to see options...">
-                    {% if args.result_column %}
-                    <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
+                    <!--if heads for pigi integration-->
+                    {% if headers %} 
+                        {% for head in headers %}
+                            {% if not loop.last %}
+                                <option value="{{ head }}">{{ head }}</option>
+                            {% else %}
+                                <option value="{{ head }}" selected>{{ head }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% elif args.result_column %}
+                        <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
                     {% endif %}
                 </select>
 
@@ -78,6 +88,11 @@
                             selected {% endif %}>
                             Gradient Boosting Regression
                         </option>
+                        <option value="GaussianProcessRegressor" {% if args.model_name=='GaussianProcessRegressor' %}
+                            selected {% endif %}>
+                            Gaussian Process Regression
+                        </option>
+                        
                     </select>
                 </div>
 
