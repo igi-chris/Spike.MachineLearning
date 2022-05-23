@@ -4,7 +4,7 @@ import uuid
 from flask import Blueprint, Response, jsonify, request
 
 from common.data_register import register_dataframe
-from common.utils import secure_filename
+from common.utils import csv_path_from_ref, secure_filename
 from literals import tmp_files_dir_name
 
 utils_blueprint = Blueprint('utils', __name__)
@@ -20,13 +20,8 @@ def save_file() -> Response:
 def save_file_local():
     uploaded_file = request.files['file']
     if uploaded_file.filename:        
-        upl_filename = secure_filename(uploaded_file.filename)
-        target_dir = os.path.join(_this_dir, tmp_files_dir_name)
         session_ref = str(uuid.uuid4())
-        target_dir = os.path.join(target_dir, session_ref)
-        os.makedirs(target_dir)
-        
-        input_file_path = os.path.join(target_dir, upl_filename)
+        input_file_path = csv_path_from_ref()
         uploaded_file.save(input_file_path)
         df = register_dataframe(path=input_file_path, ref=session_ref)
         return input_file_path, session_ref, df.columns.to_list()

@@ -1,20 +1,10 @@
-from dataclasses import dataclass, field
-from lib2to3.pgen2 import literals
-import os
-from typing import Optional
-from http import HTTPStatus
-from numpy import save
-
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.linear_model import LinearRegression
-from flask import Response, Blueprint, render_template, request, jsonify, url_for
-import pandas as pd
-from app_utils import save_file, save_file_local
+from flask import Blueprint, render_template, request, url_for
 from common.data_register import get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
+from common.utils import csv_path_from_ref
 
-from literals import models_dir, _version, base_dir, tmp_files_dir_name
-from common.model_register import get_model, register_model
+from common.model_register import register_model
 from models.regression import RegressionExperiment, evaluate, train, RegressionArgs
+from literals import _version
 
 
 regression_blueprint = Blueprint('regression', __name__)
@@ -25,12 +15,9 @@ regression_blueprint = Blueprint('regression', __name__)
 ###############################################################################
 @regression_blueprint.route("/regression/train", methods=['GET', 'POST'])
 def resgression() -> str:
-    #if request.method == 'GET':
-
-    # TODO: support just one or other: handle no ref (get from path via util?)
-    fpath = request.args.get('csv_path', default='')
     ref = request.args.get('session_ref', default='')
-    if fpath and ref:
+    if ref:
+        fpath = csv_path_from_ref(ref)
         data = register_dataframe(fpath, ref=ref)
         heads = data.columns.to_list()
         args = RegressionArgs(csv_path=fpath, session_ref=ref)
@@ -41,14 +28,6 @@ def resgression() -> str:
     return render_template('regression.html',
                         args=RegressionArgs(),
                         version=_version)
-
-    # for pIGI integration allow launch with a file
-    # fpath, ref, heads = save_file_local()
-    # return render_template('regression.html',
-    #                     args=RegressionArgs(csv_path=fpath, 
-    #                                         session_ref=ref),
-    #                     headers=heads, 
-    #                     version=_version)
 
 
 @regression_blueprint.route("/regression/evaluate", methods=['GET'])
