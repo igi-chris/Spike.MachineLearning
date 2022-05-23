@@ -49,7 +49,7 @@ def handle_exception(e):
         return e
     resp = {
         "error": str(e),
-        "traceback": traceback.format_exception(e)
+        "traceback": traceback.format_exc().splitlines()
     }
     # TODO: decide how we can separate 400 / 500 status responses - just ex type may not be enough
     return jsonify(**resp), HTTPStatus.INTERNAL_SERVER_ERROR
