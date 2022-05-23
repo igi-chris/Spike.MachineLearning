@@ -21,7 +21,7 @@ def save_file_local():
     uploaded_file = request.files['file']
     if uploaded_file.filename:        
         session_ref = str(uuid.uuid4())
-        input_file_path = csv_path_from_ref()
+        input_file_path = csv_path_from_ref(session_ref)
         uploaded_file.save(input_file_path)
         df = register_dataframe(path=input_file_path, ref=session_ref)
         return input_file_path, session_ref, df.columns.to_list()

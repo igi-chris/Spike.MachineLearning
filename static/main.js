@@ -66,7 +66,7 @@ function dropHandler(ev) {
 function saveTrainingFile(file) {
 
     console.log(file.name);
-    document.getElementById('file-display').innerHTML = `File: ${file.name}`;
+    document.getElementById('file-display').innerHTML = file.name;
       
     var formData = new FormData();
     formData.append("file", file);
