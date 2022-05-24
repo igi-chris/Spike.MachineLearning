@@ -2,6 +2,7 @@ window.onload = function() {
     training_filepath = "";
     setupBrowseListener();
     setupTrainingOptionsListerners();
+    showOrHideConstValueField();
 }
 
 function setupBrowseListener() {
@@ -76,7 +77,7 @@ function saveTrainingFile(file) {
 
     oReq.onload = function(e) {
         // handle failure, progress etc later
-        console.log(this.response);
+        //console.log(this.response);
 
         document.getElementById("csv-path").value = this.response['filepath']
         document.getElementById("session-ref").value = this.response['session_ref']
@@ -108,4 +109,17 @@ function endDragOver() {
 
 function showProgress() {
     document.getElementById('progress').style.visibility = 'visible';
+}
+
+function showOrHideConstValueField() {
+    var option = document.getElementById("null-replacement").value;
+    var fillValueEl = document.getElementById("fill-value");
+    //console.log(`option set to: ${option}`)
+    if (option == "constant") {
+        fillValueEl.style.visibility = "visible";
+        fillValueEl.required = true;
+    } else {
+        fillValueEl.style.visibility = "hidden";
+        fillValueEl.required = false;
+    }
 }

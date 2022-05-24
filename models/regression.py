@@ -28,6 +28,8 @@ class RegressionArgs():
     random_seed: Optional[int] = field(default=None)
     standardise: bool = field(default=True)
     normalise: bool = field(default=False)
+    null_replacement: str = field(default="mean")
+    fill_value: Optional[float] = field(default=None)  # use if null_replacement is "constant"
 
     @property
     def csv_filename(self) -> str:
@@ -90,8 +92,11 @@ class RegressionExperiment():
         return "".join(chr for chr in self.args.model_name if chr.isupper())
 
 
-def train(data: DataFrame,
-          args: RegressionArgs) -> Pipeline:
+def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
+    # drop rows where we don't have the result (not useful for training)
+    # TODO: report to UI
+    data.dropna(subset=[args.result_column], inplace=True)
+
     X_train, _, y_train, _ = split_data(data, args)
 
     # TODO define a mapping somewhere or expect exact str and initialise class from it
@@ -104,7 +109,10 @@ def train(data: DataFrame,
     else: 
         raise NotImplementedError(f"{args.model_name} model not currently supported")
 
-    preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)
+    preprocessor = build_column_transformer(standardise=args.standardise, 
+                                            normalise=args.normalise,
+                                            null_repl=args.null_replacement,
+                                            fill_value=args.fill_value)
     
     model = Pipeline(steps=[('preprocessor', preprocessor),
                             ('regressor', regressor)])
