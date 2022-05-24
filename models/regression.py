@@ -107,6 +107,7 @@ class RegressionExperiment():
     args: RegressionArgs
     eval: RegressionEvaluation
     model_ref: str
+    id: int
 
     @property
     def model_abbr(self) -> str:

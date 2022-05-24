@@ -39,10 +39,12 @@
     <p id="file-display" class="text-dark">{{ args.csv_filename }}</p>
     {% endif %}
 
-    <form action="/regression/evaluate" method="GET" onsubmit="showProgress()">
+    <form action="/regression/evaluate" method="GET" onsubmit="showProgress()" 
+          id="args-form" name="args_form">
 
         <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
+        <input id="selected-experiment-id" name="selected_experiment_id" type="hidden">
 
         <!--tmp for debugging-->
         <!-- <label for="csv-path-display" class="form-label mt-4">csv
@@ -231,7 +233,8 @@
     <h5>Previous Experiments</h5>
     {% endif %}
     {% for exp in prev_experiments|reverse %}
-    <span class="badge bg-light mb-3 text-primary">
+    <button class="badge bg-light mb-3 text-primary prev-experiment {% if selected_experiment_id=='{{ exp.id }}' %} selected-experiment {% endif %}" 
+            onclick="selectExperiment('{{ exp.id }}')">
         <div>
             <span>Model: {{ exp.model_abbr }}</span>
 
@@ -252,9 +255,10 @@
         <div>
             <span>
                 R²: {{ '%0.2f'|format(exp.eval.r2) }} |
-                RMSE: {{ '%0.2f'|format(exp.eval.rmse) }}</span>
+                RMSE: {{ '%0.2f'|format(exp.eval.rmse) }}
+            </span>
         </div>
-    </span>
+    </button>
     {% endfor %}
     {% endif %}
 
