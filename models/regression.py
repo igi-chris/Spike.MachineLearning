@@ -28,7 +28,7 @@ class RegressionArgs():
     random_seed: Optional[int] = field(default=None)
     standardise: bool = field(default=True)
     normalise: bool = field(default=False)
-    null_replacement: str = field(default="mean")
+    null_replacement: str = field(default="mean")  # mean | median | most_frequent | constant
     fill_value: Optional[float] = field(default=None)  # use if null_replacement is "constant"
 
     @property
@@ -36,11 +36,12 @@ class RegressionArgs():
         return os.path.split(self.csv_path)[-1]
 
     @property
-    def modelling_args(self) -> Tuple[str, bool, bool]:
+    def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float]]:
         """
         Relates to preprocessing & modelling args that will form part of the pipeline.
         """
-        return (self.model_name, self.standardise, self.normalise)
+        return (self.model_name, self.standardise, self.normalise, 
+                self.null_replacement, self.fill_value)
         
     def find_same_modelling_args(self, prev: List[RegressionExperiment]) -> Optional[RegressionExperiment]:
         """
@@ -48,6 +49,26 @@ class RegressionArgs():
         modelling args and return a match if found.
         """
         return next((e for e in prev if e.args.modelling_args == self.modelling_args), None)
+
+    @property
+    def null_abbr(self) -> str:
+        """Abbreviated summary for how null replacements are handled"""
+        if self.null_replacement == 'mean':
+            return 'Mn'
+        elif self.null_replacement == 'median':
+            return 'Md'
+        elif self.null_replacement == 'most_frequent':
+            return 'MF'
+        elif self.null_replacement =='constant' and self.fill_value is not None:
+            fill = str(round(self.fill_value, 3))
+            for i in range (3):
+                if fill.endswith("0"):
+                    fill = fill[:-1]
+            if fill.endswith("."):
+                fill = fill[:-1]
+            return fill
+        else:
+            return '??'
 
 
 class Metric(NamedTuple):
