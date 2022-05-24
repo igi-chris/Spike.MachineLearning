@@ -231,7 +231,7 @@
     <h5>Previous Experiments</h5>
     {% endif %}
     {% for exp in prev_experiments|reverse %}
-    <span class="badge bg-light mb-3 text-primary">
+    <div class="badge bg-light mb-3 text-primary prev-experiment" id="exp-{{loop.index}}">
         <div>
             <span>Model: {{ exp.model_abbr }}</span>
 
@@ -252,9 +252,10 @@
         <div>
             <span>
                 R²: {{ '%0.2f'|format(exp.eval.r2) }} |
-                RMSE: {{ '%0.2f'|format(exp.eval.rmse) }}</span>
+                RMSE: {{ '%0.2f'|format(exp.eval.rmse) }}
+            </span>
         </div>
-    </span>
+    </div>
     {% endfor %}
     {% endif %}
 
