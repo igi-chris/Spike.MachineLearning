@@ -104,12 +104,10 @@ def train(data: DataFrame,
     else: 
         raise NotImplementedError(f"{args.model_name} model not currently supported")
 
-    if args.standardise or args.normalise:
-        preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)
-        model = Pipeline(steps=[('preprocessor', preprocessor),
-                                ('regressor', regressor)])
-    else:
-        model = Pipeline(steps=[('regressor', regressor)])
+    preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)
+    
+    model = Pipeline(steps=[('preprocessor', preprocessor),
+                            ('regressor', regressor)])
 
     trained_model = model.fit(X_train, (y_train))
     return trained_model
