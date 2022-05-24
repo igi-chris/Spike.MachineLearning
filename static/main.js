@@ -105,3 +105,7 @@ function dragOverHandler(ev) {
 function endDragOver() {
     document.getElementById('drop-zone').classList.remove('dragging');
 }
+
+function showProgress() {
+    document.getElementById('progress').style.visibility = 'visible';
+}
