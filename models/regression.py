@@ -28,17 +28,20 @@ class RegressionArgs():
     random_seed: Optional[int] = field(default=None)
     standardise: bool = field(default=True)
     normalise: bool = field(default=False)
+    null_replacement: str = field(default="mean")  # mean | median | most_frequent | constant
+    fill_value: Optional[float] = field(default=None)  # use if null_replacement is "constant"
 
     @property
     def csv_filename(self) -> str:
         return os.path.split(self.csv_path)[-1]
 
     @property
-    def modelling_args(self) -> Tuple[str, bool, bool]:
+    def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float]]:
         """
         Relates to preprocessing & modelling args that will form part of the pipeline.
         """
-        return (self.model_name, self.standardise, self.normalise)
+        return (self.model_name, self.standardise, self.normalise, 
+                self.null_replacement, self.fill_value)
         
     def find_same_modelling_args(self, prev: List[RegressionExperiment]) -> Optional[RegressionExperiment]:
         """
@@ -46,6 +49,26 @@ class RegressionArgs():
         modelling args and return a match if found.
         """
         return next((e for e in prev if e.args.modelling_args == self.modelling_args), None)
+
+    @property
+    def null_abbr(self) -> str:
+        """Abbreviated summary for how null replacements are handled"""
+        if self.null_replacement == 'mean':
+            return 'Mn'
+        elif self.null_replacement == 'median':
+            return 'Md'
+        elif self.null_replacement == 'most_frequent':
+            return 'MF'
+        elif self.null_replacement =='constant' and self.fill_value is not None:
+            fill = str(round(self.fill_value, 3))
+            for i in range (3):
+                if fill.endswith("0"):
+                    fill = fill[:-1]
+            if fill.endswith("."):
+                fill = fill[:-1]
+            return fill
+        else:
+            return '??'
 
 
 class Metric(NamedTuple):
@@ -90,8 +113,11 @@ class RegressionExperiment():
         return "".join(chr for chr in self.args.model_name if chr.isupper())
 
 
-def train(data: DataFrame,
-          args: RegressionArgs) -> Pipeline:
+def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
+    # drop rows where we don't have the result (not useful for training)
+    # TODO: report to UI
+    data.dropna(subset=[args.result_column], inplace=True)
+
     X_train, _, y_train, _ = split_data(data, args)
 
     # TODO define a mapping somewhere or expect exact str and initialise class from it
@@ -104,7 +130,10 @@ def train(data: DataFrame,
     else: 
         raise NotImplementedError(f"{args.model_name} model not currently supported")
 
-    preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)
+    preprocessor = build_column_transformer(standardise=args.standardise, 
+                                            normalise=args.normalise,
+                                            null_repl=args.null_replacement,
+                                            fill_value=args.fill_value)
     
     model = Pipeline(steps=[('preprocessor', preprocessor),
                             ('regressor', regressor)])

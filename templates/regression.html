@@ -12,12 +12,12 @@
             </a>
         </div>
     </div>
-    
+
 
     {% if not evaluation %}
     <p>Select a file to be used for training data...</p>
-    <div id="drop-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" 
-         ondragleave="endDragOver();" ondragend="endDragOver();">
+    <div id="drop-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" ondragleave="endDragOver();"
+        ondragend="endDragOver();">
         <p class="text-center">
             Drag file here or
             <label>
@@ -39,7 +39,7 @@
     <p id="file-display" class="text-dark">{{ args.csv_filename }}</p>
     {% endif %}
 
-    <form action="/regression/evaluate" method="GET">
+    <form action="/regression/evaluate" method="GET" onsubmit="showProgress()">
 
         <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
@@ -56,23 +56,22 @@
             <div class="form-group">
 
                 <!--Result col option-->
-                <label for="result-column" 
-                       class="form-label mt-4 {{ 'hide-and-collapse' if evaluation else '' }}">
+                <label for="result-column" class="form-label mt-4 {{ 'hide-and-collapse' if evaluation else '' }}">
                     Result column
                 </label>
                 <select class="form-select {{ 'hide-and-collapse' if evaluation else '' }}" id="result-column"
                     name="result_column" required placeholder="Add file to see options...">
                     <!--if heads for pigi integration-->
-                    {% if headers %} 
-                        {% for head in headers %}
-                            {% if not loop.last %}
-                                <option value="{{ head }}">{{ head }}</option>
-                            {% else %}
-                                <option value="{{ head }}" selected>{{ head }}</option>
-                            {% endif %}
-                        {% endfor %}
+                    {% if headers %}
+                    {% for head in headers %}
+                    {% if not loop.last %}
+                    <option value="{{ head }}">{{ head }}</option>
+                    {% else %}
+                    <option value="{{ head }}" selected>{{ head }}</option>
+                    {% endif %}
+                    {% endfor %}
                     {% elif args.result_column %}
-                        <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
+                    <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
                     {% endif %}
                 </select>
 
@@ -80,8 +79,7 @@
                 <div>
                     <label for="regression-model">Model:</label>
                     <select id="regression-model" name="regression_model" required>
-                        <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif
-                            %}>
+                        <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif %}>
                             Linear Regression
                         </option>
                         <option value="GradientBoostingRegressor" {% if args.model_name=='GradientBoostingRegressor' %}
@@ -92,7 +90,7 @@
                             selected {% endif %}>
                             Gaussian Process Regression
                         </option> -->
-                        
+
                     </select>
                 </div>
 
@@ -128,57 +126,74 @@
                 </div>
             </div>
         </fieldset>
-        <fieldset>
 
-            <!--Preprocessing-->
-            <fieldset class="form-group">
-                <legend>Preprocessing Options</legend>
-                <div class="form-check">
-                    <!--standardise option-->
-                    <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
-                        {{ 'checked=""' if args.standardise else '' }}>
-                    <label class="form-check-label" for="check-standardise">
-                        Standardise 
-                        <small>
-                            (centre and scale data across columns to zero mean, unit variance)
-                        </small>
-                    </label>
-                </div>
-                <div class="form-check">
-                    <!--normalise option-->
-                    <input class="form-check-input" type="checkbox" id="check-normalise" name="check_normalise"
-                        {{ 'checked=""' if args.normalise else '' }}>
-                    <label class="form-check-label" for="check-normalise">
-                        Normalise data per sample 
-                        <small>
-                            (sum to one, accounting for missing values)
-                        </small>
-                    </label>
-                    <div class="text-warning">
-                        <small>This should only be used
-                            if it makes sense for the columns in each row to sum to one
-                            (i.e. they can be seen as proportions of a whole).
-                        </small>
+        <!--Preprocessing-->
+        <fieldset class="form-group">
+            <legend>Preprocessing Options</legend>
+            <div class="form-check">
+                <!--standardise option-->
+                <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
+                    {{ 'checked=""' if args.standardise else '' }}>
+                <label class="form-check-label" for="check-standardise">
+                    Standardise
+                    <small>
+                        (centre and scale data across columns to zero mean, unit variance)
+                    </small>
+                </label>
+            </div>
+            <div class="form-check">
+                <!--normalise option-->
+                <input class="form-check-input" type="checkbox" id="check-normalise" name="check_normalise"
+                    {{ 'checked=""' if args.normalise else '' }}>
+                <label class="form-check-label" for="check-normalise">
+                    Normalise data per sample
+                    <small>
+                        (sum to one, accounting for missing values)
+                    </small>
+                </label>
+                <!-- <div class="text-warning">
+                    <small>This should only be used
+                        if it makes sense for the columns in each row to sum to one
+                        (i.e. they can be seen as proportions of a whole).
+                    </small>
+                </div> -->
+            </div>
+            <!--null replacement-->
+            <label for="null-replacement">Replace empty values with</label>
+            <select id="null-replacement" name="null_replacement" required onchange="showOrHideConstValueField()">
+                <option value="mean" {% if args.null_replacement=='mean' %} selected {% endif %}>
+                    Mean
+                </option>
+                <option value="median" {% if args.null_replacement=='median' %} selected {% endif %}>
+                    Median
+                </option>
+                <option value="most_frequent" {% if args.null_replacement=='most_frequent' %} selected {% endif %}>
+                    Most Frequent
+                </option>
+                <option value="constant" {% if args.null_replacement=='constant' %} selected {% endif %}>
+                    Constant
+                </option>
+            </select>
+            <input type="number" id="fill-value" name="fill_value" step="0.001"
+                   style="visibility: hidden; width: 100px; height: 23px"
+                   {% if args.null_replacement=='constant' %} 
+                    value="{{args.fill_value}}" 
+                   {% endif %} >
+        </fieldset>
+
+        <div class="row">
+            <div class="col-2">
+                <button type="submit" class="btn btn-success">Train Model</button>
+            </div>
+            <div class="col-10">
+                <div class="progress" id="progress" style="visibility: hidden; vertical-align: middle;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                        role="progressbar" id="progressBar" aria-valuenow="100" aria-valuemin="0"
+                        aria-valuemax="100" style="width: 100%">Training Model...
                     </div>
                 </div>
-                <p>Option for missing values comming soon...</p>
-            </fieldset>
-
-            <div class="row">
-                <div class="col-2">
-                    <button type="submit" class="btn btn-success" 
-                            onclick="showProgress()">
-                        Train Model
-                    </button>
-                </div>  
-                <div class="col-10">
-                    <div class="progress" id="progress" style="visibility: hidden; vertical-align: middle;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
-                             role="progressbar" id="progressBar"
-                             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
-                             style="width: 100%">Training Model...</div>
-                    </div>
-                </div>
+            </div>
+        </div>
     </form>
 
     {% if evaluation %}
@@ -186,8 +201,7 @@
     <div class="row">
 
         <div class="col">
-            <img class="plot" src="{{ evaluation.act_vs_pred_uri }}" 
-                 alt="Plot of predicted vs actual values">
+            <img class="plot" src="{{ evaluation.act_vs_pred_uri }}" alt="Plot of predicted vs actual values">
         </div>
 
         <div class="col">
@@ -199,14 +213,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for (code, name, val) in evaluation.metrics %}
+                    {% for (code, name, val) in evaluation.metrics %}
                     <tr>
                         <td>{{ name }}</th>
                         <td id="{{ code }}" style="text-align: right;">
                             {{ '%0.2f'|format(val) }}
                         </td>
                     </tr>
-                {% endfor %}
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -217,28 +231,30 @@
     <h5>Previous Experiments</h5>
     {% endif %}
     {% for exp in prev_experiments|reverse %}
-        <span class="badge bg-light mb-3 text-primary">
-            <div>
-                <span>Model: {{ exp.model_abbr }}</span>
+    <span class="badge bg-light mb-3 text-primary">
+        <div>
+            <span>Model: {{ exp.model_abbr }}</span>
 
-                {% if exp.args.standardise %}
-                    <span class="badge bg-primary text-white">S</span>
-                {% else %}
-                    <span class="badge bg-light text-light">-</span>
-                {% endif %}
+            {% if exp.args.standardise %}
+            <span class="badge bg-primary text-white">S</span>
+            {% else %}
+            <span class="badge bg-light text-light">-</span>
+            {% endif %}
 
-                {% if exp.args.normalise %}
-                    <span class="badge bg-primary text-white">N</span>
-                    {% else %}
-                        <span class="badge bg-light text-light">-</span>
-                {% endif %}
-            </div>
-            <div>
-                <span>
-                    R²: {{ '%0.2f'|format(exp.eval.r2) }} | 
-                    RMSE: {{ '%0.2f'|format(exp.eval.rmse) }}</span>
-            </div>
-        </span>
+            {% if exp.args.normalise %}
+            <span class="badge bg-primary text-white">N</span>
+            {% else %}
+            <span class="badge bg-light text-light">-</span>
+            {% endif %}
+
+            <span class="badge bg-primary text-white">{{ exp.args.null_abbr }}</span>
+        </div>
+        <div>
+            <span>
+                R²: {{ '%0.2f'|format(exp.eval.r2) }} |
+                RMSE: {{ '%0.2f'|format(exp.eval.rmse) }}</span>
+        </div>
+    </span>
     {% endfor %}
     {% endif %}
 

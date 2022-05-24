@@ -45,7 +45,10 @@ def train_linear_regression() -> str:
         standardise = request.args.get('check_standardise', default=False, 
                                        type=lambda v: v.lower() == 'on'),
         normalise = request.args.get('check_normalise', default=False, 
-                                     type=lambda v: v.lower() == 'on')
+                                     type=lambda v: v.lower() == 'on'),
+        null_replacement=request.args.get('null_replacement', default=''),
+        fill_value=request.args.get('fill_value', default=None, 
+                                    type=lambda v: float(v) if v else None)
     )
     
     if has_data(args.session_ref):
