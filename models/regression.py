@@ -6,7 +6,9 @@ from flask import url_for
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
+from sklearn.base import BaseEstimator
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -105,9 +107,11 @@ def train(data: DataFrame,
         raise NotImplementedError(f"{args.model_name} model not currently supported")
 
     preprocessor = build_column_transformer(standardise=args.standardise, normalise=args.normalise)
-    
-    model = Pipeline(steps=[('preprocessor', preprocessor),
-                            ('regressor', regressor)])
+    steps: List[Tuple[str, BaseEstimator]] = []
+    if preprocessor:
+        steps.append(('preprocessor', preprocessor))
+    steps.append(('regressor', regressor))
+    model = Pipeline(steps=steps)
 
     trained_model = model.fit(X_train, (y_train))
     return trained_model
@@ -147,8 +151,14 @@ def split_data(data, args: RegressionArgs) -> Tuple:
     X, y = data[numeric_features].values, data[args.result_column].values
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1-args.training_split, 
                                                         random_state=args.random_seed)
-        
-    return X_train, X_test, y_train, y_test
+
+    # basic imputer for now that just does mean replacement - TODO: options
+    # not sure whether to put this in pipeline (Dan eventually wants option for 
+    # null replacement when applying model)...
+    imputer = SimpleImputer(strategy='mean')
+    X_train_cleaned = imputer.fit_transform(X_train)
+    X_test_cleaned = imputer.fit_transform(X_test)
+    return X_train_cleaned, X_test_cleaned, y_train, y_test
 
 
 def extract_numeric_columns(data: DataFrame, result_column: str) -> List[str]:    
