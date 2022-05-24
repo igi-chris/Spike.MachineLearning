@@ -233,12 +233,8 @@
     <h5>Previous Experiments</h5>
     {% endif %}
     {% for exp in prev_experiments|reverse %}
-    <button class="badge bg-light mb-3 text-primary prev-experiment" 
-            onclick="selectExperiment('{{ exp.id }}')"
-            {% if selected_experiment_id=="exp.id" %}
-            id="selected-experiment"
-            {% endif %}
-            >
+    <button class="badge bg-light mb-3 text-primary prev-experiment {% if selected_experiment_id=='{{ exp.id }}' %} selected-experiment {% endif %}" 
+            onclick="selectExperiment('{{ exp.id }}')">
         <div>
             <span>Model: {{ exp.model_abbr }}</span>
 

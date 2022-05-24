@@ -92,9 +92,10 @@
   border-radius: 4px;
   border-width: 1px;
   border-color: var(--bs-dark);
+  box-shadow: 1px 1px var(--bs-secondary);
 }
 
-#selected-experiment.prev-experiment {
+.selected-experiment.prev-experiment {
   border-width: 2px;
   border-color: var(--bs-success);
 }
