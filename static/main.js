@@ -38,17 +38,17 @@ function setupTrainingOptionsListerners() {
         e.preventDefault();
     }
 
-    previousExperimentElements = document.getElementsByClassName("prev-experiment")
-    Array.prototype.forEach.call(previousExperimentElements, function(el) {
-        console.log(`Found element - ${el.id}`)
-        el.addEventListener('click', handlePrevExperimentClick, false)
-    });
+    // previousExperimentElements = document.getElementsByClassName("prev-experiment")
+    // Array.prototype.forEach.call(previousExperimentElements, function(el) {
+    //     console.log(`Found element - ${el.id}`)
+    //     el.addEventListener('click', handlePrevExperimentClick, false)
+    // });
 
-    function handlePrevExperimentClick(e) {
-        var id = e.target.id;
-        console.log(`click from id ${id}`);
-        console.log(e.target);
-    }
+    // function handlePrevExperimentClick(e) {
+    //     var id = e.target.id;
+    //     console.log(`click from id ${id}`);
+    //     console.log(e.target);
+    // }
 }
 
 function dropHandler(ev) {
@@ -134,4 +134,10 @@ function showOrHideConstValueField() {
         fillValueEl.style.visibility = "hidden";
         fillValueEl.required = false;
     }
+}
+
+function selectExperiment(id) {
+    document.getElementById("selected-experiment-id").value = id;
+    console.log(`selected-experiment-id set to: ${document.getElementById("selected-experiment-id").value}`);
+    document.args_form.submit();
 }
