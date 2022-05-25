@@ -37,18 +37,6 @@ function setupTrainingOptionsListerners() {
         displayTrainingSplit.value = `${pct}%`
         e.preventDefault();
     }
-
-    // previousExperimentElements = document.getElementsByClassName("prev-experiment")
-    // Array.prototype.forEach.call(previousExperimentElements, function(el) {
-    //     console.log(`Found element - ${el.id}`)
-    //     el.addEventListener('click', handlePrevExperimentClick, false)
-    // });
-
-    // function handlePrevExperimentClick(e) {
-    //     var id = e.target.id;
-    //     console.log(`click from id ${id}`);
-    //     console.log(e.target);
-    // }
 }
 
 function dropHandler(ev) {
@@ -140,4 +128,48 @@ function selectExperiment(id) {
     document.getElementById("selected-experiment-id").value = id;
     console.log(`selected-experiment-id set to: ${document.getElementById("selected-experiment-id").value}`);
     document.args_form.submit();
+}
+
+function saveModel(model_type) {
+    url = `/api/${model_type}/download`;
+    session_ref = document.getElementById('session-ref').value
+    exp_id = document.getElementById('selected-experiment-id').value
+    params = `session_ref=${session_ref}`
+    if (exp_id) {
+        params += `&selected_experiment_id=${exp_id}`
+    }
+
+    var oReq = new XMLHttpRequest();
+    oReq.responseType = 'blob';
+    oReq.open("GET", url+"?"+params, true);
+
+    oReq.onload = function(e) {
+        if (oReq.status == 200) {
+            handleFileTransSuccess(this.response);
+        } else {
+            handleFileTransFailure(this.response);
+        }
+
+        function handleFileTransSuccess(response) {
+            console.log('Handling success response...');
+            var blob = response;
+            var contentDispo = e.currentTarget.getResponseHeader('Content-Disposition');
+            var filename = contentDispo.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
+            console.log(`calling saveBlob for ${filename}`)
+            saveBlob(blob, filename);
+        }
+
+        function handleFileTransFailure(response) {
+            console.log('Something went wrong...');  // handle UI for err etc later
+            console.log(response)
+        }
+    }
+    oReq.send();  
+}
+
+function saveBlob(blob, filename) {
+    var a = document.createElement('a');
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    a.dispatchEvent(new MouseEvent('click'));
 }

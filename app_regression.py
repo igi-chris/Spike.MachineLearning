@@ -4,7 +4,8 @@ from common.data_register import get_experiment, get_experiments, has_data, look
 from common.utils import csv_path_from_ref
 
 from common.model_register import register_model
-from models.regression import RegressionExperiment, evaluate, serialise_model, train, RegressionArgs
+from models.regression import evaluate, serialise_model, train
+from models.regression_types import RegressionExperiment, RegressionArgs
 from literals import _version
 
 
@@ -35,7 +36,7 @@ def train_regression_model() -> str:
 @regression_blueprint.route("/regression/evaluate", methods=['GET'])
 def evaluate_regression_model() -> str:
     selected_exp = request.args.get('selected_experiment_id', default=None, 
-                                    type=lambda v: int(v) if v else None)
+                                    type=lambda v: int(v) if v and v != 'None' else None)
     
 
     args = RegressionArgs(
@@ -65,7 +66,7 @@ def evaluate_regression_model() -> str:
     prev_experiments = get_experiments(args.session_ref)
 
     # overwrite args read from form if we have a selected experiment
-    if selected_exp or selected_exp == 0:
+    if (selected_exp or selected_exp == 0) and prev_experiments:
         print(f"selected experiment: {selected_exp}")
         exp = prev_experiments[selected_exp]
         args = exp.args

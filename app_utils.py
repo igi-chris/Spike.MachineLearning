@@ -1,14 +1,11 @@
-import os
 import uuid
 
 from flask import Blueprint, Response, jsonify, request
 
 from common.data_register import register_dataframe
-from common.utils import csv_path_from_ref, secure_filename
-from literals import tmp_files_dir_name
+from common.utils import csv_path_from_ref
 
 utils_blueprint = Blueprint('utils', __name__)
-_this_dir = os.path.dirname(__file__)
 
 
 @utils_blueprint.route("/api/savefile", methods=['POST'])

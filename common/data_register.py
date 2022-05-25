@@ -3,7 +3,7 @@ from typing import DefaultDict, Dict, List
 
 import pandas as pd
 
-from models.regression import RegressionExperiment
+from models.regression_types import RegressionExperiment
 
 
 
