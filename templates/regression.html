@@ -44,7 +44,8 @@
 
         <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
-        <input id="selected-experiment-id" name="selected_experiment_id" type="hidden">
+        <input id="selected-experiment-id" name="selected_experiment_id" 
+               value="{{ selected_experiment_id }}" type="hidden">
 
         <!--tmp for debugging-->
         <!-- <label for="csv-path-display" class="form-label mt-4">csv
@@ -225,6 +226,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <button class="btn btn-success" onclick="saveModel()">Save Model</button>
         </div>
 
     </div>

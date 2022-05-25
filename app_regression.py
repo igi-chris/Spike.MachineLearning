@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, url_for
-from common.data_register import get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
+from http import HTTPStatus
+from flask import Blueprint, Response, make_response, render_template, request, send_file, url_for
+from common.data_register import get_experiment, get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
 from common.utils import csv_path_from_ref
 
 from common.model_register import register_model
-from models.regression import RegressionExperiment, evaluate, train, RegressionArgs
+from models.regression import RegressionExperiment, evaluate, serialise_model, train, RegressionArgs
 from literals import _version
 
 
@@ -15,7 +16,7 @@ regression_blueprint = Blueprint('regression', __name__)
 ###############################################################################
 @regression_blueprint.route("/regression", methods=['GET'])
 @regression_blueprint.route("/regression/train", methods=['GET'])
-def resgression() -> str:
+def train_regression_model() -> str:
     ref = request.args.get('session_ref', default='')
     if ref:
         fpath = csv_path_from_ref(ref)
@@ -32,7 +33,7 @@ def resgression() -> str:
 
 
 @regression_blueprint.route("/regression/evaluate", methods=['GET'])
-def train_linear_regression() -> str:
+def evaluate_regression_model() -> str:
     selected_exp = request.args.get('selected_experiment_id', default=None, 
                                     type=lambda v: int(v) if v else None)
     
@@ -93,3 +94,18 @@ def train_linear_regression() -> str:
 ###############################################################################
 #                             A P I   R o u t e s                             #
 ###############################################################################
+
+@regression_blueprint.route("/api/regression/download", methods=['GET'])
+def download_regression_model() -> Response:
+    selected_exp = request.args.get('selected_experiment_id', default=None, 
+                                    type=lambda v: int(v) if v else None)
+    session_ref = request.args.get('session_ref', default='')
+
+    if selected_exp or selected_exp == 0:
+        exp = get_experiment(session_ref, selected_exp)
+    else:
+        # for now get most recent if none selected - consider if best
+        exp = get_experiments(session_ref)[-1]
+    
+    model_path = serialise_model(exp)
+    return make_response(send_file(model_path, as_attachment=True), HTTPStatus.OK)

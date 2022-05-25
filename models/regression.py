@@ -2,8 +2,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import os
 from typing import NamedTuple, Optional, List, Sequence, Tuple
-from flask import url_for
+from joblib import dump, load
 
+from flask import url_for
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import LinearRegression
@@ -13,9 +14,11 @@ from sklearn.pipeline import Pipeline
 from pandas import DataFrame
 from pandas.api.types import is_numeric_dtype
 import numpy as np
+from common.model_register import get_model
 
 from common.plotter import build_actual_vs_predicted
 from common.preprocessing import build_column_transformer
+from common.utils import get_model_path
 
 
 @dataclass
@@ -113,6 +116,10 @@ class RegressionExperiment():
     def model_abbr(self) -> str:
         return "".join(chr for chr in self.args.model_name if chr.isupper())
 
+    @property
+    def abbr_summary(self) -> str:
+        return "tmp" #self.model_abbr_
+
 
 def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
     # drop rows where we don't have the result (not useful for training)
@@ -168,6 +175,16 @@ def evaluate(data: DataFrame,
 
 def predict(X_test: np.ndarray, model: Pipeline):
     return model.predict(X_test)
+
+
+def serialise_model(exp: RegressionExperiment) -> str:
+    """
+    Serialise model and return path
+    """
+    path = get_model_path(exp)
+    model = get_model(exp.model_ref)
+    dump(model, path)
+    return path
 
 
 def split_data(data, args: RegressionArgs) -> Tuple:

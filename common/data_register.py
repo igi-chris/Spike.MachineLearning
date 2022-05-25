@@ -37,5 +37,9 @@ def get_experiments(ref: str) -> List[RegressionExperiment]:
     return _ref_to_experiments.get(ref, [])
 
 
+def get_experiment(ref: str, idx: int) -> RegressionExperiment:
+    return _ref_to_experiments[ref][idx]
+
+
 def has_data(path: str) -> bool:
     return path in _ref_to_dataframe

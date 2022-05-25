@@ -3,6 +3,7 @@ import re
 import unicodedata
 
 from literals import base_dir, tmp_files_dir_name, training_data_fname
+from models.regression import RegressionExperiment
 
 
 def ref_from_path(path: str) -> str:
@@ -14,12 +15,20 @@ def ref_from_path(path: str) -> str:
     return res.group(1)
 
 
-def csv_path_from_ref(ref: str) -> str:
+def csv_path_from_ref(session_ref: str) -> str:
     tmp_files_dir = os.path.join(base_dir, tmp_files_dir_name)
     os.makedirs(tmp_files_dir, exist_ok=True)
-    target_dir = os.path.join(tmp_files_dir, ref)
-    os.makedirs(target_dir, exist_ok=True)
-    return os.path.join(target_dir, training_data_fname)
+    session_dir = os.path.join(tmp_files_dir, session_ref)
+    os.makedirs(session_dir, exist_ok=True)
+    return os.path.join(session_dir, training_data_fname)
+
+
+def get_model_path(experiment: RegressionExperiment) -> str:
+    tmp_files_dir = os.path.join(base_dir, tmp_files_dir_name)
+    os.makedirs(tmp_files_dir, exist_ok=True)
+    session_dir = os.path.join(tmp_files_dir, experiment.args.session_ref)
+    os.makedirs(session_dir, exist_ok=True)
+    return os.path.join(session_dir, training_data_fname)
 
 
 def secure_filename(filename: str) -> str:
