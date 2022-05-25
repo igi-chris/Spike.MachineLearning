@@ -13,7 +13,8 @@ regression_blueprint = Blueprint('regression', __name__)
 ###############################################################################
 #                              U I   R o u t e s                              #
 ###############################################################################
-@regression_blueprint.route("/regression/train", methods=['GET', 'POST'])
+@regression_blueprint.route("/regression", methods=['GET'])
+@regression_blueprint.route("/regression/train", methods=['GET'])
 def resgression() -> str:
     ref = request.args.get('session_ref', default='')
     if ref:
