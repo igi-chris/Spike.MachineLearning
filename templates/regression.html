@@ -42,10 +42,14 @@
     <form action="/regression/evaluate" method="GET" onsubmit="showProgress()" 
           id="args-form" name="args_form">
 
+        <!--hiden fields-->
         <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
         <input id="selected-experiment-id" name="selected_experiment_id" 
-               value="{{ selected_experiment_id }}" type="hidden">
+               {% if selected_experiment_id and selected_experiment_id|int(-1) != -1 %}
+               value="{{ selected_experiment_id }}" 
+               {% endif %}
+               type="hidden">
 
         <!--tmp for debugging-->
         <!-- <label for="csv-path-display" class="form-label mt-4">csv
@@ -132,7 +136,7 @@
 
         <!--Preprocessing-->
         <fieldset class="form-group">
-            <legend>Preprocessing Options</legend>
+            <h5>Preprocessing Options</h5>
             <div class="form-check">
                 <!--standardise option-->
                 <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
@@ -236,10 +240,12 @@
     </div>
 
     {% if prev_experiments %}
-    <h5>Previous Experiments</h5>
+    <h5>Previous Experiments<small><small> (not saved with model)</small></small></h5>
     {% endif %}
+    <!-- <button class="badge bg-light mb-3 text-primary prev-experiment">Normal</button>
+    <button class="badge bg-light mb-3 text-primary prev-experiment selected-experiment">Selected</button> -->
     {% for exp in prev_experiments|reverse %}
-    <button class="badge bg-light mb-3 text-primary prev-experiment {% if selected_experiment_id=='{{ exp.id }}' %} selected-experiment {% endif %}" 
+    <button class="badge bg-light mb-3 text-primary prev-experiment" id="exp-{{ exp.id }}"
             onclick="selectExperiment('{{ exp.id }}')">
         <div>
             <span>Model: {{ exp.model_abbr }}</span>

@@ -3,6 +3,7 @@ window.onload = function() {
     setupBrowseListener();
     setupTrainingOptionsListerners();
     showOrHideConstValueField();
+    highlightSelectedExperiment();
 }
 
 function setupBrowseListener() {
@@ -37,6 +38,13 @@ function setupTrainingOptionsListerners() {
         displayTrainingSplit.value = `${pct}%`
         e.preventDefault();
     }
+}
+
+function highlightSelectedExperiment() {
+    selIdEl = document.getElementById("selected-experiment-id");
+    if (!selIdEl || !selIdEl.value) { return; }
+    selExpBtn = document.getElementById(`exp-${selIdEl.value}`);
+    selExpBtn.classList.add('selected-experiment')
 }
 
 function dropHandler(ev) {
@@ -125,9 +133,18 @@ function showOrHideConstValueField() {
 }
 
 function selectExperiment(id) {
-    document.getElementById("selected-experiment-id").value = id;
-    console.log(`selected-experiment-id set to: ${document.getElementById("selected-experiment-id").value}`);
-    document.args_form.submit();
+    el = document.getElementById("selected-experiment-id")
+    if (el.value == id) {
+        // deselect
+        el.value = null;
+        expEl = document.getElementById(`exp-${id}`);
+        expEl.classList.remove('selected-experiment')
+        console.log(`selected-experiment-id reset to: ${document.getElementById("selected-experiment-id").value}`);
+    } else {
+        el.value = id;
+        document.args_form.submit();
+        console.log(`selected-experiment-id set to: ${document.getElementById("selected-experiment-id").value}`);
+    }
 }
 
 function saveModel(model_type) {

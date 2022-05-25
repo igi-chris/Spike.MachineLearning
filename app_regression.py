@@ -73,12 +73,12 @@ def evaluate_regression_model() -> str:
         evaluation = exp.eval
         model_ref = exp.model_ref
     else:    
+        exp_id = len(prev_experiments)
         model = train(data=data, args=args)
-        evaluation = evaluate(data, model, args)
+        evaluation = evaluate(data, model, args, exp_id)
         matched_experiment = args.find_same_modelling_args(prev_experiments)
-        id = len(prev_experiments)
         model_ref = matched_experiment.model_ref if matched_experiment else register_model(model)
-        exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, id=id)
+        exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, id=exp_id)
 
         if not matched_experiment:
             register_experiment(ref=args.session_ref, experiment=exp)

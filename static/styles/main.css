@@ -9,6 +9,9 @@
   --bs-danger: #e74c3c;
   --bs-light: #ecf0f1;
   --bs-dark: #7b8a8b;
+  --spotOne: #26115a;
+  --spotTwo: #ec008c;
+  --spotThree: #ff0000;
 
   /* other variables */
   --info-dark-blue: #085394;
@@ -89,13 +92,14 @@
 }
 
 .prev-experiment {  
-  border-radius: 4px;
+  border-radius: 5px;
   border-width: 1px;
   border-color: var(--bs-dark);
   box-shadow: 1px 1px var(--bs-secondary);
+  cursor: pointer;
 }
-
-.selected-experiment.prev-experiment {
-  border-width: 2px;
-  border-color: var(--bs-success);
+         
+.selected-experiment {
+  /* border-color: rgb(44, 167, 28); */
+  box-shadow: 0 0 4px rgba(44, 167, 28, 0.8);
 }

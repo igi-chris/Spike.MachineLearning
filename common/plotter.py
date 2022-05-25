@@ -10,8 +10,11 @@ from literals import tmp_files_dir_name
 matplotlib.use('Agg')  # to stop matplot lib using threads for UI (showing plots)
 
 
-def build_actual_vs_predicted(actual: np.ndarray, predictions: np.ndarray, 
-                              data_path: str, data_label: str="Test data") -> str:
+def build_actual_vs_predicted(actual: np.ndarray, 
+                              predictions: np.ndarray, 
+                              data_path: str, 
+                              exp_id: int,
+                              data_label: str="Test data") -> str:
     """
     Build plot, save file and returns the relative path (easier to get the uri for).
     """
@@ -28,7 +31,7 @@ def build_actual_vs_predicted(actual: np.ndarray, predictions: np.ndarray,
              label="Identity line")
     plt.legend()
 
-    fpath = os.path.join(os.path.split(data_path)[0], 'act_vs_pred.png')
+    fpath = os.path.join(os.path.split(data_path)[0], f'act_vs_pred_{exp_id}.png')
     plt.savefig(fpath, bbox_inches='tight')
     plt.close()
 
