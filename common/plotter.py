@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 
-from literals import tmp_files_dir_name
-
 matplotlib.use('Agg')  # to stop matplot lib using threads for UI (showing plots)
 
 
@@ -26,7 +24,7 @@ def build_actual_vs_predicted(actual: np.ndarray,
     plt.ylabel('Predicted Labels')
 
     # add identity line
-    data_range = [min(0,actual.min(), predictions.min()), max(actual.max(), predictions.max())]
+    data_range = [min(actual.min(), predictions.min()), max(actual.max(), predictions.max())]
     plt.plot(data_range, data_range, color='indianred', zorder=2, alpha=0.75, 
              label="Identity line")
     plt.legend()
