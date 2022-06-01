@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from joblib import dump
+import joblib
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -73,8 +73,11 @@ def evaluate(data: DataFrame,
     return eval
 
 
-def predict(X_test: np.ndarray, model: Pipeline):
-    return model.predict(X_test)
+def predict(data: DataFrame, model: Pipeline):
+    """
+    We assume that data does not incl the result column here
+    """
+    return model.predict(data.values)
 
 
 def serialise_model(exp: RegressionExperiment) -> str:
@@ -83,8 +86,14 @@ def serialise_model(exp: RegressionExperiment) -> str:
     """
     path = get_model_path(exp)
     model = get_model(exp.model_ref)
-    dump(model, path)
+    joblib.dump(model, path)
     return path
+
+
+def deserialise_model(fpath: str) -> Pipeline:
+    # tmp just doing model itself for now, but plan to move to something with exp data (? & predictions)
+    model = joblib.load(fpath)
+    return model
 
 
 def split_data(data, args: RegressionArgs) -> Tuple:

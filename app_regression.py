@@ -1,10 +1,10 @@
 from http import HTTPStatus
-from flask import Blueprint, Response, make_response, render_template, request, send_file, url_for
+from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file, url_for
 from common.data_register import get_experiment, get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
 from common.utils import csv_path_from_ref
 
-from common.model_register import register_model
-from models.regression import evaluate, serialise_model, train
+from common.model_register import get_model, register_model
+from models.regression import evaluate, predict, serialise_model, train
 from models.regression_types import RegressionExperiment, RegressionArgs
 from literals import _version
 
@@ -110,3 +110,14 @@ def download_regression_model() -> Response:
     
     model_path = serialise_model(exp)
     return make_response(send_file(model_path, as_attachment=True), HTTPStatus.OK)
+
+
+@regression_blueprint.route("/api/regression/apply", methods=['GET'])
+def apply_regression_model() -> Response:
+    session_ref = request.args.get('session_ref', default='')
+    # TODO: tmp work around to use session ref as model ref when
+    #       saving, will rebuild experiment from serialised data
+    model = get_model(ref=session_ref)  
+    data = lookup_dataframe(session_ref)
+    predictions = predict(data, model)
+    return jsonify(predictions=predictions)

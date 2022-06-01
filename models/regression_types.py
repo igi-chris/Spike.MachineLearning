@@ -4,6 +4,8 @@ from typing import List, Optional, Sequence, Tuple, NamedTuple
 
 from dataclasses import dataclass, field
 from flask import url_for
+import numpy as np
+from sklearn.pipeline import Pipeline
 
 
 @dataclass
@@ -110,3 +112,11 @@ class RegressionExperiment():
             res += "_N"
         res += f"_{self.args.null_abbr}"
         return res
+
+
+# @dataclass
+# class PersistedRegressionExperiment():
+#     args: RegressionArgs
+#     eval: RegressionEvaluation
+#     predictions: np.ndarray
+#     model: Pipeline

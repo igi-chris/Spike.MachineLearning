@@ -15,16 +15,17 @@ def ref_from_path(path: str) -> str:
 
 
 def csv_path_from_ref(session_ref: str) -> str:
+    return get_path(session_ref, filename=training_data_fname)
+
+
+def get_model_path(experiment: RegressionExperiment) -> str:
+    fname = f"{experiment.abbr_summary}.joblib"
+    return get_path(session_ref=experiment.args.session_ref, filename=fname)
+
+
+def get_path(session_ref: str, filename: str) -> str:
     tmp_files_dir = os.path.join(base_dir, tmp_files_dir_name)
     os.makedirs(tmp_files_dir, exist_ok=True)
     session_dir = os.path.join(tmp_files_dir, session_ref)
     os.makedirs(session_dir, exist_ok=True)
-    return os.path.join(session_dir, training_data_fname)
-
-
-def get_model_path(experiment: RegressionExperiment) -> str:
-    tmp_files_dir = os.path.join(base_dir, tmp_files_dir_name)
-    os.makedirs(tmp_files_dir, exist_ok=True)
-    session_dir = os.path.join(tmp_files_dir, experiment.args.session_ref)
-    os.makedirs(session_dir, exist_ok=True)
-    return os.path.join(session_dir, f"{experiment.abbr_summary}.joblib")
+    return os.path.join(session_dir, filename)
