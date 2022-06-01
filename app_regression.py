@@ -92,6 +92,12 @@ def evaluate_regression_model() -> str:
                            version=_version)
 
 
+@regression_blueprint.route("/regression/apply", methods=['GET'])
+def sapply_regression_model() -> str:
+    return render_template('apply.html',
+                           version=_version)
+
+
 ###############################################################################
 #                             A P I   R o u t e s                             #
 ###############################################################################
