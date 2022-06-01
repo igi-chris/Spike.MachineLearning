@@ -1,30 +1,10 @@
 window.onload = function() {
     training_filepath = "";
-    setupBrowseListener();
-    setupTrainingOptionsListerners();
-    showOrHideConstValueField();
-    highlightSelectedExperiment();
-}
-
-// TODO: handle multiple browse fields or rmv
-function setupBrowseListener() {
-    var browseFile = document.getElementById("browse-file");
-    var browseLink = document.getElementById("browse-link");
-    if (browseLink) {browseLink.addEventListener('click', handleBrowseLinkClick, false);}
-    if (browseFile) {browseFile.addEventListener('change', handleBrowseFileChange, false);}
-
-    function handleBrowseLinkClick(e) {
-        browseFile.dispatchEvent(new MouseEvent('click'));
-        e.preventDefault();
+    if (location.pathname == "/regression/train") {
+        setupTrainingOptionsListerners();
+        showOrHideConstValueField();
+        highlightSelectedExperiment();
     }
-
-    function handleBrowseFileChange(e) {
-        var fileList = browseFile.files;
-        for (var i = 0; i < fileList.length; i++) {
-            saveTrainingFile(fileList[i]);
-            e.preventDefault();
-        }       
-     }
 }
 
 function setupTrainingOptionsListerners() {
@@ -61,7 +41,7 @@ function dropHandler(ev, desc) {
     } else if (desc == 'apply') {
         console.log('call func to save predictions data');
     } else if (desc == 'model') {
-        console.log('call func to save predictions data');
+        console.log('call func to save model');
     }    
     
     function getDroppedFile() {
@@ -111,9 +91,6 @@ function saveTrainingFile(file) {
 
         document.getElementById("csv-path").value = this.response['filepath']
         document.getElementById("session-ref").value = this.response['session_ref']
-
-        // tmp
-        //document.getElementById("csv-path-display").value = training_filepath
 
         heads = this.response['headers']
         var resultColSelect = document.getElementById("result-column");

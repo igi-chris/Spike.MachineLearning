@@ -15,16 +15,11 @@
 
 
     {% if not evaluation %}
-    <p>Select a file to be used for training data...</p>
     <div id="drop-zone-train" class="drop-zone" ondrop="dropHandler(event, desc='train');"
         ondragover="dragOverHandler(event, desc='train');" ondragleave="endDragOver(desc='train');"
         ondragend="endDragOver(desc='train');">
         <p class="text-center">
-            Drag file here or
-            <label>
-                <input id="browse-file" type="file" accept=".csv" />
-                <a href="" id="browse-link">browse</a>
-            </label>
+            Drag training data file here
             <label class="text-dark text-sm font-italic text-center text-sm">
                 (.csv)
             </label>
