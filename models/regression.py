@@ -73,11 +73,11 @@ def evaluate(data: DataFrame,
     return eval
 
 
-def predict(data: DataFrame, model: Pipeline):
+def predict(data: DataFrame, model: Pipeline) -> List[float]:
     """
     We assume that data does not incl the result column here
     """
-    return model.predict(data.values)
+    return model.predict(data.values).tolist()
 
 
 def serialise_model(exp: RegressionExperiment) -> str:
