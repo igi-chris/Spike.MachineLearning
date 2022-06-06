@@ -137,8 +137,10 @@ function deselectExperiment() {
     id = el.value;
     el.value = null;
     expEl = document.getElementById(`exp-${id}`);
-    expEl.classList.remove('selected-experiment');
-    expEl.blur();  // remove focus from element
+    if (expEl) {
+        expEl.classList.remove('selected-experiment');
+        expEl.blur();  // remove focus from element        
+    }
 }
 
 function saveModel(model_type) {
