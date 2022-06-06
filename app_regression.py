@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file, url_for
+from app_utils import save_data_file, save_model_file
 from common.data_register import get_experiment, get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
 from common.utils import csv_path_from_ref
 
@@ -118,11 +119,16 @@ def download_regression_model() -> Response:
     return make_response(send_file(model_path, as_attachment=True), HTTPStatus.OK)
 
 
-@regression_blueprint.route("/api/regression/apply", methods=['GET'])
+@regression_blueprint.route("/api/regression/apply", methods=['GET', 'POST'])
 def apply_regression_model() -> Response:
-    session_ref = request.args.get('session_ref', default='')
-    # TODO: tmp work around to use session ref as model ref when
-    #       saving, will rebuild experiment from serialised data
+    if request.method == 'GET':
+        session_ref = request.args.get('session_ref', default='')
+        # TODO: tmp work around to use session ref as model ref when
+        #       saving, will rebuild experiment from serialised data
+    else:
+        session_ref, _, _ = save_data_file(file_field_name='data')
+        _ = save_model_file(ref=session_ref, file_field_name='model')
+    
     model = get_model(ref=session_ref)  
     data = lookup_dataframe(session_ref)
     predictions = predict(data, model)
