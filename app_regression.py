@@ -119,6 +119,9 @@ def download_regression_model() -> Response:
     return make_response(send_file(model_path, as_attachment=True), HTTPStatus.OK)
 
 
+# using POST here is an alternative to the 2 step option:
+# 1. POST /api/add_session_data (data + model files) -> ref
+# 2. GET /api/regression/apply?session_ref={ref}
 @regression_blueprint.route("/api/regression/apply", methods=['GET', 'POST'])
 def apply_regression_model() -> Response:
     if request.method == 'GET':
