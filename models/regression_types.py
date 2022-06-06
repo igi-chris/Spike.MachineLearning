@@ -6,6 +6,10 @@ from dataclasses import dataclass, field
 from flask import url_for
 import numpy as np
 from sklearn.pipeline import Pipeline
+from common.data_register import lookup_dataframe
+
+from common.model_register import get_model
+from models.regression import predict
 
 
 @dataclass
@@ -93,6 +97,17 @@ class RegressionEvaluation():
 
 
 @dataclass
+class SerialisableRegressionExperiment():
+    args: RegressionArgs
+    eval: RegressionEvaluation
+    #predictions: List[float]  # not clear if needed - leaving off for now
+    model: Pipeline
+
+    def rebuild_experiment(self):
+        raise NotImplementedError()
+
+
+@dataclass
 class RegressionExperiment():
     args: RegressionArgs
     eval: RegressionEvaluation
@@ -113,10 +128,13 @@ class RegressionExperiment():
         res += f"_{self.args.null_abbr}"
         return res
 
-
-# @dataclass
-# class PersistedRegressionExperiment():
-#     args: RegressionArgs
-#     eval: RegressionEvaluation
-#     predictions: np.ndarray
-#     model: Pipeline
+    def make_serialisable(self) -> SerialisableRegressionExperiment:
+        model = get_model(ref=self.model_ref)
+        #data = lookup_dataframe(ref=self.args.session_ref)
+        #pred = predict(data, model)
+        return SerialisableRegressionExperiment(
+            args=self.args,
+            eval=self.eval,
+            #predictions=pred,
+            model=model
+        )

@@ -15,7 +15,7 @@ from common.model_register import get_model
 from common.plotter import build_actual_vs_predicted
 from common.preprocessing import build_column_transformer
 from common.utils import get_model_path
-from .regression_types import RegressionArgs, RegressionEvaluation, RegressionExperiment
+from .regression_types import RegressionArgs, RegressionEvaluation, RegressionExperiment, SerialisableRegressionExperiment
 
 
 def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
@@ -85,15 +85,14 @@ def serialise_model(exp: RegressionExperiment) -> str:
     Serialise model and return path
     """
     path = get_model_path(exp)
-    model = get_model(exp.model_ref)
-    joblib.dump(model, path)
+    serialisable_experiment = exp.make_serialisable()
+    joblib.dump(serialisable_experiment, path)
     return path
 
 
 def deserialise_model(fpath: str) -> Pipeline:
-    # tmp just doing model itself for now, but plan to move to something with exp data (? & predictions)
-    model = joblib.load(fpath)
-    return model
+    serialisable_experiment: SerialisableRegressionExperiment = joblib.load(fpath)
+    return serialisable_experiment.model  # TODO
 
 
 def split_data(data, args: RegressionArgs) -> Tuple:
