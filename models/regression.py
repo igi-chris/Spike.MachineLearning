@@ -52,22 +52,24 @@ def evaluate(data: DataFrame,
              args: RegressionArgs,
              exp_id: int) -> RegressionEvaluation:
     # may eval training and test later and return evaluation for both...
-    _, X_test, _, y_test = split_data(data, args)
-    y_predictions = trained_model_pipeline.predict(X_test)
+    X_train, X_test, y_train, y_test = split_data(data, args)
+    y_pred_trn = trained_model_pipeline.predict(X_train)
+    y_pred_test = trained_model_pipeline.predict(X_test)
 
     # metrics
-    mse = mean_squared_error(y_test, y_predictions)
-    act_vs_pred_path = build_actual_vs_predicted(actual=y_test, 
-                                                 predictions=y_predictions,
+    mse = mean_squared_error(y_test, y_pred_test)
+    act_vs_pred_path = build_actual_vs_predicted(y_trn=y_train,
+                                                 y_pred_trn=y_pred_trn,
+                                                 y_test=y_test,
+                                                 y_pred_test=y_pred_test,
                                                  data_path=args.csv_path, 
-                                                 exp_id=exp_id,
-                                                 data_label='Test data')
+                                                 exp_id=exp_id)
     eval = RegressionEvaluation(
         mse = mse,
         rmse = np.sqrt(mse),
-        mean_abs_err=mean_absolute_error(y_test, y_predictions),
-        median_abs_err=median_absolute_error(y_test, y_predictions),
-        r2 = r2_score(y_test, y_predictions),
+        mean_abs_err=mean_absolute_error(y_test, y_pred_test),
+        median_abs_err=median_absolute_error(y_test, y_pred_test),
+        r2 = r2_score(y_test, y_pred_test),
         act_vs_pred_plot_relative_path=act_vs_pred_path)
 
     return eval
