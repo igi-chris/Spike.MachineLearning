@@ -5,7 +5,7 @@ from common.data_register import get_experiment, get_experiments, has_data, look
 from common.utils import csv_path_from_ref
 
 from common.model_register import get_model, register_model
-from models.regression import evaluate, predict, serialise_model, train
+from models.regression import build_predictions_plot, evaluate, predict, serialise_model, train
 from models.regression_types import RegressionExperiment, RegressionArgs
 from literals import _version
 
@@ -93,6 +93,36 @@ def evaluate_regression_model() -> str:
                            version=_version)
 
 
+# using POST here is an alternative to the 2 step option:
+# 1. POST /api/add_session_data (data + model files) -> ref
+# 2. GET /api/regression/apply?session_ref={ref}
+@regression_blueprint.route("/regression/retrain", methods=['GET', 'POST'])
+def retrain_regression_model() -> str:
+
+    exp_id = 0  # pre experiments not serialised, so we always start again from 0
+    if request.method == 'GET':
+        session_ref = request.args.get('session_ref', default='')
+        exp = get_experiment(ref=session_ref, idx=exp_id)  # experiment should have been added to cache when sent via /api/add_session_data
+    else:
+        session_ref, _, _ = save_data_file(file_field_name='data')
+        exp = save_model_file(ref=session_ref, file_field_name='model')
+
+    # not rebuilt when deserialised as not needed if just using for predictions
+    exp.eval.act_vs_pred_plot_relative_path = build_predictions_plot(
+        session_ref=session_ref,
+        trained_model_pipeline=get_model(exp.model_ref),
+        args=exp.args,
+        exp_id=exp_id)
+    return render_template('regression.html',
+                           args=exp.args,
+                           model_ref=exp.model_ref,
+                           evaluation=exp.eval,
+                           prev_experiments=[],
+                           selected_experiment_id=exp_id,
+                           version=_version)
+
+
+
 @regression_blueprint.route("/regression/apply", methods=['GET'])
 def sapply_regression_model() -> str:
     return render_template('apply.html',
@@ -126,13 +156,12 @@ def download_regression_model() -> Response:
 def apply_regression_model() -> Response:
     if request.method == 'GET':
         session_ref = request.args.get('session_ref', default='')
-        # TODO: tmp work around to use session ref as model ref when
-        #       saving, will rebuild experiment from serialised data
+        exp = get_experiment(ref=session_ref, idx=0)  # experiment should have been added to cache when sent via /api/add_session_data
     else:
         session_ref, _, _ = save_data_file(file_field_name='data')
-        _ = save_model_file(ref=session_ref, file_field_name='model')
+        exp = save_model_file(ref=session_ref, file_field_name='model')
     
-    model = get_model(ref=session_ref)  
+    model = get_model(ref=exp.model_ref)  
     data = lookup_dataframe(session_ref)
-    predictions = predict(data, model)
+    predictions = predict(data, model, exp.args.result_column)
     return jsonify(predictions=predictions)

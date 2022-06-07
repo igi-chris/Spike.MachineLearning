@@ -4,12 +4,9 @@ from typing import List, Optional, Sequence, Tuple, NamedTuple
 
 from dataclasses import dataclass, field
 from flask import url_for
-import numpy as np
 from sklearn.pipeline import Pipeline
-from common.data_register import lookup_dataframe
 
 from common.model_register import get_model
-from models.regression import predict
 
 
 @dataclass
@@ -103,8 +100,13 @@ class SerialisableRegressionExperiment():
     #predictions: List[float]  # not clear if needed - leaving off for now
     model: Pipeline
 
-    def rebuild_experiment(self):
-        raise NotImplementedError()
+    def rebuild_experiment(self, session_ref: str, model_ref: str):
+        """
+        Build RegressionExperiment object and caches.
+        """
+        self.args.session_ref = session_ref  # need path to csv file??? - nope
+        exp = RegressionExperiment(self.args, self.eval, model_ref, id=0)
+        return exp
 
 
 @dataclass
@@ -130,11 +132,17 @@ class RegressionExperiment():
 
     def make_serialisable(self) -> SerialisableRegressionExperiment:
         model = get_model(ref=self.model_ref)
+        # assume predictions not needed for now...
         #data = lookup_dataframe(ref=self.args.session_ref)
         #pred = predict(data, model)
-        return SerialisableRegressionExperiment(
+        exp = SerialisableRegressionExperiment(
             args=self.args,
             eval=self.eval,
             #predictions=pred,
             model=model
         )
+        # empty cache keys that may not exist in cache when deserialised
+        exp.args.session_ref = ''  
+        exp.args.csv_path = ''
+        exp.eval.act_vs_pred_plot_relative_path = ''
+        return exp

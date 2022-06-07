@@ -4,9 +4,9 @@ import uuid
 from flask import Blueprint, Response, jsonify, request
 
 from common.data_register import register_dataframe
-from common.model_register import register_model
 from common.utils import csv_path_from_ref, get_path
-from models.regression import deserialise_model
+from models.regression import rebuild_experiment_and_populate_caches
+from models.regression_types import RegressionExperiment
 
 utils_blueprint = Blueprint('utils', __name__)
 
@@ -38,13 +38,12 @@ def save_data_file(ref: str="", file_field_name: str='data') -> Tuple[str, str, 
     raise FileNotFoundError(f"No file found under the field name: {file_field_name}")
 
 
-def save_model_file(ref: str="", file_field_name: str='model') -> str:
+def save_model_file(ref: str="", file_field_name: str='model') -> RegressionExperiment:
     uploaded_file = request.files[file_field_name]
     if uploaded_file.filename:        
         session_ref = ref if ref else str(uuid.uuid4())        
         input_file_path = get_path(session_ref, uploaded_file.filename)
         uploaded_file.save(input_file_path)
-        model = deserialise_model(input_file_path)
-        register_model(model, as_ref=session_ref)  # TODO: don't rely on session ref matching model ref, rebuild experiment
-        return session_ref
+        exp = rebuild_experiment_and_populate_caches(input_file_path, session_ref=session_ref)
+        return exp
     raise FileNotFoundError(f"No file found under the field name: {file_field_name}")

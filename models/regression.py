@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 import joblib
 
 from sklearn.ensemble import GradientBoostingRegressor
@@ -10,8 +10,9 @@ from sklearn.pipeline import Pipeline
 from pandas import DataFrame
 from pandas.api.types import is_numeric_dtype
 import numpy as np
+from common.data_register import lookup_dataframe, register_experiment
 
-from common.model_register import get_model
+from common.model_register import get_model, register_model
 from common.plotter import build_actual_vs_predicted
 from common.preprocessing import build_column_transformer
 from common.utils import get_model_path
@@ -59,7 +60,7 @@ def evaluate(data: DataFrame,
     mse = mean_squared_error(y_test, y_predictions)
     act_vs_pred_path = build_actual_vs_predicted(actual=y_test, 
                                                  predictions=y_predictions,
-                                                 data_path=args.csv_path, 
+                                                 session_ref=args.session_ref, 
                                                  exp_id=exp_id,
                                                  data_label='Test data')
     eval = RegressionEvaluation(
@@ -73,10 +74,29 @@ def evaluate(data: DataFrame,
     return eval
 
 
-def predict(data: DataFrame, model: Pipeline) -> List[float]:
+def build_predictions_plot(session_ref: str,
+                           trained_model_pipeline: Pipeline,
+                           args: RegressionArgs,
+                           exp_id: int,
+                           data: Optional[DataFrame] = None) -> str:
+    if data is None:
+        data = lookup_dataframe(session_ref)
+    _, X_test, _, y_test = split_data(data, args)
+    y_predictions = trained_model_pipeline.predict(X_test)
+    act_vs_pred_path = build_actual_vs_predicted(actual=y_test, 
+                                            predictions=y_predictions,
+                                            session_ref=args.session_ref, 
+                                            exp_id=exp_id,
+                                            data_label='Test data')
+    return act_vs_pred_path
+
+
+def predict(data: DataFrame, model: Pipeline, result_column: str='') -> List[float]:
     """
     We assume that data does not incl the result column here
     """
+    if result_column:
+        data = data.drop(result_column, axis=1)
     return model.predict(data.values).tolist()
 
 
@@ -91,8 +111,16 @@ def serialise_model(exp: RegressionExperiment) -> str:
 
 
 def deserialise_model(fpath: str) -> Pipeline:
+    model = joblib.load(fpath)
+    return model
+
+
+def rebuild_experiment_and_populate_caches(fpath: str, session_ref: str) -> RegressionExperiment:
     serialisable_experiment: SerialisableRegressionExperiment = joblib.load(fpath)
-    return serialisable_experiment.model  # TODO
+    model_ref = register_model(serialisable_experiment.model)
+    exp = serialisable_experiment.rebuild_experiment(session_ref, model_ref=model_ref)
+    register_experiment(ref=session_ref, experiment=exp)
+    return exp
 
 
 def split_data(data, args: RegressionArgs) -> Tuple:

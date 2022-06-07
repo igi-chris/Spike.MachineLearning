@@ -1,6 +1,8 @@
 window.onload = function() {
     training_filepath = "";
-    if (location.pathname == "/regression/train" || location.pathname == "/regression/evaluate") {
+    if (location.pathname == "/regression/train" || 
+        location.pathname == "/regression/evaluate" || 
+        location.pathname == "/regression/retrain") {
         setupTrainingOptionsListerners();
         showOrHideConstValueField();
         highlightSelectedExperiment();

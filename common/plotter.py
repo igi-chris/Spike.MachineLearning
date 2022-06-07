@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 
+from common.utils import get_path
+
 matplotlib.use('Agg')  # to stop matplot lib using threads for UI (showing plots)
 
 
 def build_actual_vs_predicted(actual: np.ndarray, 
                               predictions: np.ndarray, 
-                              data_path: str, 
-                              exp_id: int,
+                              session_ref: str, 
+                              exp_id: int = 0,
                               data_label: str="Test data") -> str:
     """
     Build plot, save file and returns the relative path (easier to get the uri for).
@@ -29,7 +31,7 @@ def build_actual_vs_predicted(actual: np.ndarray,
              label="Identity line")
     plt.legend()
 
-    fpath = os.path.join(os.path.split(data_path)[0], f'act_vs_pred_{exp_id}.png')
+    fpath = get_path(session_ref=session_ref, filename=f'act_vs_pred_{exp_id}.png')
     plt.savefig(fpath, bbox_inches='tight')
     plt.close()
 
