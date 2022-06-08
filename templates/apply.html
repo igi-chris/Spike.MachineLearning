@@ -11,7 +11,7 @@
                 ondragover="dragOverHandler(event, desc='apply');" ondragleave="endDragOver(desc='apply');"
                 ondragend="endDragOver(desc='apply');">
                 <p class="text-center">
-                    Drag data file here <small>(without results column)</small>
+                    Drag data file here
                     <label class="text-dark text-sm font-italic text-center text-sm">
                         (.csv)
                     </label>
@@ -23,6 +23,7 @@
                     </svg>
                 </p>
             </div>
+            <p id="file-display-apply" class="text-dark"></p>
         </div>
 
         <div class="col-6">
@@ -42,8 +43,14 @@
                     </svg>
                 </p>
             </div>
+            <p id="file-display-model" class="text-dark"></p>
         </div>
     </div>
+
+    <form action="/api/regression/apply" method="GET" id="apply-form" name="apply_form">
+        <input id="session-ref-apply" name="session_ref" type="hidden" />
+        <button type="submit" class="btn btn-success">Apply Model</button>
+    </form>
 </div>
 
 {% endblock %}

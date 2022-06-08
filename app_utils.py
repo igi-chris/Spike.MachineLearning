@@ -11,19 +11,18 @@ from models.regression_types import RegressionExperiment
 utils_blueprint = Blueprint('utils', __name__)
 
 
-# original route used from js & api
-@utils_blueprint.route("/api/savefile", methods=['POST'])
-def save_file() -> Response:
-    ref, fpath, heads = save_data_file(file_field_name='file')
-    return jsonify(filepath=fpath, session_ref=ref, headers=heads)
-
-
-# new routes (for API)
+# accept either 'data' or 'model' file attached to form (or both)
+# need ability to do one at a time for UI
 @utils_blueprint.route("/api/add_session_data", methods=['POST'])
 def add_session_data() -> Response:
-    ref, _, _ = save_data_file(file_field_name='data')
-    if len(request.files.keys()) > 1:
-        _ = save_model_file(ref=ref, file_field_name='model')
+    # option to pass ref in as we need to use the same ref if doing two separate calls
+    ref = request.args.get('session_ref', default='')
+    if 'data' in request.files.keys():
+        ref, _, _ = save_data_file(file_field_name='data')
+    if 'model' in request.files.keys():
+        exp = save_model_file(ref=ref, file_field_name='model')
+        if not ref:
+            ref = exp.args.session_ref
     return jsonify(session_ref=ref)
 
 
