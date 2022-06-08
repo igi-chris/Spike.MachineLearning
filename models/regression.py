@@ -95,9 +95,9 @@ def predict(data: DataFrame, model: Pipeline, result_column: str='') -> List[flo
     """
     We assume that data does not incl the result column here
     """
-    if result_column:
-        data = data.drop(result_column, axis=1)
-    return model.predict(data.values).tolist()
+    numeric_features = extract_numeric_columns(data, result_column)  # TODO handle non-num
+    X = data[numeric_features].values
+    return model.predict(X).tolist()
 
 
 def serialise_model(exp: RegressionExperiment) -> str:

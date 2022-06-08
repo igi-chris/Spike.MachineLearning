@@ -30,7 +30,8 @@ def connection_test() -> Response:
 @app.route("/")
 @app.route("/index", methods=['GET'])
 def index() -> str:
-    title_link_pairs = [('Regression', '/regression/train'), 
+    title_link_pairs = [('Train Regression', '/regression/train'), 
+                        ('Apply or retrain Regression', '/regression/apply'), 
                         # ('Classification', '/classification'), 
                         # ('Clustering', '/clustering'), 
                         # ('Dimension Reduction', '/dimensions')
@@ -40,7 +41,7 @@ def index() -> str:
                            version=_version)
     
 
-# TODO - Replace with a json resp or page that is suuitable for users.
+# TODO - Replace with a json resp or page that is suitable for users.
 #        Returning exc & stack trace for now for ease of debugging.
 @app.errorhandler(Exception)
 def handle_exception(e):

@@ -72,6 +72,7 @@ function endDragOver(desc) {
 function saveDataFile(file, desc) {
 
     console.log(file.name);
+    document.getElementById(`file-display-${desc}`).value = file.name;  // need to set value for later lookup
     document.getElementById(`file-display-${desc}`).innerHTML = file.name;
       
     var formData = new FormData();
@@ -86,23 +87,24 @@ function saveDataFile(file, desc) {
     
     // add session ref as query param if already set
     refEl = document.getElementById("session-ref-apply")
-    if (refEl) {
-        console.log("Got session ref elemeent");
+    if (desc != 'train' && refEl) {
+        //console.log("Got session ref elemeent");
         ref = refEl.value;
         if (ref) {
             uri = `${uri}?session_ref=${ref}`;
             console.log(`URI set to: ${uri}`);
         }
+    } else if (desc == 'train') {
+        uri = `${uri}?return_headers=${true}`;
     }
 
     oReq.open("POST", uri, true);
 
     if (desc == 'train') {
-        console.log("adding training onload func...");
+        //console.log("adding training onload func...");
         oReq.onload = function(e) {
-            console.log("handling training onload func");
+            //console.log("handling training onload func");
             // handle failure, progress etc later
-            //console.log(this.response);
     
             //document.getElementById("csv-path").value = this.response['filepath']
             document.getElementById("session-ref").value = this.response['session_ref']
@@ -116,14 +118,14 @@ function saveDataFile(file, desc) {
             resultColSelect.value = heads[i]  // default to last col for now
         }
     } else {        
-        console.log("adding apply onload func...");
+        //console.log("adding apply onload func...");
         oReq.onload = function(e) {
             console.log("handling apply onload func");
             console.log(this.response);
-            document.getElementById("session-ref-apply").value = this.response['session_ref']
+            document.getElementById("session-ref-apply").value = this.response['session_ref'];
         }
     }
-    console.log("sending request to save file...");
+    //console.log("sending request to save file...");
     oReq.send(formData);
 }
 
@@ -201,6 +203,16 @@ function saveModel(model_type) {
         }
     }
     oReq.send();  
+}
+
+function reTrainModel() {
+    if (!document.getElementById("file-display-model").value
+        || !document.getElementById("file-display-apply").value) {
+        alert("A data file and model must be uploaded first")
+    } else {
+        ref = document.getElementById("session-ref-apply").value
+        location.assign(`/regression/retrain?session_ref=${ref}`);
+    }
 }
 
 function saveBlob(blob, filename) {

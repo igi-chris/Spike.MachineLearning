@@ -49,6 +49,9 @@
 
     <form action="/api/regression/apply" method="GET" id="apply-form" name="apply_form">
         <input id="session-ref-apply" name="session_ref" type="hidden" />
+        <button type="button" class="btn btn-success" onclick="reTrainModel()">
+            Review Training
+        </button>
         <button type="submit" class="btn btn-success">Apply Model</button>
     </form>
 </div>

@@ -17,12 +17,15 @@ utils_blueprint = Blueprint('utils', __name__)
 def add_session_data() -> Response:
     # option to pass ref in as we need to use the same ref if doing two separate calls
     ref = request.args.get('session_ref', default='')
+    incl_heads = request.args.get('return_headers', default=False)
     if 'data' in request.files.keys():
-        ref, _, _ = save_data_file(file_field_name='data')
+        ref, _, heads = save_data_file(file_field_name='data')
     if 'model' in request.files.keys():
         exp = save_model_file(ref=ref, file_field_name='model')
         if not ref:
             ref = exp.args.session_ref
+    if incl_heads:
+        return jsonify(session_ref=ref, headers=heads)
     return jsonify(session_ref=ref)
 
 
