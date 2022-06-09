@@ -103,3 +103,13 @@
   /* border-color: rgb(44, 167, 28); */
   box-shadow: 0 0 4px rgba(44, 167, 28, 0.8);
 }
+
+.good {
+  stroke: var(--bs-success);
+  fill: var(--bs-success);
+}
+
+.bad {
+  stroke: var(--bs-danger);
+  fill: var(--bs-danger);
+}

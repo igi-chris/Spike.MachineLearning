@@ -66,6 +66,7 @@ class Metric(NamedTuple):
     code: str
     full_name: str
     value: float
+    up_is_good: bool
 
 
 @dataclass
@@ -81,11 +82,11 @@ class RegressionEvaluation():
     def metrics(self) -> Sequence[Metric]:
         "Tuples of long name, value, short name"
         return [
-            Metric("MSE", "Mean Squared Error", self.mse),
-            Metric("RMSE", "Root Mean Squared Error", self.rmse),
-            Metric("MnAE", "Mean Absolute Error", self.mean_abs_err),
-            Metric("MdAE", "Median Absolute Error", self.median_abs_err),
-            Metric("R²", "R² (Coefficient of determination)", self.r2)
+            #Metric("MSE", "Mean Squared Error", self.mse, up_is_good=False),
+            Metric("RMSE", "Root Mean Squared Error", self.rmse, up_is_good=False),
+            Metric("MnAE", "Mean Absolute Error", self.mean_abs_err, up_is_good=False),
+            Metric("MdAE", "Median Absolute Error", self.median_abs_err, up_is_good=False),
+            Metric("R²", "R² (Coefficient of determination)", self.r2, up_is_good=True)
         ]
 
     @property
