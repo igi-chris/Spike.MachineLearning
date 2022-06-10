@@ -58,3 +58,33 @@ change `--console` to `--windowed` if you don't want the app to bring up a conso
 Running this command writes the output exe to ./dist by default.
 
 -------------------------
+
+
+## Example vscode config (for local run)
+
+launch config for ${workspaceRoot}/.vscode/launch.json:
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Flask debug",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            // need to add app.run(port=5000) to file for this to work - 
+            // allows debugging / break points etc in vscode
+            "program": "${workspaceRoot}/app.py", 
+            "env": {
+                "FLASK_APP": "${workspaceRoot}/app.py",
+            },
+            "args": [
+                "local debug",
+            ],
+            "envFile": "${workspaceFolder}/.env",
+            "redirectOutput": true,
+            "jinja": true
+        },
+    ]
+}
+```
