@@ -1,5 +1,6 @@
 window.onload = function() {
     training_filepath = "";
+    isWebView();
     if (location.pathname == "/regression/train" || 
         location.pathname == "/regression/evaluate" || 
         location.pathname == "/regression/retrain") {
@@ -7,6 +8,17 @@ window.onload = function() {
         showOrHideConstValueField();
         highlightSelectedExperiment();
     }
+}
+
+function isWebView() {
+    var isWebView = window.chrome.webview !== undefined;
+
+    // tmp
+    if (isWebView) {
+        document.getElementById("is-webview").innerHTML="p:IGI mode";
+    }
+    
+    return isWebView;
 }
 
 function setupTrainingOptionsListerners() {

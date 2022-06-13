@@ -27,7 +27,14 @@
         <hr>
         {% block content %}{% endblock %}
         <footer class="navbar fixed-bottom">
-            <sub>{{version}}</sub>
+            <div class="row">
+                <div class="col">
+                    <sub>{{version}}</sub>
+                </div>
+                <div class="col">
+                    <sub id="is-webview"></sub>
+                </div>
+            </div>
         </footer>
     </div>
 </body>
