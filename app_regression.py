@@ -165,6 +165,7 @@ def get_model_artefact_as_str() -> Response:
     predictions = predict(data, model, exp.args.result_column)
 
     artefact = get_model_artefact(exp)
+    # getting obj as encoded str: https://stackoverflow.com/a/30469744/2012446
     pickled = codecs.encode(pickle.dumps(artefact), "base64").decode()
     return jsonify(predictions=predictions, serialised_model_artefact=pickled)
 
