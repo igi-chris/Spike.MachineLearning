@@ -1,6 +1,5 @@
 window.onload = function() {
     training_filepath = "";
-    isWebView();
     if (isWebView()) {
         document.getElementById("is-webview").innerHTML="webview";
         postMsgToWebViewHost('notification', 'ML web app started via WebView');
@@ -21,14 +20,16 @@ function isWebView() {
 }
 
 function postMsgToWebViewHost(action, data) {
-    if (isWebView) {
-        var msgObject = { 
-        	action: action, 
-        	data: data 
-        };
-        var json = JSON.stringify(msgObject, space=4);
+    var msgObject = { 
+        action: action, 
+        data: data 
+    };
+    var json = JSON.stringify(msgObject, space=4);
+    if (isWebView()) {
         console.log(`posting msg to WebView host: ${json}`)
         window.chrome.webview.postMessage(json);
+    } else {
+        console.error(`Not running WebView, cannot post msg: ${json}`)
     }
 }
 
@@ -190,7 +191,7 @@ function saveModel(model_type) {
         params += `&selected_experiment_id=${exp_id}`
     }
 
-    if (isWebView){
+    if (isWebView()){
         sendArtefactDataToPigi(model_type, params);
     } else {
         downloadModel(model_type, params);
