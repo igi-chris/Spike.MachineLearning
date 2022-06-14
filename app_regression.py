@@ -5,7 +5,7 @@ from common.data_register import get_experiment, get_experiments, has_data, look
 from common.utils import csv_path_from_ref
 
 from common.model_register import get_model, register_model
-from models.regression import build_predictions_plot, evaluate, predict, serialise_model, train
+from models.regression import build_predictions_plot, evaluate, predict, get_serialised_model_artefact, train
 from models.regression_types import RegressionExperiment, RegressionArgs
 from literals import _version
 
@@ -145,8 +145,8 @@ def download_regression_model() -> Response:
         # for now get most recent if none selected - consider if best
         exp = get_experiments(session_ref)[-1]
     
-    model_path = serialise_model(exp)
-    return make_response(send_file(model_path, as_attachment=True), HTTPStatus.OK)
+    artefact_path = get_serialised_model_artefact(exp)
+    return make_response(send_file(artefact_path, as_attachment=True), HTTPStatus.OK)
 
 
 # using POST here is an alternative to the 2 step option:

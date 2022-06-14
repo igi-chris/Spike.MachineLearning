@@ -16,7 +16,7 @@ from common.model_register import get_model, register_model
 from common.plotter import build_actual_vs_predicted
 from common.preprocessing import build_column_transformer
 from common.utils import get_model_path
-from .regression_types import RegressionArgs, RegressionEvaluation, RegressionExperiment, SerialisableRegressionExperiment
+from .regression_types import RegressionArgs, RegressionEvaluation, RegressionExperiment, ModelArtefact
 
 
 def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
@@ -100,12 +100,12 @@ def predict(data: DataFrame, model: Pipeline, result_column: str='') -> List[flo
     return model.predict(X).tolist()
 
 
-def serialise_model(exp: RegressionExperiment) -> str:
+def get_serialised_model_artefact(exp: RegressionExperiment) -> str:
     """
     Serialise model and return path
     """
     path = get_model_path(exp)
-    serialisable_experiment = exp.make_serialisable()
+    serialisable_experiment = exp.build_artefact()
     joblib.dump(serialisable_experiment, path)
     return path
 
@@ -116,7 +116,7 @@ def deserialise_model(fpath: str) -> Pipeline:
 
 
 def rebuild_experiment_and_populate_caches(fpath: str, session_ref: str) -> RegressionExperiment:
-    serialisable_experiment: SerialisableRegressionExperiment = joblib.load(fpath)
+    serialisable_experiment: ModelArtefact = joblib.load(fpath)
     model_ref = register_model(serialisable_experiment.model)
     exp = serialisable_experiment.rebuild_experiment(session_ref, model_ref=model_ref)
     register_experiment(ref=session_ref, experiment=exp)

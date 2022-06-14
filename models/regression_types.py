@@ -95,11 +95,12 @@ class RegressionEvaluation():
 
 
 @dataclass
-class SerialisableRegressionExperiment():
+class ModelArtefact():
     args: RegressionArgs
     eval: RegressionEvaluation
-    #predictions: List[float]  # not clear if needed - leaving off for now
     model: Pipeline
+    # add prev experiments / note of selected exp
+    # add collection of all features (each exp to indicate which apply)
 
     def rebuild_experiment(self, session_ref: str, model_ref: str):
         """
@@ -131,19 +132,15 @@ class RegressionExperiment():
         res += f"_{self.args.null_abbr}"
         return res
 
-    def make_serialisable(self) -> SerialisableRegressionExperiment:
+    def build_artefact(self) -> ModelArtefact:
         model = get_model(ref=self.model_ref)
-        # assume predictions not needed for now...
-        #data = lookup_dataframe(ref=self.args.session_ref)
-        #pred = predict(data, model)
-        exp = SerialisableRegressionExperiment(
+        artefact = ModelArtefact(
             args=self.args,
             eval=self.eval,
-            #predictions=pred,
             model=model
         )
         # empty cache keys that may not exist in cache when deserialised
-        exp.args.session_ref = ''  
-        exp.args.csv_path = ''
-        exp.eval.act_vs_pred_plot_relative_path = ''
-        return exp
+        artefact.args.session_ref = ''  
+        artefact.args.csv_path = ''
+        artefact.eval.act_vs_pred_plot_relative_path = ''
+        return artefact
