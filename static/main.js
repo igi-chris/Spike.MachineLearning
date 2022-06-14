@@ -5,7 +5,7 @@ window.onload = function() {
     isWebView();
     if (isWebView && !notified_webview) {
         document.getElementById("is-webview").innerHTML="webview";
-        postWebViewMsg('notification', 'ML web app started via WebView');
+        postMsgToWebViewHost('notification', 'ML web app started via WebView');
         notified_webview = true;
     }
 
@@ -22,7 +22,7 @@ function isWebView() {
     return window.chrome.webview !== undefined;
 }
 
-function postWebViewMsg(action, data) {
+function postMsgToWebViewHost(action, data) {
     if (isWebView) {
         var msgObject = { 
         	action: action, 
@@ -215,7 +215,7 @@ function sendArtefactDataToPigi(model_type, params) {
 
         function handleFileTransSuccess(response) {
             console.log('Handling success response...');
-            postWebViewMsg(action="persist_model_artefact_data", data=response)
+            postMsgToWebViewHost(action="persist_model_artefact_data", data=response)
             
         }
 
