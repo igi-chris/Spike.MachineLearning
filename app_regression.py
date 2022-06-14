@@ -18,7 +18,7 @@ regression_blueprint = Blueprint('regression', __name__)
 ###############################################################################
 @regression_blueprint.route("/regression", methods=['GET'])
 @regression_blueprint.route("/regression/train", methods=['GET'])
-def train_regression_model() -> str:
+def launch_training_ui() -> str:
     ref = request.args.get('session_ref', default='')
     if ref:
         fpath = csv_path_from_ref(ref)
@@ -35,7 +35,7 @@ def train_regression_model() -> str:
 
 
 @regression_blueprint.route("/regression/evaluate", methods=['GET'])
-def evaluate_regression_model() -> str:
+def launch_training_evaluation_ui() -> str:
     selected_exp = request.args.get('selected_experiment_id', default=None, 
                                     type=lambda v: int(v) if v and v != 'None' else None)
     
@@ -97,7 +97,7 @@ def evaluate_regression_model() -> str:
 # 1. POST /api/add_session_data (data + model files) -> ref
 # 2. GET /api/regression/apply?session_ref={ref}
 @regression_blueprint.route("/regression/retrain", methods=['GET', 'POST'])
-def retrain_regression_model() -> str:
+def relaunch_training_ui() -> str:
 
     exp_id = 0  # pre experiments not serialised, so we always start again from 0
     if request.method == 'GET':
@@ -124,7 +124,7 @@ def retrain_regression_model() -> str:
 
 
 @regression_blueprint.route("/regression/apply", methods=['GET'])
-def apply_regression_model() -> str:
+def launch_apply_ui() -> str:
     return render_template('apply.html',
                            version=_version)
 
