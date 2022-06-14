@@ -106,8 +106,16 @@ def get_serialised_model_artefact(exp: RegressionExperiment) -> str:
     """
     path = get_model_path(exp)
     serialisable_experiment = exp.build_artefact()
-    joblib.dump(serialisable_experiment, path)
+    joblib.dump(serialisable_experiment, path, compress=True)
     return path
+    
+
+def get_model_artefact(exp: RegressionExperiment) -> ModelArtefact:
+    """
+    Serialise model and return path
+    """
+    artefact = exp.build_artefact()
+    return artefact
 
 
 def deserialise_model(fpath: str) -> Pipeline:

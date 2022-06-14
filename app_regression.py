@@ -1,11 +1,13 @@
+import codecs
 from http import HTTPStatus
+import pickle
 from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file, url_for
 from app_utils import save_data_file, save_model_file
 from common.data_register import get_experiment, get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
 from common.utils import csv_path_from_ref, get_artefact_bytes
 
 from common.model_register import get_model, register_model
-from models.regression import build_predictions_plot, evaluate, predict, get_serialised_model_artefact, train
+from models.regression import build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, train
 from models.regression_types import RegressionExperiment, RegressionArgs
 from literals import _version
 
@@ -156,15 +158,15 @@ def download_regression_model() -> Response:
 @regression_blueprint.route("/api/regression/get_model_artefact_json", methods=['GET'])
 def get_model_artefact_as_str() -> Response:
     exp = get_experiment_from_request()
-    artefact_path = get_serialised_model_artefact(exp)
-    art_bytes = get_artefact_bytes(artefact_path)
 
     session_ref = request.args.get('session_ref', default='')
     model = get_model(ref=exp.model_ref)  
     data = lookup_dataframe(session_ref)
     predictions = predict(data, model, exp.args.result_column)
 
-    return jsonify(predictions=predictions, serialised_model_artefact=art_bytes)
+    artefact = get_model_artefact(exp)
+    pickled = codecs.encode(pickle.dumps(artefact), "base64").decode()
+    return jsonify(predictions=predictions, serialised_model_artefact=pickled)
 
 
 # using POST here is an alternative to the 2 step option:
