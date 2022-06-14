@@ -29,3 +29,8 @@ def get_path(session_ref: str, filename: str) -> str:
     session_dir = os.path.join(tmp_files_dir, session_ref)
     os.makedirs(session_dir, exist_ok=True)
     return os.path.join(session_dir, filename)
+
+
+def get_artefact_bytes(artefact_path: str) -> bytes:
+    with open(artefact_path, 'rb') as f:
+        return f.read()

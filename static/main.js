@@ -1,6 +1,14 @@
+var notified_webview = false;
+
 window.onload = function() {
     training_filepath = "";
     isWebView();
+    if (isWebView && !notified_webview) {
+        document.getElementById("is-webview").innerHTML="webview";
+        postWebViewMsg('notification', 'ML web app started via WebView');
+        notified_webview = true;
+    }
+
     if (location.pathname == "/regression/train" || 
         location.pathname == "/regression/evaluate" || 
         location.pathname == "/regression/retrain") {
@@ -11,14 +19,19 @@ window.onload = function() {
 }
 
 function isWebView() {
-    var isWebView = window.chrome.webview !== undefined;
+    return window.chrome.webview !== undefined;
+}
 
-    // tmp
+function postWebViewMsg(action, data) {
     if (isWebView) {
-        document.getElementById("is-webview").innerHTML="p:IGI mode";
+        var msgObject = { 
+        	action: action, 
+        	data: data 
+        };
+        var json = JSON.stringify(msgObject, space=4);
+        console.log(`posting msg to WebView host: ${json}`)
+        window.chrome.webview.postMessage(json);
     }
-    
-    return isWebView;
 }
 
 function setupTrainingOptionsListerners() {
@@ -100,7 +113,6 @@ function saveDataFile(file, desc) {
     // add session ref as query param if already set
     refEl = document.getElementById("session-ref-apply")
     if (desc != 'train' && refEl) {
-        //console.log("Got session ref elemeent");
         ref = refEl.value;
         if (ref) {
             uri = `${uri}?session_ref=${ref}`;
@@ -113,31 +125,23 @@ function saveDataFile(file, desc) {
     oReq.open("POST", uri, true);
 
     if (desc == 'train') {
-        //console.log("adding training onload func...");
         oReq.onload = function(e) {
-            //console.log("handling training onload func");
-            // handle failure, progress etc later
-    
-            //document.getElementById("csv-path").value = this.response['filepath']
             document.getElementById("session-ref").value = this.response['session_ref']
     
             heads = this.response['headers']
             var resultColSelect = document.getElementById("result-column");
-            //resultColSelect.options = heads;
             for(i in heads) {
                 resultColSelect.options[resultColSelect.options.length] = new Option(heads[i], heads[i]);
             }
             resultColSelect.value = heads[i]  // default to last col for now
         }
     } else {        
-        //console.log("adding apply onload func...");
         oReq.onload = function(e) {
             console.log("handling apply onload func");
             console.log(this.response);
             document.getElementById("session-ref-apply").value = this.response['session_ref'];
         }
     }
-    //console.log("sending request to save file...");
     oReq.send(formData);
 }
 
@@ -181,7 +185,6 @@ function deselectExperiment() {
 }
 
 function saveModel(model_type) {
-    url = `/api/${model_type}/download`;
     session_ref = document.getElementById('session-ref').value
     exp_id = document.getElementById('selected-experiment-id').value
     params = `session_ref=${session_ref}`
@@ -189,8 +192,46 @@ function saveModel(model_type) {
         params += `&selected_experiment_id=${exp_id}`
     }
 
+    if (isWebView){
+        sendArtefactDataToPigi(model_type, params);
+    } else {
+        downloadModel(model_type, params);
+    }   
+}
+
+function sendArtefactDataToPigi(model_type, params) {
+    var oReq = new XMLHttpRequest();
+    oReq.responseType = 'json';
+    url = `/api/${model_type}/get_model_artefact_json`
+    url = url+"?"+params
+    oReq.open("GET", url, true);
+
+    oReq.onload = function(e) {
+        if (oReq.status == 200) {
+            handleFileTransSuccess(this.response);
+        } else {
+            handleFileTransFailure(this.response);
+        }
+
+        function handleFileTransSuccess(response) {
+            console.log('Handling success response...');
+            postWebViewMsg(action="persist_model_artefact_data", data=response)
+            
+        }
+
+        function handleFileTransFailure(response) {
+            console.log('Something went wrong...');  // handle UI for err etc later
+            console.log(response)
+        }
+    }
+    console.log(`sending get req: ${url}`)
+    oReq.send();  
+}
+
+function downloadModel(model_type, params) {    
     var oReq = new XMLHttpRequest();
     oReq.responseType = 'blob';
+    url = `/api/${model_type}/download`;
     oReq.open("GET", url+"?"+params, true);
 
     oReq.onload = function(e) {

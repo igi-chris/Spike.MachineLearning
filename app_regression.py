@@ -2,7 +2,7 @@ from http import HTTPStatus
 from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file, url_for
 from app_utils import save_data_file, save_model_file
 from common.data_register import get_experiment, get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
-from common.utils import csv_path_from_ref
+from common.utils import csv_path_from_ref, get_artefact_bytes
 
 from common.model_register import get_model, register_model
 from models.regression import build_predictions_plot, evaluate, predict, get_serialised_model_artefact, train
@@ -133,8 +133,7 @@ def launch_apply_ui() -> str:
 #                             A P I   R o u t e s                             #
 ###############################################################################
 
-@regression_blueprint.route("/api/regression/download", methods=['GET'])
-def download_regression_model() -> Response:
+def get_experiment_from_request() -> RegressionExperiment:    
     selected_exp = request.args.get('selected_experiment_id', default=None, 
                                     type=lambda v: int(v) if v else None)
     session_ref = request.args.get('session_ref', default='')
@@ -144,9 +143,28 @@ def download_regression_model() -> Response:
     else:
         # for now get most recent if none selected - consider if best
         exp = get_experiments(session_ref)[-1]
-    
+    return exp
+
+
+@regression_blueprint.route("/api/regression/download", methods=['GET'])
+def download_regression_model() -> Response:
+    exp = get_experiment_from_request()
     artefact_path = get_serialised_model_artefact(exp)
     return make_response(send_file(artefact_path, as_attachment=True), HTTPStatus.OK)
+
+
+@regression_blueprint.route("/api/regression/get_model_artefact_json", methods=['GET'])
+def get_model_artefact_as_str() -> Response:
+    exp = get_experiment_from_request()
+    artefact_path = get_serialised_model_artefact(exp)
+    art_bytes = get_artefact_bytes(artefact_path)
+
+    session_ref = request.args.get('session_ref', default='')
+    model = get_model(ref=exp.model_ref)  
+    data = lookup_dataframe(session_ref)
+    predictions = predict(data, model, exp.args.result_column)
+
+    return jsonify(predictions=predictions, serialised_model_artefact=art_bytes)
 
 
 # using POST here is an alternative to the 2 step option:
