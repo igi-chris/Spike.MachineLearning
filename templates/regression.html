@@ -78,8 +78,7 @@
                 <div>
                     <label for="regression-model">Model:</label>
                     <select id="regression-model" name="regression_model" required>
-                        <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif
-                            %}>
+                        <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif %}>
                             Linear Regression
                         </option>
                         <option value="GradientBoostingRegressor" {% if args.model_name=='GradientBoostingRegressor' %}
@@ -97,8 +96,8 @@
                 <!--Test train split-->
                 <div>
                     <label for="trn-split" class="form-label">Training split</label>
-                    <input type="range" class="form-range" min="0" max="1" step="0.01" list="tickmarks" value={{
-                        args.training_split }} id="trn-split" name="trn_split" required
+                    <input type="range" class="form-range" min="0" max="1" step="0.01" list="tickmarks" 
+                        value={{ args.training_split }} id="trn-split" name="trn_split" required
                         style="width: 30%; padding-left: 5px;">
                     <datalist id="tickmarks">
                         {% for pct in range(0, 110, 10) %}
@@ -116,8 +115,8 @@
                         Random Seed <small>(optional)</small>
                     </label>
                     <input type="number" id="trn-split-random-seed" name="trn_split_random_seed"
-                        value="{{ args.random_seed }}" placeholder="For reproducible results">
-
+                        placeholder="For reproducibility"
+                        {% if args.random_seed %} value={{ args.random_seed }} {% endif %}>
                     <br />
                     <small style="margin-left: 20px">
                         The proportion of the data to be used for training the model (the rest
