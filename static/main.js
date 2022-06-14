@@ -1,9 +1,7 @@
-var notified_webview = false;
-
 window.onload = function() {
     training_filepath = "";
     isWebView();
-    if (isWebView && !notified_webview) {
+    if (isWebView()) {
         document.getElementById("is-webview").innerHTML="webview";
         postMsgToWebViewHost('notification', 'ML web app started via WebView');
         notified_webview = true;
