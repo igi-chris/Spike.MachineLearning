@@ -124,7 +124,7 @@ def retrain_regression_model() -> str:
 
 
 @regression_blueprint.route("/regression/apply", methods=['GET'])
-def sapply_regression_model() -> str:
+def apply_regression_model() -> str:
     return render_template('apply.html',
                            version=_version)
 
