@@ -1,13 +1,13 @@
 import { saveModel } from './modules/persist.js'
 import { isWebView, postMsgToWebViewHost } from './modules/webview.js'
 import { dropHandler, dragOverHandler, endDragOver }  from './modules/filedrop.js'
-import { selectExperiment } from './modules/experiment.js'
+import { selectExperiment, deselectExperiment, 
+    highlightSelectedExperiment } from './modules/experiment.js'
 
 window.onload = function() {
     if (isWebView()) {
         document.getElementById("is-webview").innerHTML="webview";
         postMsgToWebViewHost('notification', 'ML web app started via WebView');
-        notified_webview = true;
     }
 
     if (location.pathname == "/regression/train" || 
@@ -17,8 +17,8 @@ window.onload = function() {
         highlightSelectedExperiment();
         setupTrainingListeners();
     }
-    // tmp - plan to remove apply screen and work into main training/eval
     else if (location.pathname == "/regression/apply") {
+        setupApplyListeners();
     }
 }
 
@@ -27,23 +27,46 @@ function setupTrainingListeners() {
     setupTrainingOptionsListerners();
 
     var nullRepl = document.getElementById("null-replacement");
+    var argsForm = document.getElementById("args-form");
+    var trnBtn = document.getElementById("train-btn");
+    var saveBtn = document.getElementById("save-model-btn");
+
     nullRepl.addEventListener('input', showOrHideConstValueField, false);
+    argsForm.addEventListener('submit', showProgress, false);
+    trnBtn.addEventListener('click', deselectExperiment, false);
+    if (saveBtn) {  // only available in evaluation mode
+        saveBtn.addEventListener('click', () => saveModel('regression'), false);
+    }    
+
+    // set up listener for each "previous experiment" listed
+    var prevExpElements = document.getElementsByClassName('prev-experiment');
+    Array.from(prevExpElements).forEach(el => {
+        var id = el.id.replace("exp-", "");
+        //console.log(`Got id ${id} from ${el.id}`);
+        el.addEventListener('click', () => selectExperiment(id), false)
+    })
 }
 
 function setupApplyListeners() {    
+    // tmp - plan to remove apply screen and work into main training/eval
     setupDropHandlers('apply');  // file drop for input data to apply model to
     setupDropHandlers('model');  // file drop for model file
 
     var retrainBtn = document.getElementById("retrain-btn");
-    retrainBtn.addEventListener('click', reTrainModel(), false);
+    retrainBtn.addEventListener('click', reTrainModel, false);
 }
 
 function setupDropHandlers(desc) { // desc train | apply | model (later two just for apply.html)
-    var dropTrn = document.getElementById(`drop-zone-${desc}`);
-    dropTrn.addEventListener('drop', (ev) => {dropHandler(ev, desc)}, false);
-    dropTrn.addEventListener('dragover', (ev) => {dragOverHandler(ev, desc)}, false);
-    dropTrn.addEventListener('dragleave', () => {endDragOver(desc)}, false);
-    dropTrn.addEventListener('dragend', () => {endDragOver(desc)}, false);
+    var dropzoneId = `drop-zone-${desc}`
+    var dropzone = document.getElementById(dropzoneId);
+    if (dropzone) {
+        dropzone.addEventListener('drop', (ev) => {dropHandler(ev, desc)}, false);
+        dropzone.addEventListener('dragover', (ev) => {dragOverHandler(ev, desc)}, false);
+        dropzone.addEventListener('dragleave', () => {endDragOver(desc)}, false);
+        dropzone.addEventListener('dragend', () => {endDragOver(desc)}, false);
+    } else {
+        console.log(`No dropzone element found for id: ${dropzoneId} (expected in some cases e.g. if evaluating)`)
+    }
 }
 
 function setupTrainingOptionsListerners() {
@@ -58,13 +81,6 @@ function setupTrainingOptionsListerners() {
         displayTrainingSplit.value = `${pct}%`
         e.preventDefault();
     }
-}
-
-function highlightSelectedExperiment() {
-    var selIdEl = document.getElementById("selected-experiment-id");
-    if (!selIdEl || !selIdEl.value) { return; }
-    selExpBtn = document.getElementById(`exp-${selIdEl.value}`);
-    selExpBtn.classList.add('selected-experiment')
 }
 
 function showOrHideConstValueField() {
@@ -89,7 +105,7 @@ function reTrainModel() {
         || !document.getElementById("file-display-apply").value) {
         alert("A data file and model must be uploaded first")
     } else {
-        ref = document.getElementById("session-ref-apply").value
+        var ref = document.getElementById("session-ref-apply").value
         location.assign(`/regression/retrain?session_ref=${ref}`);
     }
 }
