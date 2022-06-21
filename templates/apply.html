@@ -7,9 +7,7 @@
     </div>
     <div class="row">
         <div class="col-6">
-            <div id="drop-zone-apply" class="drop-zone" ondrop="dropHandler(event, desc='apply');"
-                ondragover="dragOverHandler(event, desc='apply');" ondragleave="endDragOver(desc='apply');"
-                ondragend="endDragOver(desc='apply');">
+            <div id="drop-zone-apply" class="drop-zone">
                 <p class="text-center">
                     Drag data file here
                     <label class="text-dark text-sm font-italic text-center text-sm">
@@ -27,9 +25,7 @@
         </div>
 
         <div class="col-6">
-            <div id="drop-zone-model" class="drop-zone" ondrop="dropHandler(event, desc='model');"
-                ondragover="dragOverHandler(event, desc='model');" ondragleave="endDragOver(desc='model');"
-                ondragend="endDragOver(desc='model');">
+            <div id="drop-zone-model" class="drop-zone">
                 <p class="text-center">
                     Drag serilaised model file here
                     <label class="text-dark text-sm font-italic text-center text-sm">
@@ -49,7 +45,7 @@
 
     <form action="/api/regression/apply" method="GET" id="apply-form" name="apply_form">
         <input id="session-ref-apply" name="session_ref" type="hidden" />
-        <button type="button" class="btn btn-success" onclick="reTrainModel()">
+        <button id="retrain-btn" type="button" class="btn btn-success">
             Review Training
         </button>
         <button type="submit" class="btn btn-success">Apply Model</button>

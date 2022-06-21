@@ -44,7 +44,7 @@ export function saveDataFile(file, desc) {
     document.getElementById(`file-display-${desc}`).innerHTML = file.name;
       
     var formData = new FormData();
-    form_label = desc;
+    var form_label = desc;
     if (desc == 'train' || desc == 'apply') {
         form_label = 'data';
     }
@@ -54,7 +54,7 @@ export function saveDataFile(file, desc) {
     var uri = "/api/add_session_data";
     
     // add session ref as query param if already set
-    refEl = document.getElementById("session-ref-apply")
+    var refEl = document.getElementById("session-ref-apply")
     if (desc != 'train' && refEl) {
         ref = refEl.value;
         if (ref) {
@@ -71,9 +71,9 @@ export function saveDataFile(file, desc) {
         oReq.onload = function(e) {
             document.getElementById("session-ref").value = this.response['session_ref']
     
-            heads = this.response['headers']
+            var heads = this.response['headers']
             var resultColSelect = document.getElementById("result-column");
-            for(i in heads) {
+            for(var i in heads) {
                 resultColSelect.options[resultColSelect.options.length] = new Option(heads[i], heads[i]);
             }
             resultColSelect.value = heads[i]  // default to last col for now

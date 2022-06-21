@@ -19,17 +19,23 @@ window.onload = function() {
     }
     // tmp - plan to remove apply screen and work into main training/eval
     else if (location.pathname == "/regression/apply") {
-        setupDropHandlers(desc='apply');  // file drop for input data to apply model to
-        setupDropHandlers(desc='model');  // file drop for model file
     }
 }
 
 function setupTrainingListeners() {
-    setupDropHandlers(desc='train')
+    setupDropHandlers('train')
     setupTrainingOptionsListerners();
 
     var nullRepl = document.getElementById("null-replacement");
     nullRepl.addEventListener('input', showOrHideConstValueField, false);
+}
+
+function setupApplyListeners() {    
+    setupDropHandlers('apply');  // file drop for input data to apply model to
+    setupDropHandlers('model');  // file drop for model file
+
+    var retrainBtn = document.getElementById("retrain-btn");
+    retrainBtn.addEventListener('click', reTrainModel(), false);
 }
 
 function setupDropHandlers(desc) { // desc train | apply | model (later two just for apply.html)
