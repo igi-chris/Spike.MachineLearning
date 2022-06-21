@@ -15,21 +15,29 @@ window.onload = function() {
         location.pathname == "/regression/retrain") {
         showOrHideConstValueField();
         highlightSelectedExperiment();
-        setupListeners();
+        setupTrainingListeners();
+    }
+    // tmp - plan to remove apply screen and work into main training/eval
+    else if (location.pathname == "/regression/apply") {
+        setupDropHandlers(desc='apply');  // file drop for input data to apply model to
+        setupDropHandlers(desc='model');  // file drop for model file
     }
 }
 
-function setupListeners() {
+function setupTrainingListeners() {
+    setupDropHandlers(desc='train')
     setupTrainingOptionsListerners();
 
     var nullRepl = document.getElementById("null-replacement");
     nullRepl.addEventListener('input', showOrHideConstValueField, false);
+}
 
-    var dropTrn = document.getElementById("drop-zone-train");
-    dropTrn.addEventListener('drop', (ev) => {dropHandler(ev, 'train')}, false);
-    dropTrn.addEventListener('dragover', (ev) => {dragOverHandler(ev, 'train')}, false);
-    dropTrn.addEventListener('dragleave', () => {endDragOver('train')}, false);
-    dropTrn.addEventListener('dragend', () => {endDragOver('train')}, false);
+function setupDropHandlers(desc) { // desc train | apply | model (later two just for apply.html)
+    var dropTrn = document.getElementById(`drop-zone-${desc}`);
+    dropTrn.addEventListener('drop', (ev) => {dropHandler(ev, desc)}, false);
+    dropTrn.addEventListener('dragover', (ev) => {dragOverHandler(ev, desc)}, false);
+    dropTrn.addEventListener('dragleave', () => {endDragOver(desc)}, false);
+    dropTrn.addEventListener('dragend', () => {endDragOver(desc)}, false);
 }
 
 function setupTrainingOptionsListerners() {
