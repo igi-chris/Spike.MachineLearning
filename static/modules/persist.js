@@ -1,7 +1,9 @@
+import { isWebView, postMsgToWebViewHost }  from './webview.js'
+
 export function saveModel(model_type) {
-    session_ref = document.getElementById('session-ref').value
-    exp_id = document.getElementById('selected-experiment-id').value
-    params = `session_ref=${session_ref}`
+    var session_ref = document.getElementById('session-ref').value
+    var exp_id = document.getElementById('selected-experiment-id').value
+    var params = `session_ref=${session_ref}`
     if (exp_id) {
         params += `&selected_experiment_id=${exp_id}`
     }
@@ -15,9 +17,10 @@ export function saveModel(model_type) {
 
 function sendArtefactDataToPigi(model_type, params) {
     var oReq = new XMLHttpRequest();
-    oReq.responseType = 'json';
-    url = `/api/${model_type}/get_model_artefact_json`
+    var url = `/api/${model_type}/get_model_artefact_json`;
+
     url = url+"?"+params
+    oReq.responseType = 'json';
     oReq.open("GET", url, true);
 
     oReq.onload = function(e) {
@@ -44,8 +47,9 @@ function sendArtefactDataToPigi(model_type, params) {
 
 function downloadModel(model_type, params) {    
     var oReq = new XMLHttpRequest();
+    var url = `/api/${model_type}/download`;
+
     oReq.responseType = 'blob';
-    url = `/api/${model_type}/download`;
     oReq.open("GET", url+"?"+params, true);
 
     oReq.onload = function(e) {
