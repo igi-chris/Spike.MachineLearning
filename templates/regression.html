@@ -15,9 +15,7 @@
 
 
     {% if not evaluation %}
-    <div id="drop-zone-train" class="drop-zone" ondrop="dropHandler(event, desc='train');"
-        ondragover="dragOverHandler(event, desc='train');" ondragleave="endDragOver(desc='train');"
-        ondragend="endDragOver(desc='train');">
+    <div id="drop-zone-train" class="drop-zone">
         <p class="text-center">
             Drag training data file here
             <label class="text-dark text-sm font-italic text-center text-sm">
@@ -159,7 +157,7 @@
             </div>
             <!--null replacement-->
             <label for="null-replacement">Replace empty values with</label>
-            <select id="null-replacement" name="null_replacement" required onchange="showOrHideConstValueField()">
+            <select id="null-replacement" name="null_replacement" required>
                 <option value="mean" {% if args.null_replacement=='mean' %} selected {% endif %}>
                     Mean
                 </option>
