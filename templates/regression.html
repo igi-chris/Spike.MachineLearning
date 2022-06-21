@@ -33,7 +33,7 @@
     <p id="file-display-train" class="text-dark">{{ args.csv_filename }}</p>
     {% endif %}
 
-    <form action="/regression/evaluate" method="GET" onsubmit="showProgress()" id="args-form" name="args_form">
+    <form action="/regression/evaluate" method="GET" id="args-form" name="args_form">
 
         <!--hiden fields-->
         <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
@@ -178,7 +178,7 @@
 
         <div class="row">
             <div class="col-2">
-                <button type="submit" class="btn btn-success" onclick="deselectExperiment()">Train Model</button>
+                <button type="submit" class="btn btn-success" id="train-btn">Train Model</button>
             </div>
             <div class="col-10">
                 <div class="progress" id="progress" style="visibility: hidden; vertical-align: middle;">
@@ -233,7 +233,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <button class="btn btn-success" onclick="saveModel('regression')" style="display: inline-block">
+            <button class="btn btn-success" id="save-model-btn" style="display: inline-block">
                 Save Model
             </button>
 
@@ -247,8 +247,7 @@
     <!-- <button class="badge bg-light mb-3 text-primary prev-experiment">Normal</button>
     <button class="badge bg-light mb-3 text-primary prev-experiment selected-experiment">Selected</button> -->
     {% for exp in prev_experiments|reverse %}
-    <button class="badge bg-light mb-3 text-primary prev-experiment" id="exp-{{ exp.id }}"
-        onclick="selectExperiment('{{ exp.id }}')">
+    <button class="badge bg-light mb-3 text-primary prev-experiment" id="exp-{{ exp.id }}">
         <div>
             <span>Model: {{ exp.model_abbr }}</span>
 
