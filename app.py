@@ -3,6 +3,7 @@ from http.client import HTTPException
 import os
 import traceback
 import joblib
+import mimetypes
 
 from flask import Flask, Response, jsonify, make_response, render_template
 
@@ -20,6 +21,7 @@ app = Flask("ml_service")
 app.register_blueprint(utils_blueprint)
 app.register_blueprint(regression_blueprint)
 app.register_blueprint(pca_blueprint)
+mimetypes.add_type('application/javascript', '.js')
 
 
 @app.route("/test")

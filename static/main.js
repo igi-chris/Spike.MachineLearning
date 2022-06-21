@@ -1,6 +1,7 @@
-import { saveModel } from './modules/persist.mjs'
+import { saveModel } from './modules/persist.js'
 
 window.onload = function() {
+    console.log('test');
     if (isWebView()) {
         document.getElementById("is-webview").innerHTML="webview";
         postMsgToWebViewHost('notification', 'ML web app started via WebView');
@@ -195,4 +196,5 @@ function reTrainModel() {
 }
 
 export { reTrainModel, selectExperiment, showProgress, endDragOver, dropHandler, 
-    dragOverHandler, isWebView, postMsgToWebViewHost, saveModel }
+    dragOverHandler, isWebView, postMsgToWebViewHost, saveModel, showOrHideConstValueField 
+     }
