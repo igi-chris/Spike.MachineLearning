@@ -10,7 +10,8 @@ window.onload = function() {
         postMsgToWebViewHost('notification', 'ML web app started via WebView');
     }
 
-    if (location.pathname == "/regression/train" || 
+    if (location.pathname == "/regression" ||
+        location.pathname == "/regression/train" || 
         location.pathname == "/regression/evaluate" || 
         location.pathname == "/regression/retrain") {
         showOrHideConstValueField();

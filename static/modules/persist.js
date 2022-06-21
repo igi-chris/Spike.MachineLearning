@@ -32,7 +32,7 @@ function sendArtefactDataToPigi(model_type, params) {
 
         function handleFileTransSuccess(response) {
             console.log('Handling success response...');
-            postMsgToWebViewHost(action="persist_model_artefact_data", data=response)
+            postMsgToWebViewHost("persist_model_artefact_data", response)
             
         }
 
