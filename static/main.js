@@ -14,6 +14,7 @@ window.onload = function() {
         setupTrainingOptionsListerners();
         showOrHideConstValueField();
         highlightSelectedExperiment();
+        setupNullReplacementListener();
     }
 }
 
@@ -47,6 +48,11 @@ function setupTrainingOptionsListerners() {
         displayTrainingSplit.value = `${pct}%`
         e.preventDefault();
     }
+}
+
+function setupNullReplacementListener() {
+    var nullRepl = document.getElementById("null-replacement");
+    nullRepl.addEventListener('input', showOrHideConstValueField, false);
 }
 
 function highlightSelectedExperiment() {
