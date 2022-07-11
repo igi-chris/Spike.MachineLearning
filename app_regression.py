@@ -166,7 +166,7 @@ def get_model_artefact_as_str() -> Response:
 
     artefact = get_model_artefact(exp)
     # getting obj as encoded str: https://stackoverflow.com/a/30469744/2012446
-    pickled = codecs.encode(pickle.dumps(artefact), "base64").decode()
+    pickled = codecs.encode(pickle.dumps(artefact, protocol=0), "base64").decode()
     return jsonify(predictions=predictions, serialised_model_artefact=pickled)
 
 
