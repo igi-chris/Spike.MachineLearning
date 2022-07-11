@@ -129,6 +129,7 @@ def deserialise_model(fpath: str) -> Pipeline:
 def rebuild_experiment_and_populate_caches(fpath: str, session_ref: str) -> RegressionExperiment:
 
     # tmp - if file is .joblib assume its from web app else string encoded
+    # options: try/except or chk if file content is b64
     if os.path.splitext(fpath)[-1] == '.joblib':
         artefact: ModelArtefact = joblib.load(fpath)
     else:
