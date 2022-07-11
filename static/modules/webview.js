@@ -10,6 +10,7 @@ export function postMsgToWebViewHost(action, data) {
     var json = JSON.stringify(msgObject);
     if (isWebView()) {
         console.log(`posting msg to WebView host: ${json}`)
+        console.log(`from original: ${msgObject}`)
         window.chrome.webview.postMessage(json);
     } else {
         console.error(`Not running WebView, cannot post msg: ${json}`)

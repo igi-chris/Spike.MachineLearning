@@ -127,31 +127,17 @@ def deserialise_model(fpath: str) -> Pipeline:
 
 
 def rebuild_experiment_and_populate_caches(fpath: str, session_ref: str) -> RegressionExperiment:
-    def decode_base64(data, altchars=b'+/'):
-        """Decode base64, padding being optional.
 
-        :param data: Base64 data as an ASCII byte string
-        :returns: The decoded byte string.
-
-        """
-        import re, base64 
-        data = re.sub(rb'[^a-zA-Z0-9%s]+' % altchars, b'', data)  # normalize
-        missing_padding = len(data) % 4
-        if missing_padding:
-            data += b'='* (4 - missing_padding)
-        return base64.b64decode(data, altchars)
-    
     # tmp - if file is .joblib assume its from web app else string encoded
     if os.path.splitext(fpath)[-1] == '.joblib':
-        serialisable_experiment: ModelArtefact = joblib.load(fpath)
+        artefact: ModelArtefact = joblib.load(fpath)
     else:
         with open(fpath, 'r') as f:
-            str_obj = f.read().strip()
-            bin_obj = decode_base64(str_obj.encode())
-            serialisable_experiment = pickle.loads(bin_obj)
+            obj_str = bytes(f.read(), 'utf-8').decode("unicode_escape")
+            artefact = pickle.loads(codecs.decode(obj_str.encode(), "base64"))
 
-    model_ref = register_model(serialisable_experiment.model)
-    exp = serialisable_experiment.rebuild_experiment(session_ref, model_ref=model_ref)
+    model_ref = register_model(artefact.model)
+    exp = artefact.rebuild_experiment(session_ref, model_ref=model_ref)
     register_experiment(ref=session_ref, experiment=exp)
     return exp
 
