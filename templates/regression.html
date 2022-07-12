@@ -36,18 +36,10 @@
     <form action="/regression/evaluate" method="GET" id="args-form" name="args_form">
 
         <!--hiden fields-->
-        <input id="csv-path" name="csv_path" value="{{ args.csv_path }}" type="hidden" />
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
         <input id="selected-experiment-id" name="selected_experiment_id" {% if selected_experiment_id and
             selected_experiment_id|int(-1) !=-1 %} value="{{ selected_experiment_id }}" {% endif %} type="hidden">
 
-        <!--tmp for debugging-->
-        <!-- <label for="csv-path-display" class="form-label mt-4">csv
-            <small>(tmp for debugging)</small>
-        </label>
-        <input id="csv-path-display" name="csv_path_display" value="{{ args.csv_path }}" 
-               disabled style="width: 100%"/> -->
-        <!--tmp end-->
         <!--Basic Training options (supervised)-->
         <fieldset>
             <div class="form-group">

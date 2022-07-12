@@ -11,7 +11,6 @@ from common.model_register import get_model
 
 @dataclass
 class RegressionArgs():
-    csv_path: str = field(default="")
     session_ref: str = field(default="")
     result_column: str = field(default="")
     model_name: str = field(default="")
@@ -21,10 +20,6 @@ class RegressionArgs():
     normalise: bool = field(default=False)
     null_replacement: str = field(default="mean")  # mean | median | most_frequent | constant
     fill_value: Optional[float] = field(default=None)  # use if null_replacement is "constant"
-
-    @property
-    def csv_filename(self) -> str:
-        return os.path.split(self.csv_path)[-1]
 
     @property
     def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float]]:
@@ -140,7 +135,6 @@ class RegressionExperiment():
             model=model
         )
         # empty cache keys that may not exist in cache when deserialised
-        artefact.args.session_ref = ''  
-        artefact.args.csv_path = ''
+        artefact.args.session_ref = '' 
         artefact.eval.act_vs_pred_plot_relative_path = ''
         return artefact

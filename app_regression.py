@@ -1,10 +1,9 @@
 import codecs
 from http import HTTPStatus
 import pickle
-from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file, url_for
+from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file
 from app_utils import save_data_file, save_model_file
-from common.data_register import get_experiment, get_experiments, has_data, lookup_dataframe, register_dataframe, register_experiment
-from common.utils import csv_path_from_ref, get_artefact_bytes
+from common.data_register import get_experiment, get_experiments, lookup_dataframe, register_experiment
 
 from common.model_register import get_model, register_model
 from models.regression import build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, train
@@ -23,10 +22,9 @@ regression_blueprint = Blueprint('regression', __name__)
 def launch_training_ui() -> str:
     ref = request.args.get('session_ref', default='')
     if ref:
-        fpath = csv_path_from_ref(ref)
-        data = register_dataframe(fpath, ref=ref)
+        data = lookup_dataframe(ref)
         heads = data.columns.to_list()
-        args = RegressionArgs(csv_path=fpath, session_ref=ref)
+        args = RegressionArgs(session_ref=ref)
         return render_template('regression.html',
                             args=args,
                             headers=heads, 
@@ -41,10 +39,8 @@ def launch_training_evaluation_ui() -> str:
     selected_exp = request.args.get('selected_experiment_id', default=None, 
                                     type=lambda v: int(v) if v and v != 'None' else None)
     
-
     args = RegressionArgs(
     # get query params
-        csv_path = request.args.get('csv_path', default=''),
         session_ref = request.args.get('session_ref', default=''),
         result_column = request.args.get('result_column', default=''),
         model_name = request.args.get('regression_model', default=''),
@@ -61,11 +57,7 @@ def launch_training_evaluation_ui() -> str:
                                     type=lambda v: float(v) if v else None)
     )
     
-    if has_data(args.session_ref):
-        data = lookup_dataframe(args.session_ref)
-    else:
-        data = register_dataframe(args.csv_path, ref=args.session_ref)
-
+    data = lookup_dataframe(args.session_ref)
     prev_experiments = get_experiments(args.session_ref)
 
     # overwrite args read from form if we have a selected experiment

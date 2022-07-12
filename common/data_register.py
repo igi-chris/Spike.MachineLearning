@@ -41,5 +41,5 @@ def get_experiment(ref: str, idx: int) -> RegressionExperiment:
     return _ref_to_experiments[ref][idx]
 
 
-def has_data(path: str) -> bool:
-    return path in _ref_to_dataframe
+def has_data(ref: str) -> bool:
+    return ref in _ref_to_dataframe

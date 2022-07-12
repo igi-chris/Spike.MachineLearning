@@ -19,7 +19,7 @@ def add_session_data() -> Response:
     ref = request.args.get('session_ref', default='')
     incl_heads = request.args.get('return_headers', default=False)
     if 'data' in request.files.keys():
-        ref, _, heads = save_data_file(file_field_name='data')
+        ref, heads = save_data_file(file_field_name='data')
     if 'model' in request.files.keys():
         exp = save_model_file(ref=ref, file_field_name='model')
         if not ref:
@@ -29,14 +29,14 @@ def add_session_data() -> Response:
     return jsonify(session_ref=ref)
 
 
-def save_data_file(ref: str="", file_field_name: str='data') -> Tuple[str, str, List[str]]:
+def save_data_file(ref: str="", file_field_name: str='data') -> Tuple[str, List[str]]:
     uploaded_file = request.files[file_field_name]
     if uploaded_file.filename:     
         session_ref = ref if ref else str(uuid.uuid4())
         input_file_path = csv_path_from_ref(session_ref)
         uploaded_file.save(input_file_path)
         df = register_dataframe(path=input_file_path, ref=session_ref)
-        return session_ref, input_file_path, df.columns.to_list()
+        return session_ref, df.columns.to_list()
     raise FileNotFoundError(f"No file found under the field name: {file_field_name}")
 
 
