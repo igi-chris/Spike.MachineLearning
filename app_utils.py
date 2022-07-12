@@ -36,6 +36,7 @@ def save_data_file(ref: str="", file_field_name: str='data') -> Tuple[str, List[
         input_file_path = csv_path_from_ref(session_ref)
         uploaded_file.save(input_file_path)
         df = register_dataframe(path=input_file_path, ref=session_ref)
+        # todo - could delete input_file_path file here
         return session_ref, df.columns.to_list()
     raise FileNotFoundError(f"No file found under the field name: {file_field_name}")
 
