@@ -40,113 +40,10 @@
         <input id="selected-experiment-id" name="selected_experiment_id" {% if selected_experiment_id and
             selected_experiment_id|int(-1) !=-1 %} value="{{ selected_experiment_id }}" {% endif %} type="hidden">
 
-        <!--Basic Training options (supervised)-->
-        <fieldset>
-            <div class="form-group">
-
-                <!--Result col option-->
-                <label for="result-column" class="form-label mt-4 {{ 'hide-and-collapse' if evaluation else '' }}">
-                    Result column
-                </label>
-                <select class="form-select {{ 'hide-and-collapse' if evaluation else '' }}" id="result-column"
-                    name="result_column" required placeholder="Add file to see options...">
-                    <!--if heads for pigi integration-->
-                    {% if headers %}
-                    {% for head in headers %}
-                    {% if not loop.last %}
-                    <option value="{{ head }}">{{ head }}</option>
-                    {% else %}
-                    <option value="{{ head }}" selected>{{ head }}</option>
-                    {% endif %}
-                    {% endfor %}
-                    {% elif args.result_column %}
-                    <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
-                    {% endif %}
-                </select>
-
-                <!--Model selection-->
-                <div>
-                    <label for="regression-model">Model:</label>
-                    <select id="regression-model" name="regression_model" required>
-                        <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif %}>
-                            Linear Regression
-                        </option>
-                        <option value="GradientBoostingRegressor" {% if args.model_name=='GradientBoostingRegressor' %}
-                            selected {% endif %}>
-                            Gradient Boosting Regression
-                        </option>
-                        <!-- <option value="GaussianProcessRegressor" {% if args.model_name=='GaussianProcessRegressor' %}
-                            selected {% endif %}>
-                            Gaussian Process Regression
-                        </option> -->
-
-                    </select>
-                </div>
-
-                <!--Test train split-->
-                <div>
-                    <label for="trn-split" class="form-label">Training split</label>
-                    <input type="range" class="form-range" min="0" max="1" step="0.01" list="tickmarks" 
-                        value={{ args.training_split }} id="trn-split" name="trn_split" required
-                        style="width: 30%; padding-left: 5px;">
-                    <datalist id="tickmarks">
-                        {% for pct in range(0, 110, 10) %}
-                        <option value="{{ pct/100 }}" label="{{ pct }}"></option>
-                        {% endfor %}
-                    </datalist>
-
-                    <input type="text" disabled="" id="trn-pct-display" style="width: 50px; margin-left: 10px"
-                        value="{{ '%0.0f'|format(args.training_split*100) ~ '%' }}" />
-
-                    <!--TODO: tooltip explaining why to use i.e.
-                              If you use the same file, split % and random seed, the same rows will
-                              be allocated to each set, allowing for reproducible results.-->
-                    <label for="trn-split-random-seed" class="form-label" style="padding-left: 10px">
-                        Random Seed <small>(optional)</small>
-                    </label>
-                    <input type="number" id="trn-split-random-seed" name="trn_split_random_seed"
-                        placeholder="For reproducibility"
-                        {% if args.random_seed %} value={{ args.random_seed }} {% endif %}>
-                    <br />
-                    <small style="margin-left: 20px">
-                        The proportion of the data to be used for training the model (the rest
-                        will be held back to evaluate the trained model against).
-                    </small>
-                </div>
-            </div>
-        </fieldset>
-
         <!--Preprocessing-->
         <fieldset class="form-group">
             <h5>Preprocessing Options</h5>
-            <div class="form-check">
-                <!--standardise option-->
-                <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
-                    {{ 'checked=""' if args.standardise else '' }}>
-                <label class="form-check-label" for="check-standardise">
-                    Standardise
-                    <small>
-                        (centre and scale data across columns to zero mean, unit variance)
-                    </small>
-                </label>
-            </div>
-            <div class="form-check">
-                <!--normalise option-->
-                <input class="form-check-input" type="checkbox" id="check-normalise" name="check_normalise"
-                    {{ 'checked=""' if args.normalise else '' }}>
-                <label class="form-check-label" for="check-normalise">
-                    Normalise data per sample
-                    <small>
-                        (sum to one, accounting for missing values)
-                    </small>
-                </label>
-                <!-- <div class="text-warning">
-                    <small>This should only be used
-                        if it makes sense for the columns in each row to sum to one
-                        (i.e. they can be seen as proportions of a whole).
-                    </small>
-                </div> -->
-            </div>
+
             <!--null replacement-->
             <label for="null-replacement">Replace empty values with</label>
             <select id="null-replacement" name="null_replacement" required>
@@ -166,6 +63,106 @@
             <input type="number" id="fill-value" name="fill_value" step="0.001"
                 style="visibility: hidden; width: 100px; height: 23px" {% if args.null_replacement=='constant' %}
                 value="{{args.fill_value}}" {% endif %}>
+
+            <!--normalise option-->
+            <div class="form-check">                
+                <input class="form-check-input" type="checkbox" id="check-normalise" name="check_normalise"
+                    {{ 'checked=""' if args.normalise else '' }}>
+                <label class="form-check-label" for="check-normalise">
+                    Normalise data per sample
+                    <small>
+                        (sum to one, accounting for missing values)
+                    </small>
+                </label>
+            </div>
+
+            <!--standardise option-->
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
+                    {{ 'checked=""' if args.standardise else '' }}>
+                <label class="form-check-label" for="check-standardise">
+                    Standardise
+                    <small>
+                        (centre and scale data across columns to zero mean, unit variance)
+                    </small>
+                </label>
+            </div>
+        </fieldset>        
+
+        <!--Test train split-->
+        <fieldset class="form-group">
+            <h5>Training Options</h5>
+            <label for="trn-split" class="form-label">Training split</label>
+            <input type="range" class="form-range" min="0" max="1" step="0.01" list="tickmarks" 
+                value={{ args.training_split }} id="trn-split" name="trn_split" required
+                style="width: 30%; padding-left: 5px;">
+            <datalist id="tickmarks">
+                {% for pct in range(0, 110, 10) %}
+                <option value="{{ pct/100 }}" label="{{ pct }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <input type="text" disabled="" id="trn-pct-display" style="width: 50px; margin-left: 10px"
+                value="{{ '%0.0f'|format(args.training_split*100) ~ '%' }}" />
+
+            <!--TODO: tooltip explaining why to use i.e.
+                        If you use the same file, split % and random seed, the same rows will
+                        be allocated to each set, allowing for reproducible results.-->
+            <label for="trn-split-random-seed" class="form-label" style="padding-left: 10px">
+                Random Seed <small>(optional)</small>
+            </label>
+            <input type="number" id="trn-split-random-seed" name="trn_split_random_seed"
+                placeholder="For reproducibility"
+                {% if args.random_seed %} value={{ args.random_seed }} {% endif %}>
+            <br />
+            <small style="margin-left: 20px">
+                The proportion of the data to be used for training the model (the rest
+                will be held back to evaluate the trained model against).
+            </small>
+        </fieldset>
+
+        <!-- model options-->
+        <fieldset class="form-group">
+            <h5>Model Options</h5>
+
+            <!--Result col option-->
+            <label for="result-column" class="form-label {{ 'hide-and-collapse' if evaluation else '' }}">
+                Result column
+            </label>
+            <select class="form-select {{ 'hide-and-collapse' if evaluation else '' }}" id="result-column"
+                name="result_column" required placeholder="Add file to see options...">
+                <!--if heads for pigi integration-->
+                {% if headers %}
+                {% for head in headers %}
+                {% if not loop.last %}
+                <option value="{{ head }}">{{ head }}</option>
+                {% else %}
+                <option value="{{ head }}" selected>{{ head }}</option>
+                {% endif %}
+                {% endfor %}
+                {% elif args.result_column %}
+                <option value="{{ args.result_column }}" selected>{{ args.result_column }}</option>
+                {% endif %}
+            </select>
+
+            <!--Model selection-->
+            <div>
+                <label for="regression-model">Model:</label>
+                <select id="regression-model" name="regression_model" required>
+                    <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif %}>
+                        Linear Regression
+                    </option>
+                    <option value="GradientBoostingRegressor" {% if args.model_name=='GradientBoostingRegressor' %}
+                        selected {% endif %}>
+                        Gradient Boosting Regression
+                    </option>
+                    <!-- <option value="GaussianProcessRegressor" {% if args.model_name=='GaussianProcessRegressor' %}
+                        selected {% endif %}>
+                        Gaussian Process Regression
+                    </option> -->
+
+                </select>
+            </div>
         </fieldset>
 
         <div class="row">
