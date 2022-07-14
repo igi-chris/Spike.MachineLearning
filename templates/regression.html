@@ -149,17 +149,22 @@
             <div>
                 <label for="regression-model">Model:</label>
                 <select id="regression-model" name="regression_model" required>
-                    <option value="LinearRegression" {% if args.model_name=='LinearRegression' %} selected {% endif %}>
+                    <option value="LinearRegression" 
+                    {% if args.model_name=='LinearRegression' %} selected {% endif %}>
                         Linear Regression
                     </option>
-                    <option value="GradientBoostingRegressor" {% if args.model_name=='GradientBoostingRegressor' %}
-                        selected {% endif %}>
+                    <option value="GradientBoostingRegressor" 
+                    {% if args.model_name=='GradientBoostingRegressor' %} selected {% endif %}>
                         Gradient Boosting Regression
                     </option>
-                    <!-- <option value="GaussianProcessRegressor" {% if args.model_name=='GaussianProcessRegressor' %}
+                    <option value="RANSACRegressor" 
+                    {% if args.model_name=='RANSACRegressor' %} selected {% endif %}>
+                        RANSAC (RANdom SAmple Consensus) Regression (robust to outliers)
+                    </option>
+                    <option value="GaussianProcessRegressor" {% if args.model_name=='GaussianProcessRegressor' %}
                         selected {% endif %}>
                         Gaussian Process Regression
-                    </option> -->
+                    </option>
 
                 </select>
             </div>

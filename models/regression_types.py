@@ -115,7 +115,7 @@ class RegressionExperiment():
 
     @property
     def model_abbr(self) -> str:
-        return "".join(chr for chr in self.args.model_name if chr.isupper())
+        return "".join(chr for chr in self.args.model_name if chr.isupper())[:3]
 
     @property
     def abbr_summary(self) -> str:

@@ -6,7 +6,7 @@ import os
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, RANSACRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -33,7 +33,9 @@ def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
     if args.model_name == 'GradientBoostingRegressor':
         regressor = GradientBoostingRegressor(random_state=args.random_seed)  
     elif args.model_name == 'GaussianProcessRegressor':
-        regressor = GaussianProcessRegressor(random_state=args.random_seed)  
+        regressor = GaussianProcessRegressor(random_state=args.random_seed)
+    elif args.model_name == 'RANSACRegressor':
+        regressor = RANSACRegressor(random_state=args.random_seed)
     elif args.model_name == 'LinearRegression':
         regressor = LinearRegression()  
     else: 
