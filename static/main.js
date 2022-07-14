@@ -6,7 +6,10 @@ import { selectExperiment, deselectExperiment,
 
 window.onload = function() {
     if (isWebView()) {
-        document.getElementById("is-webview").innerHTML="webview";
+        var webViewMsg = document.getElementById("is-webview");
+        if (webViewMsg) {
+            webViewMsg.innerHTML="webview"
+        }
         postMsgToWebViewHost('notification', 'ML web app started via WebView');
     }
 
