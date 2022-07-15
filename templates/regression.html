@@ -41,10 +41,8 @@
             selected_experiment_id|int(-1) !=-1 %} value="{{ selected_experiment_id }}" {% endif %} type="hidden">
 
         <!--Preprocessing-->
-        <p>attempt1...</p>
-        {{super()}}
-        <p>attempt2...</p>
-        {% block preprocessing %}{{super()}}{% endblock preprocessing %}
+        <p>direct inheritance...</p>
+        {% block preprocessing %}{% endblock preprocessing %}
 
         <!--Test train split-->
         <fieldset class="form-group">
