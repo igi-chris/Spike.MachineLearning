@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block preprocessing %}
+<fieldset class="form-group">
+    <h5>Preprocessing Options (new)</h5>
+
+    <!--null replacement-->
+    <label for="null-replacement">Replace empty values with</label>
+    <select id="null-replacement" name="null_replacement" required>
+        <option value="mean" {% if args.null_replacement=='mean' %} selected {% endif %}>
+            Mean
+        </option>
+        <option value="median" {% if args.null_replacement=='median' %} selected {% endif %}>
+            Median
+        </option>
+        <option value="most_frequent" {% if args.null_replacement=='most_frequent' %} selected {% endif %}>
+            Most Frequent
+        </option>
+        <option value="constant" {% if args.null_replacement=='constant' %} selected {% endif %}>
+            Constant
+        </option>
+    </select>
+    <input type="number" id="fill-value" name="fill_value" step="0.001"
+        style="visibility: hidden; width: 100px; height: 23px" {% if args.null_replacement=='constant' %}
+        value="{{args.fill_value}}" {% endif %}>
+
+    <!--normalise option-->
+    <div class="form-check">                
+        <input class="form-check-input" type="checkbox" id="check-normalise" name="check_normalise"
+            {{ 'checked=""' if args.normalise else '' }}>
+        <label class="form-check-label" for="check-normalise">
+            Normalise data per sample
+            <small>
+                (sum to one, accounting for missing values)
+            </small>
+        </label>
+    </div>
+
+    <!--standardise option-->
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="check-standardise" name="check_standardise"
+            {{ 'checked=""' if args.standardise else '' }}>
+        <label class="form-check-label" for="check-standardise">
+            Standardise
+            <small>
+                (centre and scale data across columns to zero mean, unit variance)
+            </small>
+        </label>
+    </div>
+</fieldset>
+{% endblock %}

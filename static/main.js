@@ -10,6 +10,11 @@ window.onload = function() {
         if (webViewMsg) {
             webViewMsg.innerHTML="webview"
         }
+        // do the other way around (show if not web view then it doesn't show then disappear)
+        var restartLnk = document.getElementById("restart");
+        if (restartLnk) {
+            restartLnk.style.visibility = "hidden";
+        }
         postMsgToWebViewHost('notification', 'ML web app started via WebView');
     }
 
