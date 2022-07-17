@@ -1,12 +1,14 @@
 from __future__ import annotations
-import os
-from typing import List, Optional, Sequence, Tuple, NamedTuple
+from typing import List, Optional, Sequence, Tuple, NamedTuple, Dict, TypeVar
 
 from dataclasses import dataclass, field
 from flask import url_for
 from sklearn.pipeline import Pipeline
 
 from common.model_register import get_model
+
+
+ModelArgs = TypeVar('ModelArgs', Dict[str, str], Dict[str, float], Dict[str, 'ModelArgs'])  # add more options if needed
 
 
 @dataclass
@@ -20,14 +22,15 @@ class RegressionArgs():
     normalise: bool = field(default=False)
     null_replacement: str = field(default="mean")  # mean | median | most_frequent | constant
     fill_value: Optional[float] = field(default=None)  # use if null_replacement is "constant"
+    model_args: ModelArgs = field(default_factory=dict)
 
     @property
-    def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float]]:
+    def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float], ModelArgs]:
         """
         Relates to preprocessing & modelling args that will form part of the pipeline.
         """
         return (self.model_name, self.standardise, self.normalise, 
-                self.null_replacement, self.fill_value)
+                self.null_replacement, self.fill_value, self.model_args)
         
     def find_same_modelling_args(self, prev: List[RegressionExperiment]) -> Optional[RegressionExperiment]:
         """
