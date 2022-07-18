@@ -1,14 +1,7 @@
-from ast import Num
 from typing import List, Optional, Tuple
-from enum import Enum
 from abc import ABC
 
 from dataclasses import dataclass, field
-
-
-class Kernel(Enum):
-    RBF = 0
-    Matern = 1
 
 
 @dataclass
