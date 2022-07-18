@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Generic, List, NamedTuple, Optional, Sequence, Tuple, Dict, Union
+from typing import List, NamedTuple, Optional, Sequence, Tuple, Dict, Union
 
 from dataclasses import dataclass, field
 from flask import url_for
