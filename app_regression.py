@@ -8,6 +8,7 @@ from common.data_register import get_experiment, get_experiments, lookup_datafra
 from common.model_register import get_model, register_model
 from models.regression import build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, train
 from models.regression_types import RegressionExperiment, RegressionArgs
+from models.model_specific_args.arg_register import _model_to_args_map  # tmp??
 from literals import _version
 
 
@@ -27,7 +28,8 @@ def launch_training_ui() -> str:
         args = RegressionArgs(session_ref=ref)
         return render_template('regression.html',
                             args=args,
-                            headers=heads, 
+                            headers=heads,
+                            model_specific_args=_model_to_args_map,
                             version=_version)
     return render_template('regression.html',
                         args=RegressionArgs(),
@@ -80,6 +82,7 @@ def launch_training_evaluation_ui() -> str:
 
     return render_template('regression.html',
                            args=args,
+                           model_specific_args=_model_to_args_map,
                            model_ref=model_ref,
                            evaluation=evaluation,
                            prev_experiments=prev_experiments,
@@ -109,6 +112,7 @@ def relaunch_training_ui() -> str:
         exp_id=exp_id)
     return render_template('regression.html',
                            args=exp.args,
+                           model_specific_args=_model_to_args_map,
                            model_ref=exp.model_ref,
                            evaluation=exp.eval,
                            prev_experiments=[],

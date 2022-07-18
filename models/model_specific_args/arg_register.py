@@ -10,5 +10,5 @@ _model_to_args_map: Dict[str, List[ModelArgument]] = {
     "GaussianProcessRegressor": [gaussian_process_kernel]
 }
 
-def get_args(model_name: str) -> List[ModelArgument]:
+def get_model_args(model_name: str) -> List[ModelArgument]:
     return _model_to_args_map.get(model_name, [])
