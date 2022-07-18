@@ -33,6 +33,7 @@ def launch_training_ui() -> str:
                             version=_version)
     return render_template('regression.html',
                         args=RegressionArgs(),
+                        model_specific_args=_model_to_args_map,
                         version=_version)
 
 
