@@ -8,10 +8,9 @@ from sklearn.pipeline import Pipeline
 from common.model_register import get_model
 
 
-ModelArgs = Dict[str, Union[str, float, Dict]]  # todo - would like to tie this down more, 
-                                                # but having trouble a recursive definition
-                                                # that the type checker accepts
-                                     
+# todo - would like to tie this down more, but having trouble a recursive 
+#        definition that the type checker accepts
+SelectedModelArgs = Dict[str, Union[str, float, Dict]]  
 
 
 @dataclass
@@ -25,10 +24,10 @@ class RegressionArgs():
     normalise: bool = field(default=False)
     null_replacement: str = field(default="mean")  # mean | median | most_frequent | constant
     fill_value: Optional[float] = field(default=None)  # use if null_replacement is "constant"
-    model_args: ModelArgs = field(default_factory=dict)
+    model_args: SelectedModelArgs = field(default_factory=dict)
 
     @property
-    def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float], ModelArgs]:
+    def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float], SelectedModelArgs]:
         """
         Relates to preprocessing & modelling args that will form part of the pipeline.
         """

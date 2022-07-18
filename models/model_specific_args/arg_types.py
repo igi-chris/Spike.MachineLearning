@@ -13,11 +13,11 @@ class Kernel(Enum):
 
 @dataclass
 class ModelArgument(ABC):
-    display_name: str
+    pass
 
 
 @dataclass
-class SelectionArg(ModelArgument):
+class StringSelectionArg(ModelArgument):
     display_name: str
     default_value: Optional[str] = field(default=None)
     options: List[str] = field(default_factory=list)
@@ -36,19 +36,26 @@ class RangeArg(ModelArgument):
 
 
 @dataclass
-class NestedArg(ModelArgument):
-    display_name: str
+class NestedArgs(ModelArgument):
     children: List[ModelArgument]
 
 
 @dataclass
-class RBFKernel:
-    length_scale: float = field(default=1.0)
-    length_scale_bounds: Tuple[float, float] = field(default=(1e-05, 100000.0))
+class ComplexSelectionArg(ModelArgument):
+    display_name: str
+    default_value: Optional[ModelArgument] = field(default=None)
+    options: List[ModelArgument] = field(default_factory=list)
 
 
 length_scale = NumericalArg(display_name="Length Scale", default_value=1.0)
 length_scale_bounds = RangeArg(display_name="Length Scale Bounds", 
                                default_value=(1e-05, 100000.0))
 nu = NumericalArg(display_name="nu (smoothness)")
+
+kernel_rbf = NestedArgs([length_scale, length_scale_bounds])
+kernel_matern = NestedArgs([length_scale, length_scale_bounds, nu])
+
+gaussian_process_kernel = ComplexSelectionArg("Kernel",
+                                              default_value=None,
+                                              options=[kernel_rbf, kernel_matern])
 
