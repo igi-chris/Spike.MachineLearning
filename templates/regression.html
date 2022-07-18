@@ -193,14 +193,17 @@
                         <!--sub options-->
                         <!--todo - how to handle futher nesting (if needed) ???-->
                         {% if model_arg.field_type == 'selection-nested' %}
+                            <p>vis test</p>
                             <div class="form-group" style="margin-left: 50px">
                             {% for nested_arg in model_arg.options %}
+                            <p>nested vis test - {{ nested_arg }}</p>
                             {% if nested_arg.field_type == 'number' %}
-                                    <label for="{{ nested_arg.display_name|replace(' ', '-') }}" class="form-label">
-                                        {{ nested_arg.display_name }}
-                                    </label>
-                                    <input type="number" id="{{ nested_arg.display_name|replace(' ', '-') }}" 
-                                        name="{{ nested_arg.display_name|replace(' ', '_') }}">
+                                
+                                <label for="{{ nested_arg.display_name|replace(' ', '-') }}" class="form-label">
+                                    {{ nested_arg.display_name }}
+                                </label>
+                                <input type="number" id="{{ nested_arg.display_name|replace(' ', '-') }}" 
+                                    name="{{ nested_arg.display_name|replace(' ', '_') }}">
                             {% endif %}
                             {% endfor %}
                             </div> 
