@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional, Sequence, Tuple, NamedTuple, Dict, TypeVar
+from typing import Any, Generic, List, NamedTuple, Optional, Sequence, Tuple, Dict, Union
 
 from dataclasses import dataclass, field
 from flask import url_for
@@ -8,7 +8,10 @@ from sklearn.pipeline import Pipeline
 from common.model_register import get_model
 
 
-ModelArgs = TypeVar('ModelArgs', Dict[str, str], Dict[str, float], Dict[str, 'ModelArgs'])  # add more options if needed
+ModelArgs = Dict[str, Union[str, float, Dict]]  # todo - would like to tie this down more, 
+                                                # but having trouble a recursive definition
+                                                # that the type checker accepts
+                                     
 
 
 @dataclass
