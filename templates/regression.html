@@ -172,7 +172,13 @@
             <!--Model specific options
                  - hide all to begin with and show as needed (via js)-->
             <div>
-                
+                {% for model_name, model_args in model_specific_args.items() %}
+                <div id="{{model_name}}">
+                    {%  for model_arg in model_args %}
+                    
+                    {% endfor %}
+                </div>
+                {% endfor %}
             </div>
         </fieldset>
 
