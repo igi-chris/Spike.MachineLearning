@@ -102,7 +102,7 @@ def relaunch_training_ui() -> str:
         session_ref = request.args.get('session_ref', default='')
         exp = get_experiment(ref=session_ref, idx=exp_id)  # experiment should have been added to cache when sent via /api/add_session_data
     else:
-        session_ref, _, _ = save_data_file(file_field_name='data')
+        session_ref, _ = save_data_file(file_field_name='data')
         exp = save_model_file(ref=session_ref, file_field_name='model')
 
     # not rebuilt when deserialised as not needed if just using for predictions
@@ -176,7 +176,7 @@ def apply_regression_model() -> Response:
         session_ref = request.args.get('session_ref', default='')
         exp = get_experiment(ref=session_ref, idx=0)  # experiment should have been added to cache when sent via /api/add_session_data
     else:
-        session_ref, _, _ = save_data_file(file_field_name='data')
+        session_ref, _ = save_data_file(file_field_name='data')
         exp = save_model_file(ref=session_ref, file_field_name='model')
     
     model = get_model(ref=exp.model_ref)  
