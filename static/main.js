@@ -3,6 +3,7 @@ import { isWebView, postMsgToWebViewHost } from './modules/webview.js'
 import { dropHandler, dragOverHandler, endDragOver }  from './modules/filedrop.js'
 import { selectExperiment, deselectExperiment, 
     highlightSelectedExperiment } from './modules/experiment.js'
+import { showModelOptions } from './modules/modeloptions.js'
 
 window.onload = function() {
     if (isWebView()) {
@@ -52,11 +53,7 @@ function setupTrainingListeners() {
 
     // set up listener to show the appropriate model options when model selection is changed
     var modelSelector = document.getElementById('regression-model');
-    modelSelector.onchange(() => showModelOptions(modelSelector));
-}
-
-function showModelOptions(modelSelector) {
-    if (modelSelector)
+    modelSelector.addEventListener('change', () => showModelOptions(modelSelector), false);
 }
 
 function setupApplyListeners() {    

@@ -176,7 +176,8 @@
                      WILL LIKELY MOVE TO VUE FOR THIS REASON-->
             <div>
                 {% for model_name, model_args in model_specific_args.items() %} <!--1 open-->
-                    <div class="form-group card" id="{{model_name}}">
+                    <div class="form-group card" id="{{model_name}}-options"
+                        style="display: none;">
                         <div class="card-header">
                             {{model_name}} Options
                         </div>
