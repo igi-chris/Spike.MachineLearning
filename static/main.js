@@ -49,6 +49,14 @@ function setupTrainingListeners() {
         //console.log(`Got id ${id} from ${el.id}`);
         el.addEventListener('click', () => selectExperiment(id), false)
     })
+
+    // set up listener to show the appropriate model options when model selection is changed
+    var modelSelector = document.getElementById('regression-model');
+    modelSelector.onchange(() => showModelOptions(modelSelector));
+}
+
+function showModelOptions(modelSelector) {
+    if (modelSelector)
 }
 
 function setupApplyListeners() {    
