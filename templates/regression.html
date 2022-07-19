@@ -176,63 +176,63 @@
                      WILL LIKELY MOVE TO VUE FOR THIS REASON-->
             <div>
                 {% for model_name, model_args in model_specific_args.items() %} <!--1 open-->
-                <div class="form-group card" id="{{model_name}}">
-                    <div class="card-header">
-                        {{model_name}} Options
-                    </div>
-                    <div class="card-body">
-                        {% for model_arg in model_args %} <!--2 open-->
-                        {% if model_arg.field_type.startswith('selection') %}
-                            <label for="{{ model_arg.display_name|replace(' ', '-') }}" class="form-label">
-                                {{ model_arg.display_name }}
-                            </label>
-                            <select id="{{ model_arg.display_name|replace(' ', '-') }}" 
-                                    name="{{ model_arg.display_name|replace(' ', '_') }}">
-                                {% for option in model_arg.options %} <!--3 open-->
-                                <option value="{{ option|string }}">{{ option|string }}</option>
-                                {% endfor %} <!--3 cls-->
-                            </select>
-
-                            <!--sub options-->
-                            <!--todo - how to handle futher nesting (if needed) ???-->
-                            {% if model_arg.field_type == 'selection-nested' %}
-                                <div class="form-group">
-
-                                {% for option in model_arg.options %} <!--3b open-->
-                                <!--p>tmp nested vis test - {{ option }}</p-->  <!-- tmp kernel lvl-->
-                                    
-                                {% for child_arg in option.children %} <!--4 open-->
-                                <!-- <p>tmp nested vis test - {{ child_arg }}</p> -->
-                                {% if child_arg.field_type == 'number' %}
-                                    <!-- <small>tmp dbg - is number</small> -->
-                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}" class="form-label">
-                                        {{ child_arg.display_name }}
+                    <div class="form-group card" id="{{model_name}}">
+                        <div class="card-header">
+                            {{model_name}} Options
+                        </div>
+                        <div class="card-body">
+                            {% for model_arg in model_args %} <!--2 open-->
+                                {% if model_arg.field_type.startswith('selection') %}
+                                    <label for="{{ model_arg.display_name|replace(' ', '-') }}" class="form-label">
+                                        {{ model_arg.display_name }}
                                     </label>
-                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}" 
-                                        name="{{ child_arg.display_name|replace(' ', '_') }}"
-                                        style="width: 50px;">
-                                {% elif child_arg.field_type == 'range' %}
-                                    <!-- <small>tmp dbg - is range</small> -->
-                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}" class="form-label">
-                                        {{ child_arg.display_name }}
-                                    </label>
-                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}" 
-                                        name="{{ child_arg.display_name|replace(' ', '_') }}"
-                                        style="width: 50px;">
+                                    <select id="{{ model_arg.display_name|replace(' ', '-') }}" 
+                                            name="{{ model_arg.display_name|replace(' ', '_') }}">
+                                        {% for option in model_arg.options %} <!--3 open-->
+                                            <option value="{{ option|string }}">{{ option|string }}</option>
+                                        {% endfor %} <!--3 cls-->
+                                    </select>
+
+                                    <!--sub options-->
+                                    <!--todo - how to handle futher nesting (if needed) ???-->
+                                    {% if model_arg.field_type == 'selection-nested' %}
+                                        <div class="form-group">
+
+                                        {% for option in model_arg.options %} <!--3b open-->
+                                        <!--p>tmp nested vis test - {{ option }}</p-->  <!-- tmp kernel lvl-->
+                                            
+                                            <div id="{{ option.display_name|replace(' ', '-') }}">
+                                            {% for child_arg in option.children %} <!--4 open-->
+                                                <!-- <p>tmp nested vis test - {{ child_arg }}</p> -->
+                                                {% if child_arg.field_type == 'number' %}
+                                                    <!-- <small>tmp dbg - is number</small> -->
+                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}" class="form-label">
+                                                        {{ child_arg.display_name }}
+                                                    </label>
+                                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}" 
+                                                        name="{{ child_arg.display_name|replace(' ', '_') }}" style="width: 50px;">
+                                                {% elif child_arg.field_type == 'range' %}
+                                                    <!-- <small>tmp dbg - is range</small> -->
+                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}-low" class="form-label">
+                                                        {{ child_arg.display_name }}
+                                                    </label>
+                                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}-low" 
+                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_low" style="width: 50px;">
+                                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}-high" 
+                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_high" style="width: 50px;">
+                                                {% endif %}
+                                            {% endfor %} <!--4 cls-->
+                                            </div>
+                                        {% endfor %} <!--3b cls-->
+                                        </div> 
+
+                                    {% elif child_arg.field_type == 'number' %}
+                                        <!-- todo - macro to save repeating???-->
+                                    {% endif %}
                                 {% endif %}
-                                {% endfor %} <!--4 cls-->
-                                {% endfor %} <!--3b cls-->
-                                
-                                </div> 
-                            
-
-                            {% elif child_arg.field_type == 'number' %}
-                                <!-- todo - macro to save repeating???-->
-                            {% endif %}
-                        {% endif %}
-                        {% endfor %} <!--2 cls-->
+                            {% endfor %} <!--2 cls-->
+                        </div>
                     </div>
-                </div>
                 {% endfor %} <!--1 cls-->
             </div>
         </fieldset>
