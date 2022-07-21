@@ -62,8 +62,10 @@ def launch_training_evaluation_ui() -> str:
     )
 
     # get model specific options
+    kernel = request.args.get('kernel', default='')
+    kernel_options = {}
     if args.model_name == 'GaussianProcessRegressor':
-        kernel = request.args.get('kernel', default='')
+        
         if kernel == 'RBF' or kernel == 'Matern':
             len_sc = request.args.get(length_scale.dom_name, 
                 default=length_scale.default_value, type=lambda v: float(v))
@@ -78,10 +80,6 @@ def launch_training_evaluation_ui() -> str:
             if kernel == 'Matern':
                 kernel_options['nu'] = request.args.get(f"{nu.dom_name}", 
                     default=nu.default_value, type=lambda v: float(v))
-        elif kernel == 'Default':
-            model_args = {}
-            kernel_options = {}
-
         
         model_args: SelectedModelArgs = {"kernel": kernel}
         if kernel_options:
