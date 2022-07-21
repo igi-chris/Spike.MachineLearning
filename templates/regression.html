@@ -184,11 +184,11 @@
                         <div class="card-body">
                             {% for model_arg in model_args %} <!--2 open-->
                                 {% if model_arg.field_type.startswith('selection') %}
-                                    <label for="{{ model_arg.display_name|replace(' ', '-') }}" class="form-label">
+                                    <label for="{{ model_arg.id }}" class="form-label">
                                         {{ model_arg.display_name }}
                                     </label>
-                                    <select id="{{ model_arg.display_name|replace(' ', '-') }}" 
-                                            name="{{ model_arg.display_name|replace(' ', '_') }}">
+                                    <select id="{{ model_arg.id }}" 
+                                            name="{{ model_arg.dom_name }}">
                                         {% for option in model_arg.options %} <!--3 open-->
                                             <option value="{{ option|string }}">{{ option|string }}</option>
                                         {% endfor %} <!--3 cls-->
@@ -202,34 +202,32 @@
                                         {% for option in model_arg.options %} <!--3b open-->
                                         <!--p>tmp nested vis test - {{ option }}</p-->  <!-- tmp kernel lvl-->
                                             
-                                            <div id="{{ option.display_name|replace(' ', '-') }}">
+                                            <div id="{{ option.id }}">
                                             {% for child_arg in option.children %} <!--4 open-->
                                                 <!-- <p>tmp nested vis test - {{ child_arg }}</p> -->
 
                                                 {% if child_arg.field_type == 'number' %}
                                                     <!-- <small>tmp dbg - is number</small> -->
-                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}" 
-                                                        class="form-label">
+                                                    <label for="{{ child_arg.id }}" class="form-label">
                                                         {{ child_arg.display_name }}
                                                     </label>
                                                     <input type="number" 
-                                                        id="{{ child_arg.display_name|replace(' ', '-') }}" 
-                                                        name="{{ child_arg.display_name|replace(' ', '_') }}" 
+                                                        id="{{ child_arg.id }}" 
+                                                        name="{{ child_arg.dom_name }}" 
                                                         style="width: 80px;">
 
                                                 {% elif child_arg.field_type == 'range' %}
                                                     <!-- <small>tmp dbg - is range</small> -->
-                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}-low" 
-                                                        class="form-label">
+                                                    <label for="{{ child_arg.id }}-low" class="form-label">
                                                         {{ child_arg.display_name }}
                                                     </label>
                                                     <input type="number" 
-                                                        id="{{ child_arg.display_name|replace(' ', '-') }}-low" 
-                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_low" 
+                                                        id="{{ child_arg.id }}-low" 
+                                                        name="{{ child_arg.dom_name }}_low" 
                                                         style="width: 80px;">
                                                     <input type="number" 
-                                                        id="{{ child_arg.display_name|replace(' ', '-') }}-high" 
-                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_high" 
+                                                        id="{{ child_arg.id }}-high" 
+                                                        name="{{ child_arg.dom_name }}_high" 
                                                         style="width: 80px;">
                                                 
                                                 {% elif model_arg.field_type == 'display' %}
