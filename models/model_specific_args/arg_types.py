@@ -12,12 +12,12 @@ class BaseModelArgument(ABC):
     @property
     def id(self) -> str:
         """Get the id that can be used by default in the html"""
-        return self.display_name.replace(" ", "-")
+        return self.display_name.lower().replace(" ", "-")
 
     @property
     def dom_name(self) -> str:
         """The html element name is used for the arg name when submitting the form"""
-        return self.display_name.replace(" ", "_")
+        return self.display_name.lower().replace(" ", "_")
 
     def __str__(self):
         """Needed for dropdowns where selections are complex, can just call str() on any selection now"""
@@ -90,6 +90,8 @@ kernel_rbf = NestedArgs(display_name="RBF",
 kernel_matern = NestedArgs(display_name="Matern", 
     children=[length_scale, length_scale_bounds, nu])
 
+# todo? may need to be more specific i.e. I can image >1 model type having a kernel, but not the
+#       same args. We may need to have an internal name (for id etc as well as display_name)
 gaussian_process_kernel = ComplexSelectionArg("Kernel",
     default_value=None,
     options=[kernel_default, kernel_rbf, kernel_matern])
