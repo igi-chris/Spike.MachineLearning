@@ -13,10 +13,6 @@ export function showModelOptions(modelSelector) {
     if (modelSelector.value === 'GaussianProcessRegressor') {        
         if (gprOptions) {
             gprOptions.style.display = 'block';
-            // kernel options needs to be triggered the first time as options
-            // are hidden until dropdown is changed (so if first selector value
-            // has options these would not show unless you change away then back)
-            showGPRKernelOptions(document.getElementById('kernel-options'));
         }
     } else {
        console.log(`No dislay handler for option: ${modelSelector.value}`) 
