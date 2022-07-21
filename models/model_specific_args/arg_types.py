@@ -41,14 +41,14 @@ class StringSelectionArg(BaseModelArgument):
 class NumericalArg(BaseModelArgument):
     field_type: ClassVar[str] = "number"
     display_name: str
-    default_value: Optional[float] = field(default=None)
+    default_value: float
 
 
 @dataclass
 class RangeArg(BaseModelArgument):
     field_type: ClassVar[str] = "range"
     display_name: str
-    default_value: Optional[Tuple[float, float]] = field(default=None)
+    default_value: Tuple[float, float]
 
 
 @dataclass
