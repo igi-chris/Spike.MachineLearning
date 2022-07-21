@@ -75,9 +75,13 @@ def launch_training_evaluation_ui() -> str:
                 "length_scale": len_sc,
                 "length_scale_bounds": (bounds_low, bounds_high)
                 }
-        if kernel == 'Matern':
-            kernel_options['nu'] = request.args.get(f"{nu.dom_name}", 
-                default=nu.default_value, type=lambda v: float(v))
+            if kernel == 'Matern':
+                kernel_options['nu'] = request.args.get(f"{nu.dom_name}", 
+                    default=nu.default_value, type=lambda v: float(v))
+        elif kernel == 'Default':
+            model_args = {}
+            kernel_options = {}
+
         
         model_args: SelectedModelArgs = {"kernel": kernel}
         if kernel_options:

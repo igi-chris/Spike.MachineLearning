@@ -8,13 +8,13 @@ from sklearn.pipeline import Pipeline
 from common.model_register import get_model
 
 
-# todo - would like to tie this down more, but having trouble a recursive 
-#        definition that the type checker accepts
-SelectedModelArgs = Dict[str, Union[str, float, Dict]]  
+SupportedArgTypes = Union[str, float, Tuple[float, float]]
+# recursive type hints not yet supported in mypy, hence the error silence cmt below: https://github.com/python/mypy/issues/731
+SelectedModelArgs = Dict[str, Union[SupportedArgTypes, Dict[str, 'SelectedModelArgs']]]  # type: ignore[misc]
 
 
 @dataclass
-class RegressionArgs():
+class RegressionArgs:
     session_ref: str = field(default="")
     result_column: str = field(default="")
     model_name: str = field(default="")
@@ -22,44 +22,60 @@ class RegressionArgs():
     random_seed: Optional[int] = field(default=None)
     standardise: bool = field(default=True)
     normalise: bool = field(default=False)
-    null_replacement: str = field(default="mean")  # mean | median | most_frequent | constant
-    fill_value: Optional[float] = field(default=None)  # use if null_replacement is "constant"
+    null_replacement: str = field(
+        default="mean"
+    )  # mean | median | most_frequent | constant
+    fill_value: Optional[float] = field(
+        default=None
+    )  # use if null_replacement is "constant"
     model_args: SelectedModelArgs = field(default_factory=dict)
 
     @property
-    def modelling_args(self) -> Tuple[str, bool, bool, str, Optional[float], SelectedModelArgs]:
+    def modelling_args(
+        self,
+    ) -> Tuple[str, bool, bool, str, Optional[float], SelectedModelArgs]:
         """
         Relates to preprocessing & modelling args that will form part of the pipeline.
         """
-        return (self.model_name, self.standardise, self.normalise, 
-                self.null_replacement, self.fill_value, self.model_args)
-        
-    def find_same_modelling_args(self, prev: List[RegressionExperiment]) -> Optional[RegressionExperiment]:
+        return (
+            self.model_name,
+            self.standardise,
+            self.normalise,
+            self.null_replacement,
+            self.fill_value,
+            self.model_args,
+        )
+
+    def find_same_modelling_args(
+        self, prev: List[RegressionExperiment]
+    ) -> Optional[RegressionExperiment]:
         """
-        Checks the provided list previous experiments and compares on 
+        Checks the provided list previous experiments and compares on
         modelling args and return a match if found.
         """
-        return next((e for e in prev if e.args.modelling_args == self.modelling_args), None)
+        return next(
+            (e for e in prev if e.args.modelling_args == self.modelling_args), None
+        )
 
     @property
     def null_abbr(self) -> str:
         """Abbreviated summary for how null replacements are handled"""
-        if self.null_replacement == 'mean':
-            return 'Mn'
-        elif self.null_replacement == 'median':
-            return 'Md'
-        elif self.null_replacement == 'most_frequent':
-            return 'MF'
-        elif self.null_replacement =='constant' and self.fill_value is not None:
+        if self.null_replacement == "mean":
+            return "Mn"
+        elif self.null_replacement == "median":
+            return "Md"
+        elif self.null_replacement == "most_frequent":
+            return "MF"
+        elif self.null_replacement == "constant" and self.fill_value is not None:
             fill = str(round(self.fill_value, 3))
-            for i in range (3):
+            for i in range(3):
                 if fill.endswith("0"):
                     fill = fill[:-1]
             if fill.endswith("."):
                 fill = fill[:-1]
             return fill
         else:
-            return '??'
+            return "??"
 
 
 class Metric(NamedTuple):
@@ -70,7 +86,7 @@ class Metric(NamedTuple):
 
 
 @dataclass
-class RegressionEvaluation():
+class RegressionEvaluation:
     mse: float
     rmse: float
     mean_abs_err: float
@@ -82,20 +98,22 @@ class RegressionEvaluation():
     def metrics(self) -> Sequence[Metric]:
         "Tuples of long name, value, short name"
         return [
-            #Metric("MSE", "Mean Squared Error", self.mse, up_is_good=False),
+            # Metric("MSE", "Mean Squared Error", self.mse, up_is_good=False),
             Metric("RMSE", "Root Mean Squared Error", self.rmse, up_is_good=False),
             Metric("MnAE", "Mean Absolute Error", self.mean_abs_err, up_is_good=False),
-            Metric("MdAE", "Median Absolute Error", self.median_abs_err, up_is_good=False),
-            Metric("R²", "R² (Coefficient of determination)", self.r2, up_is_good=True)
+            Metric(
+                "MdAE", "Median Absolute Error", self.median_abs_err, up_is_good=False
+            ),
+            Metric("R²", "R² (Coefficient of determination)", self.r2, up_is_good=True),
         ]
 
     @property
     def act_vs_pred_uri(self) -> str:
-        return url_for('static', filename=self.act_vs_pred_plot_relative_path) 
+        return url_for("static", filename=self.act_vs_pred_plot_relative_path)
 
 
 @dataclass
-class ModelArtefact():
+class ModelArtefact:
     args: RegressionArgs
     eval: RegressionEvaluation
     model: Pipeline
@@ -112,7 +130,7 @@ class ModelArtefact():
 
 
 @dataclass
-class RegressionExperiment():
+class RegressionExperiment:
     args: RegressionArgs
     eval: RegressionEvaluation
     model_ref: str
@@ -134,12 +152,8 @@ class RegressionExperiment():
 
     def build_artefact(self) -> ModelArtefact:
         model = get_model(ref=self.model_ref)
-        artefact = ModelArtefact(
-            args=self.args,
-            eval=self.eval,
-            model=model
-        )
+        artefact = ModelArtefact(args=self.args, eval=self.eval, model=model)
         # empty cache keys that may not exist in cache when deserialised
-        artefact.args.session_ref = '' 
-        artefact.eval.act_vs_pred_plot_relative_path = ''
+        artefact.args.session_ref = ""
+        artefact.eval.act_vs_pred_plot_relative_path = ""
         return artefact

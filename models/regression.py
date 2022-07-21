@@ -1,11 +1,12 @@
 import codecs
 import pickle
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 import joblib
 import os
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, Matern
 from sklearn.linear_model import LinearRegression, RANSACRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -33,13 +34,35 @@ def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
     if args.model_name == 'GradientBoostingRegressor':
         regressor = GradientBoostingRegressor(random_state=args.random_seed)  
     elif args.model_name == 'GaussianProcessRegressor':
-        regressor = GaussianProcessRegressor(random_state=args.random_seed)
+        kernel_name = args.model_args.get('kernel', '')
+        if kernel_name == 'Default':
+            print("Using default kernel for GPR...")
+            regressor = GaussianProcessRegressor(random_state=args.random_seed)
+        elif kernel_name == 'RBF' or kernel_name == 'Matern':
+            kernel_options = args.model_args.get('kernel_options', {})
+            assert isinstance(kernel_options, dict)
+            assert isinstance(kernel_options['length_scale'], float)
+            assert isinstance(kernel_options['length_scale_bounds'], tuple)
+            scale = kernel_options['length_scale']
+            bounds = kernel_options['length_scale_bounds']
+
+            if kernel_name == 'RBF':
+                kernel = RBF(length_scale=scale, length_scale_bounds=bounds)
+            elif kernel_name == 'Matern':
+                assert isinstance(kernel_options['nu'], float)
+                nu = kernel_options['nu']
+                kernel = Matern(length_scale=scale, length_scale_bounds=bounds, nu=nu)
+            else:
+                raise NotImplementedError(f"{kernel_name} not yet supported.")
+
+            regressor = GaussianProcessRegressor(kernel=kernel, random_state=args.random_seed)
     elif args.model_name == 'RANSACRegressor':
         regressor = RANSACRegressor(random_state=args.random_seed)
     elif args.model_name == 'LinearRegression':
         regressor = LinearRegression()  
     else: 
         raise NotImplementedError(f"{args.model_name} model not currently supported")
+    print(f"Regressor: {regressor}")
 
     preprocessor = build_column_transformer(standardise=args.standardise, 
                                             normalise=args.normalise,
@@ -166,5 +189,6 @@ def extract_numeric_columns(data: DataFrame, result_column: str) -> List[str]:
             numeric_features.append(col)
         else:
             excluded_cols.append(col)
-    print(f"Warning, non-numeric columns not handled yet - excluded: {excluded_cols}")
+    if excluded_cols:
+        print(f"Warning, non-numeric columns not handled yet - excluded: {excluded_cols}")
     return numeric_features
