@@ -81,7 +81,7 @@ class ComplexSelectionArg(BaseModelArgument):
 length_scale = NumericalArg(display_name="Length Scale", default_value=1.0)
 length_scale_bounds = RangeArg(display_name="Length Scale Bounds", 
                                default_value=(1e-05, 100000.0))
-nu = NumericalArg(display_name="nu (smoothness)")
+nu = NumericalArg(display_name="nu (smoothness)", default_value=1.5)
 default_display = TextInPlaceOfArgs(display_name="Default kernal used:",
     text="ConstantKernel(1.0, constant_value_bounds='fixed') * RBF(1.0, length_scale_bounds='fixed')")
 

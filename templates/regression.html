@@ -213,7 +213,8 @@
                                                     <input type="number" 
                                                         id="{{ child_arg.id }}" 
                                                         name="{{ child_arg.dom_name }}" 
-                                                        style="width: 80px;">
+                                                        style="width: 80px;"
+                                                        value="{{ child_arg.default_value }}">
 
                                                 {% elif child_arg.field_type == 'range' %}
                                                     <!-- <small>tmp dbg - is range</small> -->
@@ -223,11 +224,13 @@
                                                     <input type="number" 
                                                         id="{{ child_arg.id }}-low" 
                                                         name="{{ child_arg.dom_name }}_low" 
-                                                        style="width: 80px;">
+                                                        style="width: 80px;"
+                                                        value="{{ child_arg.default_value[0] }}">
                                                     <input type="number" 
                                                         id="{{ child_arg.id }}-high" 
                                                         name="{{ child_arg.dom_name }}_high" 
-                                                        style="width: 80px;">
+                                                        style="width: 80px;"
+                                                        value="{{ child_arg.default_value[1] }}">
                                                 
                                                 {% elif child_arg.field_type == 'display' %}
                                                     <p id="{{ child_arg.id }}" class="text-secondary">
