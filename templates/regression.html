@@ -195,7 +195,7 @@
                                     </select>
 
                                     <!--sub options-->
-                                    <!--todo - how to handle futher nesting (if needed) ???-->
+                                    <!--todo - how to handle futher nesting (if needed) ???-->                                    
                                     {% if model_arg.field_type == 'selection-nested' %}
                                         <div class="form-group">
 
@@ -205,22 +205,35 @@
                                             <div id="{{ option.display_name|replace(' ', '-') }}">
                                             {% for child_arg in option.children %} <!--4 open-->
                                                 <!-- <p>tmp nested vis test - {{ child_arg }}</p> -->
+
                                                 {% if child_arg.field_type == 'number' %}
                                                     <!-- <small>tmp dbg - is number</small> -->
-                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}" class="form-label">
+                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}" 
+                                                        class="form-label">
                                                         {{ child_arg.display_name }}
                                                     </label>
-                                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}" 
-                                                        name="{{ child_arg.display_name|replace(' ', '_') }}" style="width: 50px;">
+                                                    <input type="number" 
+                                                        id="{{ child_arg.display_name|replace(' ', '-') }}" 
+                                                        name="{{ child_arg.display_name|replace(' ', '_') }}" 
+                                                        style="width: 80px;">
+
                                                 {% elif child_arg.field_type == 'range' %}
                                                     <!-- <small>tmp dbg - is range</small> -->
-                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}-low" class="form-label">
+                                                    <label for="{{ child_arg.display_name|replace(' ', '-') }}-low" 
+                                                        class="form-label">
                                                         {{ child_arg.display_name }}
                                                     </label>
-                                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}-low" 
-                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_low" style="width: 50px;">
-                                                    <input type="number" id="{{ child_arg.display_name|replace(' ', '-') }}-high" 
-                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_high" style="width: 50px;">
+                                                    <input type="number" 
+                                                        id="{{ child_arg.display_name|replace(' ', '-') }}-low" 
+                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_low" 
+                                                        style="width: 80px;">
+                                                    <input type="number" 
+                                                        id="{{ child_arg.display_name|replace(' ', '-') }}-high" 
+                                                        name="{{ child_arg.display_name|replace(' ', '_') }}_high" 
+                                                        style="width: 80px;">
+                                                
+                                                {% elif model_arg.field_type == 'display' %}
+                                                    <p>{{ model_arg.text }}</p>
                                                 {% endif %}
                                             {% endfor %} <!--4 cls-->
                                             </div>
