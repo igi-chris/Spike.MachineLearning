@@ -61,7 +61,7 @@ class NestedArgs(BaseModelArgument):
 @dataclass
 class TextInPlaceOfArgs(BaseModelArgument):
     field_type: ClassVar[str] = "display"
-    display_name: str  # e.g. for dropdown
+    display_name: str
     text: str
 
 
@@ -82,9 +82,11 @@ length_scale = NumericalArg(display_name="Length Scale", default_value=1.0)
 length_scale_bounds = RangeArg(display_name="Length Scale Bounds", 
                                default_value=(1e-05, 100000.0))
 nu = NumericalArg(display_name="nu (smoothness)")
-
-kernel_default = TextInPlaceOfArgs(display_name="Default",
+default_display = TextInPlaceOfArgs(display_name="Default kernal used:",
     text="ConstantKernel(1.0, constant_value_bounds='fixed') * RBF(1.0, length_scale_bounds='fixed')")
+
+kernel_default = NestedArgs(display_name="Default", 
+    children=[default_display])
 kernel_rbf = NestedArgs(display_name="RBF", 
     children=[length_scale, length_scale_bounds])
 kernel_matern = NestedArgs(display_name="Matern", 

@@ -229,8 +229,10 @@
                                                         name="{{ child_arg.dom_name }}_high" 
                                                         style="width: 80px;">
                                                 
-                                                {% elif model_arg.field_type == 'display' %}
-                                                    <p>{{ model_arg.text }}</p>
+                                                {% elif child_arg.field_type == 'display' %}
+                                                    <p id="{{ child_arg.id }}" class="text-secondary">
+                                                        {{ child_arg.text }}
+                                                    </p>
                                                 {% endif %}
                                             {% endfor %} <!--4 cls-->
                                             </div>
