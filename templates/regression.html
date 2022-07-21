@@ -176,8 +176,7 @@
                      WILL LIKELY MOVE TO VUE FOR THIS REASON-->
             <div>
                 {% for model_name, model_args in model_specific_args.items() %} <!--1 open-->
-                    <div class="form-group card" id="{{model_name}}-options"
-                        style="display: none;">
+                    <div class="form-group card" id="{{model_name}}-options" style="display: none;">
                         <div class="card-header">
                             {{model_name}} Options
                         </div>
@@ -202,7 +201,7 @@
                                         {% for option in model_arg.options %} <!--3b open-->
                                         <!--p>tmp nested vis test - {{ option }}</p-->  <!-- tmp kernel lvl-->
                                             
-                                            <div id="{{ option.id }}">
+                                            <div id="{{ option.id }}" style="display: none;">
                                             {% for child_arg in option.children %} <!--4 open-->
                                                 <!-- <p>tmp nested vis test - {{ child_arg }}</p> -->
 
