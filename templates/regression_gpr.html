@@ -1,0 +1,83 @@
+{% extends "regression.html" %}
+
+{% block gaussian_process_regressor_options %}
+
+<!-- hide all to begin with and show as needed (via js) -->
+<div>
+    {% for model_name, model_args in model_specific_args.items() %} <!--1 open-->
+        <div class="form-group card" id="{{model_name}}-options"> <!--style="display: none;"-->
+            <div class="card-header">
+                {{model_name}} Options
+            </div>
+            <div class="card-body">
+                {% for model_arg in model_args %} <!--2 open-->
+                    {% if model_arg.field_type.startswith('selection') %}
+                        <label for="{{ model_arg.id }}" class="form-label">
+                            {{ model_arg.display_name }}
+                        </label>
+                        <select id="{{ model_arg.id }}" 
+                                name="{{ model_arg.dom_name }}">
+                            {% for option in model_arg.options %} <!--3 open-->
+                                <option value="{{ option|string }}">{{ option|string }}</option>
+                            {% endfor %} <!--3 cls-->
+                        </select>
+
+                        <!--sub options-->
+                        <!--todo - how to handle futher nesting (if needed) ???-->                                    
+                        {% if model_arg.field_type == 'selection-nested' %}
+                            <div class="form-group">
+
+                            {% for option in model_arg.options %} <!--3b open-->
+                            <!--p>tmp nested vis test - {{ option }}</p-->  <!-- tmp kernel lvl-->
+                                
+                                <div id="{{ option.id }}" style="display: none;">
+                                {% for child_arg in option.children %} <!--4 open-->
+                                    <!-- <p>tmp nested vis test - {{ child_arg }}</p> -->
+
+                                    {% if child_arg.field_type == 'number' %}
+                                        <!-- <small>tmp dbg - is number</small> -->
+                                        <label for="{{ child_arg.id }}" class="form-label">
+                                            {{ child_arg.display_name }}
+                                        </label>
+                                        <input type="number" 
+                                            id="{{ child_arg.id }}" 
+                                            name="{{ child_arg.dom_name }}" 
+                                            style="width: 80px;"
+                                            value="{{ child_arg.default_value }}">
+
+                                    {% elif child_arg.field_type == 'range' %}
+                                        <!-- <small>tmp dbg - is range</small> -->
+                                        <label for="{{ child_arg.id }}-low" class="form-label">
+                                            {{ child_arg.display_name }}
+                                        </label>
+                                        <input type="number" 
+                                            id="{{ child_arg.id }}-low" 
+                                            name="{{ child_arg.dom_name }}_low" 
+                                            style="width: 80px;"
+                                            value="{{ child_arg.default_value[0] }}">
+                                        <input type="number" 
+                                            id="{{ child_arg.id }}-high" 
+                                            name="{{ child_arg.dom_name }}_high" 
+                                            style="width: 80px;"
+                                            value="{{ child_arg.default_value[1] }}">
+                                    
+                                    {% elif child_arg.field_type == 'display' %}
+                                        <p id="{{ child_arg.id }}" class="text-secondary">
+                                            {{ child_arg.text }}
+                                        </p>
+                                    {% endif %}
+                                {% endfor %} <!--4 cls-->
+                                </div>
+                            {% endfor %} <!--3b cls-->
+                            </div> 
+
+                        {% elif child_arg.field_type == 'number' %}
+                            <!-- todo - macro to save repeating???-->
+                        {% endif %}
+                    {% endif %}
+                {% endfor %} <!--2 cls-->
+            </div>
+        </div>
+    {% endfor %} <!--1 cls-->
+</div>
+{% endblock gaussian_process_regressor_options %}

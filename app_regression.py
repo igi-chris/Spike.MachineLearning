@@ -23,16 +23,19 @@ regression_blueprint = Blueprint('regression', __name__)
 @regression_blueprint.route("/regression/train", methods=['GET'])
 def launch_training_ui() -> str:
     ref = request.args.get('session_ref', default='')
+    model_name = request.args.get('regression_model', default='')
+    template = 'regression_gpr.html' if model_name == 'GaussianProcessRegressor' else 'regression.html'
+    
     if ref:
         data = lookup_dataframe(ref)
         heads = data.columns.to_list()
         args = RegressionArgs(session_ref=ref)
-        return render_template('regression.html',
+        return render_template(template,
                             args=args,
                             headers=heads,
                             model_specific_args=_model_to_args_map,
                             version=_version)
-    return render_template('regression.html',
+    return render_template(template,
                         args=RegressionArgs(),
                         model_specific_args=_model_to_args_map,
                         version=_version)
@@ -65,8 +68,9 @@ def launch_training_evaluation_ui() -> str:
     kernel = request.args.get('kernel', default='')
     kernel_options = {}
     if args.model_name == 'GaussianProcessRegressor':
-        
-        if kernel == 'RBF' or kernel == 'Matern':
+        if kernel == '': # if no options selected yet, reload with optons
+            return launch_training_ui()
+        elif kernel == 'RBF' or kernel == 'Matern':
             len_sc = request.args.get(length_scale.dom_name, 
                 default=length_scale.default_value, type=lambda v: float(v))
             bounds_low = request.args.get(f"{length_scale_bounds.dom_name}_low", 
@@ -107,7 +111,9 @@ def launch_training_evaluation_ui() -> str:
         if not matched_experiment:
             register_experiment(ref=args.session_ref, experiment=exp)
 
-    return render_template('regression.html',
+
+    template = 'regression_gpr.html' if args.model_name == 'GaussianProcessRegressor' else 'regression.html'
+    return render_template(template,
                            args=args,
                            model_specific_args=_model_to_args_map,
                            model_ref=model_ref,

@@ -11,9 +11,11 @@ export function showModelOptions(modelSelector) {
     // model options
     console.log(`model selector value: ${modelSelector.value}`);
     if (modelSelector.value === 'GaussianProcessRegressor') {        
-        if (gprOptions) {
-            gprOptions.style.display = 'block';
-        }
+        // if (gprOptions) {
+        //     gprOptions.style.display = 'block';
+        // }
+        document.args_form.submit(); // need to refresh page to get options as they are in a
+                                     // separate temnplate
     } else {
        console.log(`No dislay handler for option: ${modelSelector.value}`) 
     }

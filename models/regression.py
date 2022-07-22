@@ -52,10 +52,11 @@ def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
                 assert isinstance(kernel_options['nu'], float)
                 nu = kernel_options['nu']
                 kernel = Matern(length_scale=scale, length_scale_bounds=bounds, nu=nu)
-            else:
-                raise NotImplementedError(f"{kernel_name} not yet supported.")
-
+            
             regressor = GaussianProcessRegressor(kernel=kernel, random_state=args.random_seed)
+        else:
+            raise NotImplementedError(f"{kernel_name} not yet supported.")
+
     elif args.model_name == 'RANSACRegressor':
         regressor = RANSACRegressor(random_state=args.random_seed)
     elif args.model_name == 'LinearRegression':

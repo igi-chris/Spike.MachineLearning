@@ -55,12 +55,15 @@ function setupTrainingListeners() {
     var modelSelector = document.getElementById('regression-model');
     modelSelector.addEventListener('change', 
         () => showModelOptions(modelSelector), false);
-    showModelOptions(modelSelector);  // call first time in case in eval mode and one is already selected
+    //showModelOptions(modelSelector);  // call first time in case in eval mode and one is already selected
 
     var gprKernelSelector = document.getElementById('kernel-options');
-    gprKernelSelector.addEventListener('change', 
-        () => showGPRKernelOptions(gprKernelSelector), false);
-    showGPRKernelOptions(gprKernelSelector)
+    if (gprKernelSelector) {
+        gprKernelSelector.addEventListener('change', 
+            () => showGPRKernelOptions(gprKernelSelector), false);
+        showGPRKernelOptions(gprKernelSelector)
+    }
+    
 }
 
 function setupApplyListeners() {    
