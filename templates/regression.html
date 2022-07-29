@@ -189,7 +189,10 @@
                                     <select id="{{ model_arg.id }}" 
                                             name="{{ model_arg.dom_name }}">
                                         {% for option in model_arg.options %} <!--3 open-->
-                                            <option value="{{ option|string }}">{{ option|string }}</option>
+                                            <option value="{{ option|string }}"
+                                                {% if args.model_args['kernel']==option|string %} selected {% endif %}>
+                                                {{ option|string }}
+                                            </option>
                                         {% endfor %} <!--3 cls-->
                                     </select>
 
