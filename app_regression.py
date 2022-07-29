@@ -66,19 +66,20 @@ def launch_training_evaluation_ui() -> str:
     kernel_options = {}
     if args.model_name == 'GaussianProcessRegressor':
         
-        if kernel == 'RBF' or kernel == 'Matern':
-            len_sc = request.args.get(length_scale.dom_name, 
+        kernel = kernel.lower()
+        if kernel == 'rbf' or kernel == 'matern':
+            len_sc = request.args.get(f"{kernel}_{length_scale.dom_name}", 
                 default=length_scale.default_value, type=lambda v: float(v))
-            bounds_low = request.args.get(f"{length_scale_bounds.dom_name}_low", 
+            bounds_low = request.args.get(f"{kernel}_{length_scale_bounds.dom_name}_low", 
                 default=length_scale_bounds.default_value[0], type=lambda v: float(v))
-            bounds_high = request.args.get(f"{length_scale_bounds.dom_name}_high", 
+            bounds_high = request.args.get(f"{kernel}_{length_scale_bounds.dom_name}_high", 
                 default=length_scale_bounds.default_value[1], type=lambda v: float(v))
             kernel_options = {
-                "length_scale": len_sc,
-                "length_scale_bounds": (bounds_low, bounds_high)
+                f"{kernel}_length_scale": len_sc,
+                f"{kernel}_length_scale_bounds": (bounds_low, bounds_high)
                 }
-            if kernel == 'Matern':
-                kernel_options['nu'] = request.args.get(f"{nu.dom_name}", 
+            if kernel == 'matern':
+                kernel_options[f'{kernel}_nu_(smoothness)'] = request.args.get(f"{nu.dom_name}", 
                     default=nu.default_value, type=lambda v: float(v))
         
         model_args: SelectedModelArgs = {"kernel": kernel}

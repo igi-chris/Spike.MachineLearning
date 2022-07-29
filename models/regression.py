@@ -35,22 +35,24 @@ def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
         regressor = GradientBoostingRegressor(random_state=args.random_seed)  
     elif args.model_name == 'GaussianProcessRegressor':
         kernel_name = args.model_args.get('kernel', '')
-        if kernel_name == 'Default':
+        assert isinstance(kernel_name, str)
+        kernel_name = kernel_name.lower()
+        if kernel_name == 'default':
             print("Using default kernel for GPR...")
             regressor = GaussianProcessRegressor(random_state=args.random_seed)
-        elif kernel_name == 'RBF' or kernel_name == 'Matern':
+        elif kernel_name == 'rbf' or kernel_name == 'matern':
             kernel_options = args.model_args.get('kernel_options', {})
             assert isinstance(kernel_options, dict)
-            assert isinstance(kernel_options['length_scale'], float)
-            assert isinstance(kernel_options['length_scale_bounds'], tuple)
-            scale = kernel_options['length_scale']
-            bounds = kernel_options['length_scale_bounds']
+            assert isinstance(kernel_options[f'{kernel_name}_length_scale'], float)
+            assert isinstance(kernel_options[f'{kernel_name}_length_scale_bounds'], tuple)
+            scale = kernel_options[f'{kernel_name}_length_scale']
+            bounds = kernel_options[f'{kernel_name}_length_scale_bounds']
 
-            if kernel_name == 'RBF':
+            if kernel_name == 'rbf':
                 kernel = RBF(length_scale=scale, length_scale_bounds=bounds)
-            elif kernel_name == 'Matern':
-                assert isinstance(kernel_options['nu'], float)
-                nu = kernel_options['nu']
+            elif kernel_name == 'matern':
+                assert isinstance(kernel_options[f'{kernel_name}_nu_(smoothness)'], float)
+                nu = kernel_options[f'{kernel_name}_nu_(smoothness)']
                 kernel = Matern(length_scale=scale, length_scale_bounds=bounds, nu=nu)
             else:
                 raise NotImplementedError(f"{kernel_name} not yet supported.")

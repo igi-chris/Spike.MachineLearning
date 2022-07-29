@@ -29,7 +29,7 @@ window.onload = function() {
 
 function setupTrainingListeners() {
     setupDropHandlers('train')
-    setupTrainingOptionsListerners();
+    setupTrainingOptionsListeners();
 
     var nullRepl = document.getElementById("null-replacement");
     var argsForm = document.getElementById("args-form");
@@ -85,7 +85,7 @@ function setupDropHandlers(desc) { // desc train | apply | model (later two just
     }
 }
 
-function setupTrainingOptionsListerners() {
+function setupTrainingOptionsListeners() {
     var trainingSplitSlider = document.getElementById("trn-split");
     if (trainingSplitSlider) {
         trainingSplitSlider.addEventListener('input', handleTrainingSplitInputChange, false);
