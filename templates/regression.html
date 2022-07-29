@@ -190,7 +190,9 @@
                                             name="{{ model_arg.dom_name }}">
                                         {% for option in model_arg.options %} <!--3 open-->
                                             <option value="{{ option|string }}"
-                                                {% if args.model_args['kernel']==option|string %} selected {% endif %}>
+                                                {% if 'kernel' in args.model_args and args.model_args['kernel']==option|string %} 
+                                                    selected 
+                                                {% endif %}>
                                                 {{ option|string }}
                                             </option>
                                         {% endfor %} <!--3 cls-->
@@ -217,7 +219,16 @@
                                                         id="{{ child_arg.id }}" 
                                                         name="{{ child_arg.dom_name }}" 
                                                         style="width: 80px;"
-                                                        value="{{ child_arg.default_value }}">
+                                                        step="{{ child_arg.step }}"
+                                                        min="{{ child_arg.min }}"
+                                                        max="{{ child_arg.max }}"
+                                                        {% if ('kernel_options' in args.model_args) and 
+                                                            (child_arg.dom_name in args.model_args['kernel_options']) %}
+                                                            value="{{ args.model_args['kernel_options'][child_arg.dom_name] }}"
+                                                        {% else %}
+                                                            value="{{ child_arg.default_value }}"
+                                                        {% endif %}
+                                                    >
 
                                                 {% elif child_arg.field_type == 'range' %}
                                                     <!-- <small>tmp dbg - is range</small> -->

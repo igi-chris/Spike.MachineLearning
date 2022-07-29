@@ -42,6 +42,9 @@ class NumericalArg(BaseModelArgument):
     field_type: ClassVar[str] = "number"
     display_name: str
     default_value: float
+    step: float
+    min: float
+    max: float
 
 
 @dataclass
@@ -49,6 +52,11 @@ class RangeArg(BaseModelArgument):
     field_type: ClassVar[str] = "range"
     display_name: str
     default_value: Tuple[float, float]
+    step: float
+    min0: float
+    max0: float
+    min1: float
+    max1: float
 
 
 @dataclass
@@ -78,10 +86,11 @@ class ComplexSelectionArg(BaseModelArgument):
         return super().id + "-options"
 
 
-length_scale = NumericalArg(display_name="Length Scale", default_value=1.0)
+length_scale = NumericalArg(display_name="Length Scale", default_value=1.0, step=0.01, min=0, max=1000)
 length_scale_bounds = RangeArg(display_name="Length Scale Bounds", 
-                               default_value=(1e-05, 100000.0))
-nu = NumericalArg(display_name="nu (smoothness)", default_value=1.5)
+                               default_value=(1e-05, 100000.0),
+                               step=1e-05, min0=1e-05, max0=1000, min1=1, max1=100000.0)
+nu = NumericalArg(display_name="nu (smoothness)", default_value=1.5, step=1, min=0.5, max=2.5)
 default_display = TextInPlaceOfArgs(display_name="Default kernal used:",
     text="ConstantKernel(1.0, constant_value_bounds='fixed') * RBF(1.0, length_scale_bounds='fixed')")
 
