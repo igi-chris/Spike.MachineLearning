@@ -3,6 +3,7 @@ import { isWebView, postMsgToWebViewHost } from './modules/webview.js'
 import { dropHandler, dragOverHandler, endDragOver }  from './modules/filedrop.js'
 import { selectExperiment, deselectExperiment, 
     highlightSelectedExperiment } from './modules/experiment.js'
+import { showModelOptions, showGPRKernelOptions } from './modules/modeloptions.js'
 
 window.onload = function() {
     if (isWebView()) {
@@ -28,7 +29,7 @@ window.onload = function() {
 
 function setupTrainingListeners() {
     setupDropHandlers('train')
-    setupTrainingOptionsListerners();
+    setupTrainingOptionsListeners();
 
     var nullRepl = document.getElementById("null-replacement");
     var argsForm = document.getElementById("args-form");
@@ -49,6 +50,17 @@ function setupTrainingListeners() {
         //console.log(`Got id ${id} from ${el.id}`);
         el.addEventListener('click', () => selectExperiment(id), false)
     })
+
+    // set up listener to show the appropriate model options when model selection is changed
+    var modelSelector = document.getElementById('regression-model');
+    modelSelector.addEventListener('change', 
+        () => showModelOptions(modelSelector), false);
+    showModelOptions(modelSelector);  // call first time in case in eval mode and one is already selected
+
+    var gprKernelSelector = document.getElementById('kernel-options');
+    gprKernelSelector.addEventListener('change', 
+        () => showGPRKernelOptions(gprKernelSelector), false);
+    showGPRKernelOptions(gprKernelSelector)
 }
 
 function setupApplyListeners() {    
@@ -73,7 +85,7 @@ function setupDropHandlers(desc) { // desc train | apply | model (later two just
     }
 }
 
-function setupTrainingOptionsListerners() {
+function setupTrainingOptionsListeners() {
     var trainingSplitSlider = document.getElementById("trn-split");
     if (trainingSplitSlider) {
         trainingSplitSlider.addEventListener('input', handleTrainingSplitInputChange, false);

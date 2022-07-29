@@ -7,7 +7,7 @@
         </p> -->
         {% for title, link in title_link_pairs %}
         <a href="{{ link }}">
-            <div class="card bg-light mb-3" style="max-width:150px">
+            <div class="card card-clickable bg-light mb-3" style="max-width:150px">
                 <div class="card-header">{{ title }}</div>
             </div>
         {% endfor %}

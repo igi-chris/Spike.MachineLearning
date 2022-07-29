@@ -35,7 +35,7 @@
 
     <form action="/regression/evaluate" method="GET" id="args-form" name="args_form">
 
-        <!--hiden fields-->
+        <!--hidden fields-->
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
         <input id="selected-experiment-id" name="selected_experiment_id" {% if selected_experiment_id and
             selected_experiment_id|int(-1) !=-1 %} value="{{ selected_experiment_id }}" {% endif %} type="hidden">
@@ -168,6 +168,118 @@
 
                 </select>
             </div>
+
+            <!--Model specific options
+                 - hide all to begin with and show as needed (via js)-->
+                 <!--This is where the flexibility of templates isn't ideal - can't use composition to bring in multiple
+                     child templates, just extension, so end up defining lots of hidden options and displaying dynamically
+                     WILL LIKELY MOVE TO VUE FOR THIS REASON-->
+            <div>
+                {% for model_name, model_args in model_specific_args.items() %} <!--1 open-->
+                    <div class="form-group card" id="{{model_name}}-options" style="display: none;">
+                        <div class="card-header">
+                            {{model_name}} Options
+                        </div>
+                        <div class="card-body">
+                            {% for model_arg in model_args %} <!--2 open-->
+                                {% if model_arg.field_type.startswith('selection') %}
+                                    <label for="{{ model_arg.id }}" class="form-label">
+                                        {{ model_arg.display_name }}
+                                    </label>
+                                    <select id="{{ model_arg.id }}" 
+                                            name="{{ model_arg.dom_name }}">
+                                        {% for option in model_arg.options %} <!--3 open-->
+                                            <option value="{{ option|string }}"
+                                                {% if 'kernel' in args.model_args and args.model_args['kernel']==option|string|lower %} 
+                                                    selected 
+                                                {% endif %}>
+                                                {{ option|string }}
+                                            </option>
+                                        {% endfor %} <!--3 cls-->
+                                    </select>
+
+                                    <!--sub options-->
+                                    <!--todo - how to handle further nesting (if needed) ???-->                                    
+                                    {% if model_arg.field_type == 'selection-nested' %}
+                                        <div class="form-group">
+
+                                        {% for option in model_arg.options %} <!--3b open-->
+                                        <!-- <p>tmp nested vis test - {{ option }}</p>  tmp kernel lvl -->
+                                            
+                                            <div id="{{ option.id }}" style="display: none;">
+                                            {% for child_arg in option.children %} <!--4 open-->
+                                                {# <p>tmp nested vis test - {{ child_arg }}<p> #}
+
+                                                {% if child_arg.field_type == 'number' %}
+                                                    <!-- <small>tmp dbg - is number</small> -->
+                                                    <label for="{{ option.id }}_{{ child_arg.id }}"  class="form-label">
+                                                        {{ child_arg.display_name }}
+                                                    </label>
+                                                    <input type="number" 
+                                                        id="{{ option.id }}_{{ child_arg.id }}" 
+                                                        name="{{ option.dom_name }}_{{ child_arg.dom_name }}" 
+                                                        style="width: 100px;"
+                                                        step="{{ child_arg.step }}"
+                                                        min="{{ child_arg.min }}"
+                                                        max="{{ child_arg.max }}"
+                                                        {% if 'kernel_options' in args.model_args and 
+                                                            option.dom_name + '_' + child_arg.dom_name in args.model_args['kernel_options'] %}
+                                                            value="{{ args.model_args['kernel_options'][option.dom_name + '_' + child_arg.dom_name] }}"
+                                                        {% else %}
+                                                            value="{{ child_arg.default_value }}"
+                                                        {% endif %}>
+
+                                                {% elif child_arg.field_type == 'range' %}
+                                                    <!-- <small>tmp dbg - is range</small> -->
+                                                    <label for="{{ option.id }}_{{ child_arg.id }}-low" class="form-label">
+                                                        {{ child_arg.display_name }}
+                                                    </label>
+                                                    <input type="number" 
+                                                        id="{{ option.id }}_{{ child_arg.id }}-low" 
+                                                        name="{{ option.dom_name }}_{{ child_arg.dom_name }}_low" 
+                                                        style="width: 100px;"
+                                                        step="{{ child_arg.step0 }}"
+                                                        min="{{ child_arg.min0 }}"
+                                                        max="{{ child_arg.max0 }}"
+                                                        {% if 'kernel_options' in args.model_args and 
+                                                            option.dom_name + '_' + child_arg.dom_name in args.model_args['kernel_options'] %}
+                                                            value="{{ args.model_args['kernel_options'][option.dom_name + '_' + child_arg.dom_name][0] }}"
+                                                        {% else %}
+                                                            value="{{ child_arg.default_value[0] }}"
+                                                        {% endif %}>
+                                                    <input type="number" 
+                                                        id="{{ option.id }}_{{ child_arg.id }}-high" 
+                                                        name="{{ option.dom_name }}_{{ child_arg.dom_name }}_high" 
+                                                        style="width: 100px;"
+                                                        step="{{ child_arg.step1 }}"
+                                                        min="{{ child_arg.min1 }}"
+                                                        max="{{ child_arg.max1 }}"
+                                                        {% if 'kernel_options' in args.model_args and 
+                                                            option.dom_name + '_' + child_arg.dom_name in args.model_args['kernel_options'] %}
+                                                            value="{{ args.model_args['kernel_options'][option.dom_name + '_' + child_arg.dom_name][1] }}"
+                                                        {% else %}
+                                                            value="{{ child_arg.default_value[1] }}"
+                                                        {% endif %}>
+                                                
+                                                {% elif child_arg.field_type == 'display' %}
+                                                    <p id="{{ child_arg.id }}" class="text-secondary">
+                                                        {{ child_arg.text }}
+                                                    </p>
+                                                {% endif %}
+                                            {% endfor %} <!--4 cls-->
+                                            </div>
+                                        {% endfor %} <!--3b cls-->
+                                        </div> 
+
+                                    {% elif child_arg.field_type == 'number' %}
+                                        <!-- todo - macro to save repeating???-->
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %} <!--2 cls-->
+                        </div>
+                    </div>
+                {% endfor %} <!--1 cls-->
+            </div>
         </fieldset>
 
         <div class="row">
@@ -236,7 +348,7 @@
     </div>
 
     {% if prev_experiments %}
-    <h5>Previous Experiments<small><small> (not saved with model)</small></small></h5>
+    <h5>Previous Experiments<small><small> (not yet saved with model)</small></small></h5>
     {% endif %}
     <!-- <button class="badge bg-light mb-3 text-primary prev-experiment">Normal</button>
     <button class="badge bg-light mb-3 text-primary prev-experiment selected-experiment">Selected</button> -->
@@ -258,6 +370,16 @@
             {% endif %}
 
             <span class="badge bg-primary text-white">{{ exp.args.null_abbr }}</span>
+        </div>
+        <div>
+            {% if 'kernel' in exp.args.model_args %}
+                {% if exp.args.model_args['kernel'] != 'default' %}
+                    <span>
+                        {{ exp.args.model_args['kernel']|truncate(3, True) }}
+                        ({{ exp.args.model_args['kernel_options'].values()|join(",")|truncate(15, True) }})
+                    </span>
+                {% endif %}
+            {% endif %}
         </div>
         <div>
             <span>

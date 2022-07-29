@@ -7,7 +7,9 @@ from common.data_register import get_experiment, get_experiments, lookup_datafra
 
 from common.model_register import get_model, register_model
 from models.regression import build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, train
-from models.regression_types import RegressionExperiment, RegressionArgs
+from models.regression_types import RegressionExperiment, RegressionArgs, SelectedModelArgs
+from models.model_specific_args.arg_register import _model_to_args_map  # tmp??
+from models.model_specific_args.arg_types import length_scale, length_scale_bounds, nu
 from literals import _version
 
 
@@ -27,10 +29,12 @@ def launch_training_ui() -> str:
         args = RegressionArgs(session_ref=ref)
         return render_template('regression.html',
                             args=args,
-                            headers=heads, 
+                            headers=heads,
+                            model_specific_args=_model_to_args_map,
                             version=_version)
     return render_template('regression.html',
                         args=RegressionArgs(),
+                        model_specific_args=_model_to_args_map,
                         version=_version)
 
 
@@ -56,6 +60,32 @@ def launch_training_evaluation_ui() -> str:
         fill_value=request.args.get('fill_value', default=None, 
                                     type=lambda v: float(v) if v else None)
     )
+
+    # get model specific options
+    kernel = request.args.get('kernel', default='')
+    kernel_options = {}
+    if args.model_name == 'GaussianProcessRegressor':
+        
+        kernel = kernel.lower()
+        if kernel == 'rbf' or kernel == 'matern':
+            len_sc = request.args.get(f"{kernel}_{length_scale.dom_name}", 
+                default=length_scale.default_value, type=lambda v: float(v))
+            bounds_low = request.args.get(f"{kernel}_{length_scale_bounds.dom_name}_low", 
+                default=length_scale_bounds.default_value[0], type=lambda v: float(v))
+            bounds_high = request.args.get(f"{kernel}_{length_scale_bounds.dom_name}_high", 
+                default=length_scale_bounds.default_value[1], type=lambda v: float(v))
+            kernel_options = {
+                f"{kernel}_length_scale": len_sc,
+                f"{kernel}_length_scale_bounds": (bounds_low, bounds_high)
+                }
+            if kernel == 'matern':
+                kernel_options[f'{kernel}_nu_(smoothness)'] = request.args.get(f"{nu.dom_name}", 
+                    default=nu.default_value, type=lambda v: float(v))
+        
+        model_args: SelectedModelArgs = {"kernel": kernel}
+        if kernel_options:
+            model_args["kernel_options"] = kernel_options
+        args.model_args = model_args
     
     data = lookup_dataframe(args.session_ref)
     prev_experiments = get_experiments(args.session_ref)
@@ -80,6 +110,7 @@ def launch_training_evaluation_ui() -> str:
 
     return render_template('regression.html',
                            args=args,
+                           model_specific_args=_model_to_args_map,
                            model_ref=model_ref,
                            evaluation=evaluation,
                            prev_experiments=prev_experiments,
@@ -109,6 +140,7 @@ def relaunch_training_ui() -> str:
         exp_id=exp_id)
     return render_template('regression.html',
                            args=exp.args,
+                           model_specific_args=_model_to_args_map,
                            model_ref=exp.model_ref,
                            evaluation=exp.eval,
                            prev_experiments=[],

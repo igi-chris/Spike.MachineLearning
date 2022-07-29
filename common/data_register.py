@@ -24,7 +24,7 @@ def register_dataframe(path: str, ref: str) -> pd.DataFrame:
 
 def lookup_dataframe(ref: str) -> pd.DataFrame:
     """
-    Lookup data from key, raises KeyErorr if the ref is not found.
+    Lookup data from key, raises KeyError if the ref is not found.
     """
     return _ref_to_dataframe[ref]
 

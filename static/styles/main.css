@@ -18,7 +18,7 @@
   --info-light-blue: #e7f7fd;
 }
 
-.card:hover {
+.card-clickable:hover {
   border-color: #66afe9;
   box-shadow: 0 0 8px rgba(255,0,0, 0.6);
   /* box-shadow: 0 0 8px rgba(111, 188, 233, 0.842); */ /* alt shadow colour */
