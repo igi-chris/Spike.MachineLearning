@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div>
+<div id="vue-regression">
     <div class="row">
         <div class="col">
             <h4>Train a Regression Model</h4>
@@ -35,7 +35,7 @@
 
     <form action="/regression/evaluate" method="GET" id="args-form" name="args_form">
 
-        <!--hiden fields-->
+        <!--hidden fields-->
         <input id="session-ref" name="session_ref" value="{{ args.session_ref }}" type="hidden" />
         <input id="selected-experiment-id" name="selected_experiment_id" {% if selected_experiment_id and
             selected_experiment_id|int(-1) !=-1 %} value="{{ selected_experiment_id }}" {% endif %} type="hidden">
