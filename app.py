@@ -6,6 +6,7 @@ import joblib
 import mimetypes
 
 from flask import Flask, Response, jsonify, make_response, render_template
+from flask_cors import CORS
 
 from literals import models_dir, _version
 from app_pca import pca_blueprint
@@ -18,6 +19,7 @@ from common.model_register import register_model
 #         e.g. sklearn warning (https://github.com/Prosserc/python_notebooks/blob/master/learning/sklearn/ICA.ipynb)
 
 app = Flask("ml_service")
+CORS(app)  # may need to be more specific around accepted origins for prod version: https://flask-cors.readthedocs.io/en/latest/#resource-specific-cors
 app.register_blueprint(utils_blueprint)
 app.register_blueprint(regression_blueprint)
 app.register_blueprint(pca_blueprint)
