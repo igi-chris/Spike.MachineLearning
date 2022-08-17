@@ -3,7 +3,7 @@ import uuid
 
 from flask import Blueprint, Response, jsonify, request
 
-from common.data_register import register_dataframe
+from common.data_register import register_dataframe, lookup_dataframe
 from common.utils import csv_path_from_ref, get_path
 from models.regression import rebuild_experiment_and_populate_caches
 from models.regression_types import RegressionExperiment
@@ -27,6 +27,14 @@ def add_session_data() -> Response:
     if incl_heads:
         return jsonify(session_ref=ref, headers=heads)
     return jsonify(session_ref=ref)
+
+
+# added for new ui (vue) to move away from getting with session ref when submitting data
+@utils_blueprint.route("/api/get_headers", methods=['GET'])
+def get_headers() -> Response:
+    ref = request.args.get('session_ref', default='')
+    df = lookup_dataframe(ref)
+    return jsonify(df.columns.to_list())
 
 
 def save_data_file(ref: str="", file_field_name: str='data') -> Tuple[str, List[str]]:
