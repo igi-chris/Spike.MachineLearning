@@ -5,7 +5,12 @@ import { selectExperiment, deselectExperiment,
     highlightSelectedExperiment } from './modules/experiment.js'
 import { showModelOptions, showGPRKernelOptions } from './modules/modeloptions.js'
 
+let _version = "0.0.2";  // todo: get from api
+
 window.onload = function() {
+    window._version = _version;
+    console.info(`using version: ${_version}`);
+
     if (isWebView()) {
         var webViewMsg = document.getElementById("is-webview");
         if (webViewMsg) {
