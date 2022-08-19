@@ -37,7 +37,7 @@ def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
         kernel_name = args.model_args.get('kernel', '')
         assert isinstance(kernel_name, str)
         kernel_name = kernel_name.lower()
-        if kernel_name == 'default':
+        if not kernel_name or kernel_name == 'default':
             print("Using default kernel for GPR...")
             regressor = GaussianProcessRegressor(random_state=args.random_seed)
         elif kernel_name == 'rbf' or kernel_name == 'matern':
