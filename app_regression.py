@@ -1,5 +1,6 @@
 import codecs
 from http import HTTPStatus
+import json
 import pickle
 from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file
 from app_utils import save_data_file, save_model_file
@@ -256,4 +257,17 @@ def train_regression() -> Response:
     if not matched_experiment:
         register_experiment(ref=args.session_ref, experiment=exp)
 
-    return jsonify(evaluation)
+    resp = { 
+        'exp_id': exp_id,
+        'plot_uri': f"{request.root_url}{evaluation.act_vs_pred_uri.strip('/')}",
+        'metrics': [m._asdict() for m in evaluation.metrics]
+     }
+
+    return jsonify(resp)
+
+
+# @regression_blueprint.route("/api/regression/plots/pred_vs_act", methods=['GET'])
+# def get_pred_vs_act_plot() -> Response:
+#     session_ref = request.args.get('session_ref', default='')
+#     path = get_experiments(session_ref)[-1].eval.act_vs_pred_plot_relative_path
+#     return make_response(send_file(path, as_attachment=True), HTTPStatus.OK)

@@ -81,13 +81,15 @@ def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
 def evaluate(data: DataFrame,
              trained_model_pipeline: Pipeline,
              args: RegressionArgs,
-             exp_id: int) -> RegressionEvaluation:
+             exp_id: int,
+             build_plot: bool = True) -> RegressionEvaluation:
     # may eval training and test later and return evaluation for both...
     _, X_test, _, y_test = split_data(data, args)
     y_predictions = trained_model_pipeline.predict(X_test)
 
     # metrics
     mse = mean_squared_error(y_test, y_predictions)
+
     act_vs_pred_path = build_actual_vs_predicted(actual=y_test, 
                                                  predictions=y_predictions,
                                                  session_ref=args.session_ref, 

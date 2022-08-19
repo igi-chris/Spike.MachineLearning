@@ -96,7 +96,7 @@ class RegressionEvaluation:
 
     @property
     def metrics(self) -> Sequence[Metric]:
-        "Tuples of long name, value, short name"
+        "Tuples of short name, long name, value, up_is_good"
         return [
             # Metric("MSE", "Mean Squared Error", self.mse, up_is_good=False),
             Metric("RMSE", "Root Mean Squared Error", self.rmse, up_is_good=False),
