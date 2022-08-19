@@ -247,7 +247,10 @@ def train_regression() -> Response:
     #     evaluation = exp.eval
     #     model_ref = exp.model_ref
     # else:    
-    exp_id = len(prev_experiments)
+
+    # TODO: for now it's always the latest when getting via api, will change when vue
+    #       app has option to select prev experiments...
+    exp_id = len(prev_experiments)   
     model = train(data=data, args=args)
     evaluation = evaluate(data, model, args, exp_id)
     matched_experiment = args.find_same_modelling_args(prev_experiments)
