@@ -215,8 +215,6 @@ def apply_regression_model() -> Response:
 
 @regression_blueprint.route("/api/regression/train", methods=['GET'])
 def train_regression() -> Response:
-    selected_exp = request.args.get('selected_experiment_id', default=None, 
-                                    type=lambda v: int(v) if v and v != 'None' else None)
     
     args = RegressionArgs(
     # get query params
@@ -238,24 +236,17 @@ def train_regression() -> Response:
     
     data = lookup_dataframe(args.session_ref)
     prev_experiments = get_experiments(args.session_ref)
-
-    # overwrite args read from form if we have a selected experiment
-    # if (selected_exp or selected_exp == 0) and prev_experiments:
-    #     print(f"selected experiment: {selected_exp}")
-    #     exp = prev_experiments[selected_exp]
-    #     args = exp.args
-    #     evaluation = exp.eval
-    #     model_ref = exp.model_ref
-    # else:    
-
-    # TODO: for now it's always the latest when getting via api, will change when vue
-    #       app has option to select prev experiments...
-    exp_id = len(prev_experiments)   
-    model = train(data=data, args=args)
-    evaluation = evaluate(data, model, args, exp_id)
     matched_experiment = args.find_same_modelling_args(prev_experiments)
-    model_ref = matched_experiment.model_ref if matched_experiment else register_model(model)
-    exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, id=exp_id)
+    if matched_experiment:
+        exp_id = matched_experiment.id
+        evaluation = matched_experiment.eval
+        exp = matched_experiment
+    else:
+        exp_id = len(prev_experiments)   
+        model = train(data=data, args=args)
+        evaluation = evaluate(data, model, args, exp_id)
+        model_ref = matched_experiment.model_ref if matched_experiment else register_model(model)
+        exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, id=exp_id)
 
     if not matched_experiment:
         register_experiment(ref=args.session_ref, experiment=exp)
