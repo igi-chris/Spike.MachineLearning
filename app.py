@@ -19,7 +19,7 @@ from common.model_register import register_model
 #         e.g. sklearn warning (https://github.com/Prosserc/python_notebooks/blob/master/learning/sklearn/ICA.ipynb)
 
 app = Flask("ml_service")
-CORS(app)  # may need to be more specific around accepted origins for prod version: https://flask-cors.readthedocs.io/en/latest/#resource-specific-cors
+CORS(app, supports_credentials=True)  # may need to be more specific around accepted origins for prod version: https://flask-cors.readthedocs.io/en/latest/#resource-specific-cors
 app.register_blueprint(utils_blueprint)
 app.register_blueprint(regression_blueprint)
 app.register_blueprint(pca_blueprint)

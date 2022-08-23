@@ -1,6 +1,6 @@
 import codecs
 from http import HTTPStatus
-import json
+import os
 import pickle
 from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file
 from app_utils import save_data_file, save_model_file
@@ -177,7 +177,10 @@ def get_experiment_from_request() -> RegressionExperiment:
 def download_regression_model() -> Response:
     exp = get_experiment_from_request()
     artefact_path = get_serialised_model_artefact(exp)
-    return make_response(send_file(artefact_path, as_attachment=True), HTTPStatus.OK)
+    fname = os.path.split(artefact_path)[-1]
+    resp = make_response(send_file(artefact_path, as_attachment=True, download_name=fname), HTTPStatus.OK)
+    resp.headers['Access-Control-Expose-Headers'] = 'Content-Disposition'
+    return resp
 
 
 @regression_blueprint.route("/api/regression/get_model_artefact_json", methods=['GET'])
