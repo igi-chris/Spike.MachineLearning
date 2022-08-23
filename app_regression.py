@@ -229,9 +229,9 @@ def train_regression() -> Response:
         random_seed = request.args.get('trn_split_random_seed', default=None,
                                        type=lambda v: int(v) if v else None),
         standardise = request.args.get('check_standardise', default=False, 
-                                       type=lambda v: v.lower() == 'on'),
-        normalise = request.args.get('check_normalise', default=False, 
-                                     type=lambda v: v.lower() == 'on'),
+                                       type=lambda v: v.lower() == 'true'),
+        normalise = request.args.get('check_normalise', default=False,
+                                     type=lambda v: v.lower() == 'true'),
         null_replacement=request.args.get('null_replacement', default=''),
         fill_value=request.args.get('fill_value', default=None, 
                                     type=lambda v: float(v) if v else None)
