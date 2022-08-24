@@ -7,7 +7,7 @@ from app_utils import save_data_file, save_model_file
 from common.data_register import get_experiment, get_experiments, lookup_dataframe, register_experiment
 
 from common.model_register import get_model, register_model
-from models.regression import build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, train
+from models.regression import build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, split_data, train
 from models.regression_types import RegressionExperiment, RegressionArgs, SelectedModelArgs
 from models.model_specific_args.arg_register import _model_to_args_map  # tmp??
 from models.model_specific_args.arg_types import length_scale, length_scale_bounds, nu
@@ -260,6 +260,26 @@ def train_regression() -> Response:
         'metrics': [m._asdict() for m in evaluation.metrics]
      }
 
+    return jsonify(resp)
+
+
+@regression_blueprint.route("/api/regression/predictions", methods=['GET'])
+def get_predictions() -> Response:
+    exp = get_experiment_from_request()
+    data = lookup_dataframe(exp.args.session_ref)
+    model = get_model(exp.model_ref)
+
+    # TODO: matters that we are splitting again? should store outcome from training???
+    trn_features, test_features, trn_labels, test_labels = split_data(data, exp.args)
+    test_predictions = model.predict(test_features)
+    trn_predictions = model.predict(trn_features)
+
+    resp = {
+        "trn_pred": trn_predictions.tolist(),
+        "test_pred": test_predictions.tolist(),     
+        "trn_labels": trn_labels.tolist(),
+        "test_labels": test_labels.tolist()
+    }
     return jsonify(resp)
 
 

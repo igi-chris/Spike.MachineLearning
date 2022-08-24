@@ -114,9 +114,9 @@ def build_predictions_plot(session_ref: str,
     if data is None:
         data = lookup_dataframe(session_ref)
     _, X_test, _, y_test = split_data(data, args)
-    y_predictions = trained_model_pipeline.predict(X_test)
+    test_predictions = trained_model_pipeline.predict(X_test)
     act_vs_pred_path = build_actual_vs_predicted(actual=y_test, 
-                                            predictions=y_predictions,
+                                            predictions=test_predictions,
                                             session_ref=args.session_ref, 
                                             exp_id=exp_id,
                                             data_label='Test data')
