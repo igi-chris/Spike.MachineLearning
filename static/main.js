@@ -5,7 +5,7 @@ import { selectExperiment, deselectExperiment,
     highlightSelectedExperiment } from './modules/experiment.js'
 import { showModelOptions, showGPRKernelOptions } from './modules/modeloptions.js'
 
-const version = "0.0.2";  // todo: get from api??
+const version = "0.0.3";  // todo: get from api??
 
 window.onload = function() {
     window.version = version;

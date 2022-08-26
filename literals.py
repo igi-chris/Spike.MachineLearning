@@ -1,6 +1,6 @@
 import os
 
-_version = "0.0.2"
+_version = "0.0.3"
 models_dir = "./serialised_models"
 os.makedirs(models_dir, exist_ok=True)
 base_dir = os.path.dirname(__file__)
