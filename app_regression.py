@@ -7,7 +7,7 @@ from app_utils import save_data_file, save_model_file
 from common.data_register import get_experiment, get_experiments, lookup_dataframe, register_experiment
 
 from common.model_register import get_model, register_model
-from models.regression import build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, split_data, train
+from models.regression import build_evaluation, build_predictions_plot, evaluate, get_model_artefact, predict, get_serialised_model_artefact, split_data, train
 from models.regression_types import RegressionExperiment, RegressionArgs, SelectedModelArgs
 from models.model_specific_args.arg_register import _model_to_args_map  # tmp??
 from models.model_specific_args.arg_types import length_scale, length_scale_bounds, nu
@@ -247,7 +247,12 @@ def train_regression() -> Response:
     else:
         exp_id = len(prev_experiments)   
         model = train(data=data, args=args)
-        evaluation = evaluate(data, model, args, exp_id)
+
+        trn_features, test_features, trn_labels, test_labels = split_data(data, args)
+        test_predictions = model.predict(test_features)
+        trn_predictions = model.predict(trn_features)
+        
+        evaluation = build_evaluation(test_labels, test_predictions)
         model_ref = matched_experiment.model_ref if matched_experiment else register_model(model)
         exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, id=exp_id)
 
@@ -256,8 +261,19 @@ def train_regression() -> Response:
 
     resp = { 
         'exp_id': exp_id,
-        'plot_uri': f"{request.root_url}{evaluation.act_vs_pred_uri.strip('/')}",
-        'metrics': [m._asdict() for m in evaluation.metrics]
+        "preictions": {
+            "trn_pred": trn_predictions.tolist(),
+            "test_pred": test_predictions.tolist(),     
+            "trn_labels": trn_labels.tolist(),
+            "test_labels": test_labels.tolist()
+        },
+        "metrics": {
+            "RMSE": evaluation.rmse,
+            "MnAE": evaluation.mean_abs_err,
+            "MdAE": evaluation.median_abs_err,
+            "R²": evaluation.r2
+        },
+        #'metrics': [m._asdict() for m in evaluation.metrics],  # tmp old format
      }
 
     return jsonify(resp)
@@ -273,12 +289,23 @@ def get_predictions() -> Response:
     trn_features, test_features, trn_labels, test_labels = split_data(data, exp.args)
     test_predictions = model.predict(test_features)
     trn_predictions = model.predict(trn_features)
+    eval = build_evaluation(test_labels, test_predictions)
 
     resp = {
-        "trn_pred": trn_predictions.tolist(),
-        "test_pred": test_predictions.tolist(),     
-        "trn_labels": trn_labels.tolist(),
-        "test_labels": test_labels.tolist()
+        "exp_id": exp,
+        "preictions": {
+            "trn_pred": trn_predictions.tolist(),
+            "test_pred": test_predictions.tolist(),     
+            "trn_labels": trn_labels.tolist(),
+            "test_labels": test_labels.tolist()
+        },
+        "metrics": {
+            "RMSE": eval.rmse,
+            "MnAE": eval.mean_abs_err,
+            "MdAE": eval.median_abs_err,
+            "R²": eval.r2
+        },
+        "args": "to follow"
     }
     return jsonify(resp)
 

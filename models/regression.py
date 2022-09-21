@@ -1,6 +1,6 @@
 import codecs
 import pickle
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import joblib
 import os
 
@@ -14,6 +14,7 @@ from sklearn.pipeline import Pipeline
 from pandas import DataFrame
 from pandas.api.types import is_numeric_dtype
 import numpy as np
+from numpy.typing import NDArray
 from common.data_register import lookup_dataframe, register_experiment
 
 from common.model_register import get_model, register_model
@@ -87,22 +88,26 @@ def evaluate(data: DataFrame,
     _, X_test, _, y_test = split_data(data, args)
     y_predictions = trained_model_pipeline.predict(X_test)
 
-    # metrics
-    mse = mean_squared_error(y_test, y_predictions)
+    act_vs_pred_path = ''
+    if build_plot:
+        act_vs_pred_path = build_actual_vs_predicted(actual=y_test, 
+                                                    predictions=y_predictions,
+                                                    session_ref=args.session_ref, 
+                                                    exp_id=exp_id,
+                                                    data_label='Test data')
 
-    act_vs_pred_path = build_actual_vs_predicted(actual=y_test, 
-                                                 predictions=y_predictions,
-                                                 session_ref=args.session_ref, 
-                                                 exp_id=exp_id,
-                                                 data_label='Test data')
+    return build_evaluation(y_test, y_predictions, act_vs_pred_path)
+
+
+def build_evaluation(y_test: NDArray, y_predictions: NDArray, plot_path: str=''):
+    mse = mean_squared_error(y_test, y_predictions)
     eval = RegressionEvaluation(
         mse = mse,
         rmse = np.sqrt(mse),
         mean_abs_err=mean_absolute_error(y_test, y_predictions),
         median_abs_err=median_absolute_error(y_test, y_predictions),
         r2 = r2_score(y_test, y_predictions),
-        act_vs_pred_plot_relative_path=act_vs_pred_path)
-
+        act_vs_pred_plot_relative_path=plot_path)
     return eval
 
 
@@ -172,7 +177,7 @@ def rebuild_experiment_and_populate_caches(fpath: str, session_ref: str) -> Regr
     return exp
 
 
-def split_data(data, args: RegressionArgs) -> Tuple:
+def split_data(data, args: RegressionArgs) -> Tuple[NDArray, NDArray, NDArray, NDArray]:
     if args.result_column not in data.columns:
         raise ValueError(f"Result col {args.result_column} not in data frame cols: {data.columns}")
     numeric_features = extract_numeric_columns(data, args.result_column)
