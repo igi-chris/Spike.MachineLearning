@@ -241,15 +241,18 @@ def train_regression() -> Response:
     data = lookup_dataframe(args.session_ref)
     prev_experiments = get_experiments(args.session_ref)
     matched_experiment = args.find_same_modelling_args(prev_experiments)
+    trn_features, test_features, trn_labels, test_labels = split_data(data, args)
+
     if matched_experiment:
         exp_id = matched_experiment.id
         evaluation = matched_experiment.eval
         exp = matched_experiment
+        model = get_model(exp.model_ref)
+        test_predictions = model.predict(test_features)
+        trn_predictions = model.predict(trn_features)
     else:
         exp_id = len(prev_experiments)   
         model = train(data=data, args=args)
-
-        trn_features, test_features, trn_labels, test_labels = split_data(data, args)
         test_predictions = model.predict(test_features)
         trn_predictions = model.predict(trn_features)
         
@@ -274,6 +277,7 @@ def train_regression() -> Response:
             "MdAE": evaluation.median_abs_err,
             "R²": evaluation.r2
         },
+        "args": exp.args
      }
 
     return jsonify(resp)
@@ -309,17 +313,18 @@ def get_predictions() -> Response:
             "MdAE": eval.median_abs_err,
             "R²": eval.r2
         },
-        "args": {
-            "check_standardise": args.standardise,
-            "check_normalise": args.normalise,
-            "null_replacement": args.null_replacement,
-            "fill_value": args.fill_value,
-            "trn_split": args.training_split,
-            "trn_split_random_seed": args.random_seed,
-            "result_column": args.result_column,
-            "regression_model": args.model_name,
-            "model_args:": args.model_args
-        }
+        "args": args
+        # {
+        #     "check_standardise": args.standardise,
+        #     "check_normalise": args.normalise,
+        #     "null_replacement": args.null_replacement,
+        #     "fill_value": args.fill_value,
+        #     "trn_split": args.training_split,
+        #     "trn_split_random_seed": args.random_seed,
+        #     "result_column": args.result_column,
+        #     "regression_model": args.model_name,
+        #     "model_args:": args.model_args
+        # }
 
     }
     return jsonify(resp)
