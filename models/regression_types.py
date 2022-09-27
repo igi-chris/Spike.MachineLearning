@@ -53,6 +53,8 @@ class RegressionArgs:
         Checks the provided list previous experiments and compares on
         modelling args and return a match if found.
         """
+        prev_exp_args = [a.args.modelling_args for a in prev]  #tmp
+        print(prev_exp_args)
         return next(
             (e for e in prev if e.args.modelling_args == self.modelling_args), None
         )

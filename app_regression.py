@@ -1,5 +1,6 @@
 import codecs
 from http import HTTPStatus
+import json
 import os
 import pickle
 from flask import Blueprint, Response, jsonify, make_response, render_template, request, send_file
@@ -261,7 +262,7 @@ def train_regression() -> Response:
 
     resp = { 
         'exp_id': exp_id,
-        "preictions": {
+        "predictions": {
             "trn_pred": trn_predictions.tolist(),
             "test_pred": test_predictions.tolist(),     
             "trn_labels": trn_labels.tolist(),
@@ -273,7 +274,6 @@ def train_regression() -> Response:
             "MdAE": evaluation.median_abs_err,
             "R²": evaluation.r2
         },
-        #'metrics': [m._asdict() for m in evaluation.metrics],  # tmp old format
      }
 
     return jsonify(resp)
@@ -285,15 +285,19 @@ def get_predictions() -> Response:
     data = lookup_dataframe(exp.args.session_ref)
     model = get_model(exp.model_ref)
 
-    # TODO: matters that we are splitting again? should store outcome from training???
+    # TODO??: matters that we are splitting again? should store outcome from training???
+    # - wait until we have resolved question...
+    # https://trello.com/c/95Vsgr7o/43-ml-define-expected-behaviour-for-retraining-models
     trn_features, test_features, trn_labels, test_labels = split_data(data, exp.args)
     test_predictions = model.predict(test_features)
     trn_predictions = model.predict(trn_features)
     eval = build_evaluation(test_labels, test_predictions)
+    args = exp.args
 
+    # tmp - just do serialisiation here in spike for now
     resp = {
-        "exp_id": exp,
-        "preictions": {
+        "exp_id": exp.id,
+        "predictions": {
             "trn_pred": trn_predictions.tolist(),
             "test_pred": test_predictions.tolist(),     
             "trn_labels": trn_labels.tolist(),
@@ -305,7 +309,18 @@ def get_predictions() -> Response:
             "MdAE": eval.median_abs_err,
             "R²": eval.r2
         },
-        "args": "to follow"
+        "args": {
+            "check_standardise": args.standardise,
+            "check_normalise": args.normalise,
+            "null_replacement": args.null_replacement,
+            "fill_value": args.fill_value,
+            "trn_split": args.training_split,
+            "trn_split_random_seed": args.random_seed,
+            "result_column": args.result_column,
+            "regression_model": args.model_name,
+            "model_args:": args.model_args
+        }
+
     }
     return jsonify(resp)
 
