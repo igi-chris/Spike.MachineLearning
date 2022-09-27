@@ -241,6 +241,53 @@ def train_regression() -> Response:
     data = lookup_dataframe(args.session_ref)
     prev_experiments = get_experiments(args.session_ref)
     matched_experiment = args.find_same_modelling_args(prev_experiments)
+    if matched_experiment:
+        exp_id = matched_experiment.id
+        evaluation = matched_experiment.eval
+        exp = matched_experiment
+    else:
+        exp_id = len(prev_experiments)   
+        model = train(data=data, args=args)
+        evaluation = evaluate(data, model, args, exp_id)
+        model_ref = matched_experiment.model_ref if matched_experiment else register_model(model)
+        exp = RegressionExperiment(args=args, eval=evaluation, model_ref=model_ref, id=exp_id)
+
+    if not matched_experiment:
+        register_experiment(ref=args.session_ref, experiment=exp)
+
+    resp = { 
+        'exp_id': exp_id,
+        'plot_uri': f"{request.root_url}{evaluation.act_vs_pred_uri.strip('/')}",
+        'metrics': [m._asdict() for m in evaluation.metrics]
+     }
+
+    return jsonify(resp)
+
+
+@regression_blueprint.route("/api/v0/regression/train", methods=['GET'])
+def train_regression_v0() -> Response:
+    
+    args = RegressionArgs(
+    # get query params
+        session_ref = request.args.get('session_ref', default=''),
+        result_column = request.args.get('result_column', default=''),
+        model_name = request.args.get('regression_model', default=''),
+        training_split = request.args.get('trn_split', default=0.8, 
+                                          type=lambda v: float(v)),
+        random_seed = request.args.get('trn_split_random_seed', default=None,
+                                       type=lambda v: int(v) if v else None),
+        standardise = request.args.get('check_standardise', default=False, 
+                                       type=lambda v: v.lower() == 'true'),
+        normalise = request.args.get('check_normalise', default=False,
+                                     type=lambda v: v.lower() == 'true'),
+        null_replacement=request.args.get('null_replacement', default=''),
+        fill_value=request.args.get('fill_value', default=None, 
+                                    type=lambda v: float(v) if v else None)
+    )
+    
+    data = lookup_dataframe(args.session_ref)
+    prev_experiments = get_experiments(args.session_ref)
+    matched_experiment = args.find_same_modelling_args(prev_experiments)
     trn_features, test_features, trn_labels, test_labels = split_data(data, args)
 
     if matched_experiment:
@@ -289,6 +336,26 @@ def get_predictions() -> Response:
     data = lookup_dataframe(exp.args.session_ref)
     model = get_model(exp.model_ref)
 
+    # TODO: matters that we are splitting again? should store outcome from training???
+    trn_features, test_features, trn_labels, test_labels = split_data(data, exp.args)
+    test_predictions = model.predict(test_features)
+    trn_predictions = model.predict(trn_features)
+
+    resp = {
+        "trn_pred": trn_predictions.tolist(),
+        "test_pred": test_predictions.tolist(),     
+        "trn_labels": trn_labels.tolist(),
+        "test_labels": test_labels.tolist()
+    }
+    return jsonify(resp)
+
+
+@regression_blueprint.route("/api/v0/regression/predictions", methods=['GET'])
+def get_predictions_v0() -> Response:
+    exp = get_experiment_from_request()
+    data = lookup_dataframe(exp.args.session_ref)
+    model = get_model(exp.model_ref)
+
     # TODO??: matters that we are splitting again? should store outcome from training???
     # - wait until we have resolved question...
     # https://trello.com/c/95Vsgr7o/43-ml-define-expected-behaviour-for-retraining-models
@@ -314,18 +381,6 @@ def get_predictions() -> Response:
             "R²": eval.r2
         },
         "args": args
-        # {
-        #     "check_standardise": args.standardise,
-        #     "check_normalise": args.normalise,
-        #     "null_replacement": args.null_replacement,
-        #     "fill_value": args.fill_value,
-        #     "trn_split": args.training_split,
-        #     "trn_split_random_seed": args.random_seed,
-        #     "result_column": args.result_column,
-        #     "regression_model": args.model_name,
-        #     "model_args:": args.model_args
-        # }
-
     }
     return jsonify(resp)
 
