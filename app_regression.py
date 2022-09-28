@@ -294,6 +294,13 @@ def train_regression_v0() -> Response:
         exp_id = matched_experiment.id
         evaluation = matched_experiment.eval
         exp = matched_experiment
+
+        # retrain model if trn split or random seed has changed???
+        if (exp.args.training_split != args.training_split or 
+            exp.args.random_seed != args.random_seed):
+            model = train(data=data, args=args)
+            exp.args = args
+
         model = get_model(exp.model_ref)
         test_predictions = model.predict(test_features)
         trn_predictions = model.predict(trn_features)
