@@ -25,10 +25,6 @@ from .regression_types import RegressionArgs, RegressionEvaluation, RegressionEx
 
 
 def train(data: DataFrame, args: RegressionArgs) -> Pipeline:
-    # drop rows where we don't have the result (not useful for training)
-    # TODO: report to UI
-    data.dropna(subset=[args.result_column], inplace=True)
-
     X_train, _, y_train, _ = split_data(data, args)
 
     # TODO define a mapping somewhere or expect exact str and initialise class from it
@@ -178,6 +174,10 @@ def rebuild_experiment_and_populate_caches(fpath: str, session_ref: str) -> Regr
 
 
 def split_data(data, args: RegressionArgs) -> Tuple[NDArray, NDArray, NDArray, NDArray]:
+    # drop rows where we don't have the result (not useful for training)
+    # TODO: report to UI
+    data.dropna(subset=[args.result_column], inplace=True)
+    
     if args.result_column not in data.columns:
         raise ValueError(f"Result col {args.result_column} not in data frame cols: {data.columns}")
     numeric_features = extract_numeric_columns(data, args.result_column)
