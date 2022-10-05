@@ -137,6 +137,7 @@ e.g.
         "AttributeError: 'SimpleImputer' object has no attribute '_fit_dtype'"
     ]
 }
+```
 
 We can discuss whether it is appropriate to send this kind of detail as the web response or whether we should log the error and send a more generic response.
 
